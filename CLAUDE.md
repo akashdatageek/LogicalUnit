@@ -9,7 +9,13 @@ extraction runs against external repos, score them, and iterate on ONE file.
 - notes/*.md, results.tsv                         (your lab notebook)
 Everything else is fixed for the experiment. A hook enforces this.
 
+## Every session starts with
+    ./harness/status.sh          # which phase, what next — the repo is the memory, not you
+and ends with
+    ./harness/checkpoint.sh "…"  # commit + push runs/ notes/ results.tsv; uncommitted work dies with the VM
+
 ## Commands
+    ./harness/pin_corpus.sh                               replace PIN_ME with HEAD shas (mechanical; allowed)
     ./harness/run_one.sh <owner/name> <sha> <rep> [--condition noskill] [--hide-docs]
     ./harness/run_corpus.sh [--reps 0,1,2] [--only a,b] [--condition ..] [--hide-docs]
     python3 harness/aggregate.py [--label <sha>]          per-repo table, corpus primaries
@@ -25,4 +31,5 @@ Second model for the transfer check (RQ5): set LU_MODEL to it. Ask the human to 
 - Keep/revert is decided by `aggregate.py --decide`, never by you. Revert = `git revert --no-edit HEAD`.
 - Holdout repos (harness/holdout.txt) are never run by you.
 - Runs live in runs/<repo>/<sha>/<skill_label>/<rep>/ and are never deleted, moved, or rerun.
-- There is no human in the loop. Never ask a question. Never stop without a summary in notes/.
+- There is no human in the loop. Never ask a question. Never stop without checkpointing.
+- You may be resumed by a supervisor, a cloud session, or a routine. Assume no memory of prior sessions.

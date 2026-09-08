@@ -3,13 +3,26 @@
 Read CLAUDE.md (rules), program.md (pre-registered outcomes and decision rule), and
 notes/CODEBOOK.md (failure codes). This file is the procedure. Follow it in order.
 No questions — nobody answers. Every phase ends by writing to notes/.
-Budget ~8h; check `date` at phase boundaries. Over budget → Phase 6.
+
+## Resuming (do this first, every session)
+You may be a fresh session with no memory of earlier ones. The repo is the memory.
+    ./harness/status.sh
+It prints the phase you are in and the next command. Start there, not at Phase 0.
+After finishing any phase, and after every ratchet iteration, run
+    ./harness/checkpoint.sh "<what you did>"
+so runs/ and notes/ are committed and pushed. Uncommitted work is lost when the VM ends.
+If status.sh exits 2 (BLOCKED or WAITING), stop; a human is needed.
+
+Budget: the ratchet runs at most LU_MAX_ITER iterations (default 12). Per session,
+check `date` at phase boundaries and checkpoint before you run low on turns.
 
 Vocabulary: a *replicate* is a repeated run (there is no seed). A *label* is the harness
 git sha at run time; runs live in runs/<repo>/<sha>/<label>/<rep>/.
 
 ## Phase 0 — Sanity (≤ 30 min)
-1. corpus.txt fully pinned? If any PIN_ME → notes/BLOCKED.md, stop.
+1. corpus.txt fully pinned? If any PIN_ME → `./harness/pin_corpus.sh && git commit -am "pin corpus"`.
+   (Pinning is mechanical, not a sampling decision, so it is yours to do. Adding or
+   removing repos is not.) If pinning fails for a repo → notes/BLOCKED.md.
 2. `./harness/run_one.sh psf/requests <sha> 0 --max-turns 40`
 3. Confirm manifest parses, lint.log has ≥1 round, result.json has total_cost_usd,
    meta.json has skill_label and model, score.json has graph_source = "tree-sitter"
@@ -45,7 +58,7 @@ until it is ≥ 0.6. Score gains on an unstable skill are noise.
 Per iteration:
 1. Take the top untested hypothesis. Design ONE edit. Classify it. Write the edit AND a
    falsifiable prediction ("q_gain_dir up on flask, fastapi; valid unchanged") to
-   notes/rq2.md BEFORE running.
+   notes/rq2.md BEFORE running, under a heading `## iteration <n>` (status.sh counts these).
 2. `git commit -am "[category] …"`;  NEW=$(git rev-parse --short HEAD)
 3. Targeted signal: `./harness/run_corpus.sh --reps 0,1,2 --only <predicted repos>`
    Then `python3 harness/aggregate.py --decide $PREV $NEW` restricted by what exists.
@@ -57,7 +70,7 @@ Per iteration:
    - KEEP → REPLICATE: `./harness/run_corpus.sh --reps 3,4,5`; `--decide $PREV $NEW` again.
      Flips → revert, log "did not replicate". Holds → PREV=$NEW, `--tsv >> results.tsv`.
 6. Natural-partition check: if >70% of the gain comes from ripgrep + MAVSDK, revert.
-7. Back to 1.
+7. `./harness/checkpoint.sh "iteration <n>: <KEEP|REVERT>"`. Back to 1.
 
 Hard rules: one edit per iteration; no repo/library/path names in SKILL.md; never weaken
 invariants, anti-patterns, or the stop rule; never touch holdout; never move or delete a
@@ -75,11 +88,11 @@ With LU_MODEL set to the second model (CLAUDE.md says which):
 ## Phase 5 — (human only) Holdout
 Not yours. Write "holdout not run" in the summary.
 
-## Phase 6 — Write-up (last 45 min, mandatory). notes/SUMMARY.md, ≤ 700 words:
+## Phase 6 — Write-up (mandatory; status.sh sends you here when the budget is spent). notes/SUMMARY.md, ≤ 700 words:
 1. Baseline table (--label baseline) and final table (--label HEAD); `git log --oneline baseline..HEAD`.
 2. RQ1: top 3 predictors of failure with codes and evidence.
 3. RQ2: per category — attempted / kept / replicated / reverted, with CIs.
 4. RQ3: skill vs noskill.  RQ4: docs vs hide-docs.  RQ5: transfer or "not run".
 5. Threats: what in the metric or corpus you distrust most, and why.
 6. Total cost from summing runs/**/result.json.
-Then stop.
+Then `./harness/checkpoint.sh "summary"` and stop.

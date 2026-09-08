@@ -7,12 +7,10 @@ instruction change is a git commit.
 ## 0. Prerequisites (human, once)
 
     # container image needs: claude (Claude Code CLI), git, jq, python3 >= 3.10
-    pip install tree-sitter tree-sitter-language-pack networkx
+    pip install tree-sitter tree-sitter-language-pack networkx   # or rely on the SessionStart hook
     # code-intelligence plugins for python/typescript/go/rust/java/cpp in Claude Code
     cd lu-bench && git init && git add -A && git commit -m "lu-bench v1.1"
-    # pin the corpus (replace PIN_ME):
-    for r in $(grep -v '^#' harness/corpus.txt | awk '{print $1}'); do
-      sha=$(git ls-remote https://github.com/$r HEAD | cut -f1); sed -i "s|^$r .*PIN_ME|$r $sha|" harness/corpus.txt; done
+    ./harness/pin_corpus.sh && git commit -am "pin corpus"   # or leave it: Phase 0 does this itself now
     export ANTHROPIC_API_KEY=...        # or however the container authenticates
     export LU_MODEL=<model id to pin>   # optional but recommended for a multi-day experiment
 
@@ -41,18 +39,49 @@ If the sample-size line says you need more repos than you have:
     python3 harness/build_corpus.py --n <N> --seed 7 --strata lowvis,famous --cutoff <model cutoff date>
     # then add ~30% of the new repos to harness/holdout.txt, stratified, BEFORE any skill edit
 
-## 3. THE LOOP — the research run (unattended, ~8h)
+## 3. THE LOOP — starting it and keeping it going
 
-    ./harness/kickoff.sh
+The loop is resumable from repo state: `harness/status.sh` derives the current phase from
+runs/, notes/, tags, and git log, and `harness/checkpoint.sh` commits and pushes after
+every phase and iteration. That is what lets any of the three mechanisms below pick up
+where the last one stopped, with zero memory of it.
 
-which is:
+The resume prompt (same for all three):
 
-    claude -p "Read CLAUDE.md, program.md, and LOOP.md. Then execute LOOP.md from Phase 0." \
-      --max-turns 800 --output-format json
+    Read CLAUDE.md, program.md, and LOOP.md. Run ./harness/status.sh and resume LOOP.md
+    at the phase it names. Checkpoint after every phase and iteration. Keep going until
+    status.sh reports DONE, BLOCKED, or WAITING.
 
-That is the entire prompt. Everything else the agent needs is in the three files it is
-told to read, plus notes/CODEBOOK.md which LOOP.md points it to. In the morning read
-`notes/SUMMARY.md`, then `results.tsv`, then `git log --oneline baseline..HEAD`.
+### 3a. Claude Code on the web (cloud session) — simplest
+1. At claude.ai/code, create a cloud environment for this repo:
+   - Environment variables:  LU_MODEL=<primary model id>   LU_MAX_ITER=12
+   - Setup script (cached as a snapshot, so it runs once):
+         pip install tree-sitter tree-sitter-language-pack networkx
+     (The repo's SessionStart hook also installs these if missing, so the setup script
+     is an optimisation, not a requirement.)
+   - Network: Trusted is enough (GitHub, PyPI, api.anthropic.com are in the default list).
+2. Start a session on the branch you want the results on, paste the resume prompt.
+   The session keeps running when you close the browser.
+3. When it stops (context, turn, or time limit), open the session and send the resume
+   prompt again. Because everything is checkpointed, nothing is repeated.
+
+### 3b. Routine (scheduled) — hands-off across days
+Create a routine at claude.ai/code/routines: repository = this repo, environment = the
+one above, trigger = hourly or nightly, prompt = the resume prompt plus one line:
+    Work on branch <your-branch>; pull it first. Stop after one phase or one ratchet
+    iteration and checkpoint.
+Each run is a fresh session with zero context; status.sh gives it its place. The
+routine keeps firing until status.sh reports DONE (it then does nothing) or exits 2
+(BLOCKED/WAITING — it stops and you fix the note). Pause the routine when you are done.
+
+### 3c. Your own machine or self-hosted runner — deterministic
+    ./harness/supervise.sh 20 300      # up to 20 launches, 300 turns each
+A shell loop: status → launch a fresh `claude -p` with the resume prompt → checkpoint →
+repeat until DONE/BLOCKED/WAITING. Needs `claude` authenticated and the deps installed.
+This is the most controllable option and the one to use for the 100-repo campaign.
+
+In every case, the morning read is the same: `notes/SUMMARY.md` (if DONE), `results.tsv`,
+`git log --oneline baseline..HEAD`, and `notes/BLOCKED.md` or `notes/NEED_CORPUS.md` if it stopped.
 
 ## 4. The inner prompt (you never type this; run_one.sh does)
 
