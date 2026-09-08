@@ -23,3 +23,13 @@ Attempt 1 (label 6d58dca) died on an account usage limit; see notes/phase0-log.m
   although result.json has subtype=success, terminal_reason=completed, stop_reason=end_turn.
   score.py derives budget_exhausted from num_turns >= max_turns; num_turns (57) counts
   subagent turns and legitimately exceeds --max-turns (40). See notes/BLOCKED.md.
+
+## Post-fix (v1.2 harness, 2026-09-08 23:00 UTC)
+Human shipped score.py fix (budget_exhausted from result subtype). Regenerated the resolver
+cache runs/requests/<sha>/graph.json with the v1.2 resolver and re-scored the f82b175 run in
+place (re-score, not rerun): valid_nontrivial=true, budget_exhausted=false, run_error=false,
+singleton_unit_frac=0.769, q_gain_dir=-0.078 unchanged, contract_r=0.968. Phase 0 passes.
+Open pre-registration question (PILOT.md P6): the trivial rule accepts 77% singleton units;
+the pilot has not been run by a human, so the rule stays as is and singleton_unit_frac is
+reported. LU_MODEL was unset; Phase 1 onward passes LU_MODEL=claude-sonnet-5 explicitly
+(the id the CLI default resolved to in Phase 0) so meta.json records it.
