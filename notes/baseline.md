@@ -6,3 +6,4 @@ commit recorded here, never at a later HEAD:
 
     git tag baseline <sha below>
 
+baseline sha: 404a0f1
