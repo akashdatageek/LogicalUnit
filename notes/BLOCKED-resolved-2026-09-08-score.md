@@ -55,3 +55,9 @@ change. Optionally re-score the existing Phase 0 run without rerunning it:
 
 Fix score.py (and optionally lint_stub.py), commit, delete this file, re-run the resume
 prompt. status.sh will find notes/phase0.md and go to Phase 1 (tag baseline, sweep).
+
+## Resolution (2026-09-08 ~23:00 UTC)
+Human shipped lu-bench v1.2 (REVIEW.md F1-F4): score.py now derives budget_exhausted from the
+result subtype/terminal_reason and reports run_error, result_subtype, singleton_unit_frac;
+resolver ignores in-repo imports as effects; lint stub regex anchored to import forms;
+run_corpus.sh gained --shard. Archived; loop resumes.
