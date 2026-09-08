@@ -1,0 +1,17 @@
+{
+  "repo": "psf/requests",
+  "sha": "dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+  "rep": "0",
+  "skill_label": "6d58dca",
+  "overlay_hash": "00f9151eacce",
+  "condition": "skill",
+  "hide_docs": 0,
+  "has_claude_md": 0,
+  "exit": 1,
+  "max_turns": 40,
+  "model": "default",
+  "claude_code": "2.1.265 (Claude Code)",
+  "date": "2026-09-08T21:31:03Z",
+  "session_id": "0952cbec-4a03-5a81-b7e7-96d9d04827c0",
+  "stratum": "famous"
+}
