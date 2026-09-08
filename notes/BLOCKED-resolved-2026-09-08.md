@@ -58,3 +58,8 @@ Then re-verify: `python3 -c "import tree_sitter, tree_sitter_language_pack, netw
 After fixing both blockers and committing corpus.txt, re-run `./harness/kickoff.sh`
 (or the same one-line prompt). The loop restarts at Phase 0 and will hand-run
 `psf/requests` first.
+
+## Resolution (2026-09-08, later session)
+Both blockers were resolved by the human-supplied lu-bench v1.1 update: pin_corpus.sh makes
+pinning an agent-owned mechanical step, and the SessionStart hook installed tree-sitter,
+tree-sitter-language-pack and networkx. Archived here; status.sh no longer sees it.
