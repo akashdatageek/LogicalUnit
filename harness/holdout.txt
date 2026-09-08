@@ -1,0 +1,4 @@
+# repos the research agent never runs. Human scores these at the end.
+gson
+express
+dronekit-python

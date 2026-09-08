@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": ["Read", "Grep", "Glob", "Agent", "Write(/out/**)", "Bash(ent:*)"],
+    "deny":  ["Edit", "WebFetch", "WebSearch", "Bash(git:*)", "Bash(rm:*)", "Bash(curl:*)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_write.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/lint_manifest.sh", "timeout": 120 }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/require_manifest.sh" }]
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+# owner/name  sha  stratum  language   (pin sha with `git ls-remote https://github.com/<repo> HEAD`; add repos with build_corpus.py)
+psf/requests                             PIN_ME  famous python
+spf13/cobra                              PIN_ME  famous go
+expressjs/express                        PIN_ME  famous javascript
+pallets/flask                            PIN_ME  famous python
+tiangolo/fastapi                         PIN_ME  famous python
+google/gson                              PIN_ME  famous java
+BurntSushi/ripgrep                       PIN_ME  natpart rust
+nestjs/nest                              PIN_ME  natpart typescript
+dronekit/dronekit-python                 PIN_ME  uav python
+mavlink/MAVSDK                           PIN_ME  uav cpp

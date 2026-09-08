@@ -1,0 +1,58 @@
+{
+  "repo": "example/tinyhttp@0000000",
+  "units": [
+    {
+      "name": "request-model",
+      "kind": "domain",
+      "role": "Turn a caller's intent into a request and a server's bytes into a response object.",
+      "description": "This is the part that understands what a web request *is*. You give it a web address and some options, and it builds a properly formed request. When the server answers, it turns the raw reply into something you can ask questions of, like 'did it succeed?' or 'what did it say?'. It never touches the network itself; it hands that job to the transport.",
+      "files": ["tinyhttp/models.py", "tinyhttp/api.py"],
+      "entrypoints": [
+        { "name": "get",      "kind": "function", "location": "tinyhttp/api.py:12", "signature": "get(url: str, **opts) -> Response", "plain": "Fetch a web address." },
+        { "name": "post",     "kind": "function", "location": "tinyhttp/api.py:20", "signature": "post(url: str, data=None, **opts) -> Response", "plain": "Send data to a web address." },
+        { "name": "Response", "kind": "class",    "location": "tinyhttp/models.py:40", "plain": "What the server sent back." }
+      ],
+      "depends_on": [
+        { "unit": "transport", "entrypoint": "send" },
+        { "unit": "config",    "entrypoint": "default_headers" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "transport",
+      "kind": "infra",
+      "role": "Move bytes to and from a server over a socket.",
+      "description": "This is the part that actually talks to the internet. It opens a connection, sends the bytes it is given, waits, and returns whatever comes back. It does not know or care what the bytes mean.",
+      "files": ["tinyhttp/transport.py"],
+      "entrypoints": [
+        { "name": "send", "kind": "function", "location": "tinyhttp/transport.py:8", "signature": "send(host, port, raw: bytes, timeout) -> bytes", "plain": "Send bytes, get bytes back." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "network", "description": "Opens TCP sockets to arbitrary hosts." },
+        { "kind": "clock",   "description": "Enforces timeouts." }
+      ]
+    },
+    {
+      "name": "config",
+      "kind": "infra",
+      "role": "Supply default settings from the environment.",
+      "description": "Reads settings such as default headers and proxy address from environment variables so the rest of the library does not have to.",
+      "files": ["tinyhttp/config.py"],
+      "entrypoints": [
+        { "name": "default_headers", "kind": "function", "location": "tinyhttp/config.py:5", "plain": "The headers to send unless told otherwise." }
+      ],
+      "depends_on": [],
+      "effects": [ { "kind": "env", "description": "Reads TINYHTTP_* environment variables." } ]
+    }
+  ],
+  "excluded": [
+    { "path": "tests/test_api.py", "reason": "test" },
+    { "path": "docs/conf.py",      "reason": "docs build" }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    { "from_unit": "request-model", "to_unit": "transport", "location": "tinyhttp/api.py:31",
+      "note": "api.py imports transport._pool directly instead of going through send(). Recorded, not fixed." }
+  ]
+}

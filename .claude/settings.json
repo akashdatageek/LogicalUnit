@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": ["Read", "Grep", "Glob", "Edit", "Write", "Bash(./harness/*)", "Bash(python3:*)", "Bash(git:*)", "Bash(jq:*)", "Bash(ls:*)", "Bash(cat:*)"],
+    "deny":  ["WebFetch", "WebSearch", "Bash(rm:*)", "Bash(curl:*)", "Bash(pip:*)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      { "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "bash \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/guard_edit.sh" }] }
+    ]
+  }
+}
