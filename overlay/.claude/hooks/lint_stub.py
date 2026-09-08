@@ -8,7 +8,7 @@ from pathlib import Path
 SRC_EXT = {'.py','.js','.ts','.tsx','.go','.rs','.java','.c','.cc','.cpp','.h','.hpp'}
 SKIP_DIRS = {'.git','node_modules','vendor','target','build','dist','__pycache__','.claude','examples'}
 EFFECT_PATTERNS = {
-  'network':    r'\b(requests|httpx|urllib|socket|fetch\(|axios|net/http|reqwest|HttpClient)\b',
+  'network':    r'\b(import requests|import httpx|urllib\.request|socket\.socket|fetch\(|axios\.|net/http|reqwest::|HttpClient)\b',
   'filesystem': r'\b(open\(|os\.path|pathlib|fs\.|std::fs|ioutil|java\.io\.File)\b',
   'subprocess': r'\b(subprocess|child_process|os/exec|std::process|ProcessBuilder)\b',
   'env':        r'\b(os\.environ|process\.env|os\.Getenv|std::env|System\.getenv)\b',

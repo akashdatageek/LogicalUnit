@@ -54,7 +54,13 @@ The resume prompt (same for all three):
 
 ### 3a. Claude Code on the web (cloud session) — simplest
 1. At claude.ai/code, create a cloud environment for this repo:
-   - Environment variables:  LU_MODEL=<primary model id>   LU_MAX_ITER=12
+   - Environment variables:
+         LU_MODEL=<primary model id>        # pin it; the CLI default drifts and the pilot's variance is model-specific
+         LU_MAX_ITER=12
+         ANTHROPIC_API_KEY=<key>            # optional but recommended: the INNER `claude -p` runs (the bulk of the
+                                            # spend) then bill to the API instead of your plan's usage limit, which
+                                            # is what killed the first Phase 0 attempt. Anyone using the environment
+                                            # can read it, so use a scoped key on a personal environment.
    - Setup script (cached as a snapshot, so it runs once):
          pip install tree-sitter tree-sitter-language-pack networkx
      (The repo's SessionStart hook also installs these if missing, so the setup script

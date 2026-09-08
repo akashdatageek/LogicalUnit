@@ -5,6 +5,9 @@ Reports a VECTOR, not a composite. The decision rule lives in aggregate.py --dec
 
 Primary outcomes (pre-registered, see program.md):
   valid_nontrivial   bool   coverage>=0.95 and edge_resolution>=0.90 and not trivial and not budget_exhausted
+                            budget_exhausted comes from the result's subtype/terminal_reason (error_max_turns,
+                            error_max_budget_usd), NOT from num_turns, which also counts subagent turns.
+  singleton_unit_frac       fraction of units owning <=1 file (over-split indicator; reported, audited in pilot P6)
   q_gain_dir         float  Q_llm - max(Q_one, Q_dir) on the import graph  (Louvain is a ceiling, NOT a baseline)
 Secondary:
   q_cochange_gain    Q on the git co-change graph vs same baselines (orthogonal proxy)
@@ -151,8 +154,11 @@ def main(run_dir, repo_dir):
 
     n_units = len(units)
     trivial = n_units <= 1 or (len(owned) > 3 and n_units >= 0.8*len(owned))
-    max_turns = meta.get('max_turns'); turns = res.get('num_turns')
-    budget_exhausted = bool(max_turns and turns and turns >= max_turns)
+    turns = res.get('num_turns')   # counts subagent turns too; never compare it to --max-turns
+    subtype = str(res.get('subtype') or ''); term = str(res.get('terminal_reason') or '')
+    budget_exhausted = subtype in ('error_max_turns', 'error_max_budget_usd') or 'max_turns' in term or 'budget' in term
+    run_error = subtype.startswith('error_') or bool(res.get('is_error'))
+    singleton_frac = (sum(1 for u in units if len(u.get('files', [])) <= 1) / len(units)) if units else None
 
     # static graph: tree-sitter resolver, cached per (repo, sha); regex fallback only if tree-sitter is missing
     graph = None
@@ -206,6 +212,7 @@ def main(run_dir, repo_dir):
         valid_nontrivial=valid_nontrivial, q_gain_dir=round(q_gain_dir,4),
         # validity components
         coverage=round(coverage,3), edge_resolution=round(edge_res,3), trivial=trivial, budget_exhausted=budget_exhausted,
+        run_error=run_error, result_subtype=subtype or None, singleton_unit_frac=None if singleton_frac is None else round(singleton_frac,3),
         n_units=n_units, unpartitioned=len(m.get('unpartitioned', [])), lint_rounds=lint_rounds,
         # structure
         q_llm=round(q_llm,4), q_one=round(q_one,4), q_dir=round(q_dir,4), q_ceiling=round(q_ceiling,4),

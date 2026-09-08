@@ -69,6 +69,11 @@ unstable to benchmark; fix the Procedure section (that is a legitimate pre-100 e
 then re-pilot).
 
 ### P6. The validity thresholds are not lying
+Phase 0 already produced a case for this check: a requests manifest with 11 of 13 units
+owning a single file passed `trivial=False` (the 80% singleton rule) with negative gain.
+`singleton_unit_frac` is now reported per run. Decide from the pilot's distribution whether
+the trivial rule should be tightened (e.g. singleton_frac >= 0.6) BEFORE tagging `baseline`;
+after that it is pre-registered and stays.
 Open every run that is `valid_nontrivial=True` and check the 3 with the lowest
 `q_gain_dir`. If any of them is obviously bad to a maintainer, the thresholds
 (coverage 0.95, edge 0.90, trivial 80%) are too loose. Open the 3 invalid runs with
