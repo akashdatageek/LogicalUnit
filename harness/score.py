@@ -144,8 +144,11 @@ def main(run_dir, repo_dir):
     files = src_files(repo)
     units = m.get('units', [])
     owned = {f: u['name'] for u in units for f in u.get('files', [])}
-    excluded = {e['path'] for e in m.get('excluded', [])}
-    in_scope = [f for f in files if f not in excluded]
+    exc = [e['path'] for e in m.get('excluded', [])
+           if isinstance(e, dict) and isinstance(e.get('path'), str)]
+    excluded = set(exc)
+    exc_dirs = tuple(q.rstrip('/') + '/' for q in exc)
+    in_scope = [f for f in files if f not in excluded and not f.startswith(exc_dirs)]
     coverage = sum(1 for f in in_scope if f in owned) / max(1, len(in_scope))
 
     eps = {u['name']: {e['name'] for e in u.get('entrypoints', [])} for u in units}
