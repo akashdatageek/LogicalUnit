@@ -16,6 +16,14 @@ NAME="${REPO#*/}"
 WORK="${LU_WORK:-/work/$NAME-${SHA:0:7}-$REP}"
 OUT="${LU_OUT:-/out/$NAME-${SHA:0:7}-$REP}"
 SKILL_LABEL="$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo nogit)"
+# The model changes the measurement, so it belongs in the label. aggregate.py groups by label
+# alone, so two models under one label are silently pooled — exactly the confound REVIEW.md B5
+# warns about. meta.json still carries the full id. Runs before 2026-09-09 predate this and
+# carry a bare label; they were all claude-sonnet-5.
+if [ -n "$MODEL" ]; then
+  MODEL_SLUG=$(printf '%s' "$MODEL" | sed 's/^claude-//; s/-[0-9]\{8\}$//; s/[^a-zA-Z0-9]//g')
+  SKILL_LABEL="${SKILL_LABEL}-${MODEL_SLUG}"
+fi
 [ "$CONDITION" = skill ] || SKILL_LABEL="${SKILL_LABEL}-${CONDITION}"
 [ "$HIDE_DOCS" = 1 ] && SKILL_LABEL="${SKILL_LABEL}-nodocs"
 RUN="$HERE/runs/$NAME/$SHA/$SKILL_LABEL/$REP"
