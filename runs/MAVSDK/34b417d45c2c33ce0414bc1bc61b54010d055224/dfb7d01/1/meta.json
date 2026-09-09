@@ -1,0 +1,17 @@
+{
+  "repo": "mavlink/MAVSDK",
+  "sha": "34b417d45c2c33ce0414bc1bc61b54010d055224",
+  "rep": "1",
+  "skill_label": "dfb7d01",
+  "overlay_hash": "ed0ae79809b7",
+  "condition": "skill",
+  "hide_docs": 0,
+  "has_claude_md": 0,
+  "exit": 1,
+  "max_turns": 60,
+  "model": "claude-sonnet-5",
+  "claude_code": "2.1.265 (Claude Code)",
+  "date": "2026-09-09T01:16:14Z",
+  "session_id": "0952cbec-4a03-5a81-b7e7-96d9d04827c0",
+  "stratum": "uav"
+}
