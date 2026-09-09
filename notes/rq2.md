@@ -80,3 +80,89 @@ enumeration off the lead) is the cleaner way to get the same benefit without the
 Stability was not measurably improved: requests jaccard could not be recomputed against
 baseline from a two-repo run, and the mandate that opened this iteration (baseline jaccard
 0.452 < 0.6) still stands for whoever resumes.
+
+---
+
+# Queued hypotheses — pre-registered, NOT applied
+
+The Phase 1 analysis produced more hypotheses than the one iteration tested. They are written
+here as predictions so a later session can run them one at a time. **None of these is applied
+to SKILL.md.** Applying five untested edits at once is precisely the anti-pattern the ratchet
+exists to prevent, and an unmeasured "improvement" is not an improvement.
+
+Order matters. Iterations 2 and 3 are Procedure edits, which the stability-first rule
+(baseline jaccard 0.452 < 0.6) requires before anything aimed at quality. Run patches 01-04
+first: patch 01 changes the failure landscape these predictions describe, so re-baseline
+before testing them.
+
+## QUEUED iteration 2 — [procedure] delegate enumeration off the lead
+
+**Hypothesis (rq1 H1).** F8 exhaustion is driven by the lead doing per-file work in the main
+loop, not by repo size. Step 1 tells the lead to list the tree and classify every file itself
+before any scout runs. Evidence: flask (24 files) exhausted twice, ripgrep (84) never; every
+exhausted run enumerated heavily; fastapi rep 0 drew 50 I1 lines and then died.
+
+**Edit.** Step 1 states that the lead classifies *directories*, not files, and that any tree it
+can name as out of scope is excluded as a single entry. Individual file paths appear only where
+a directory is genuinely mixed.
+
+**Prediction.** valid_nontrivial rises on flask, fastapi and nest. Output tokens per run fall
+by more than 20% on repos with large non-source trees. q_gain_dir does not move on cobra,
+requests or ripgrep. Targeted repos: flask, fastapi, nest.
+
+**Caveat.** Patch 01 removes the lint pressure that causes this behaviour, so part of the
+effect may already be gone. If patch 01 lands first, this iteration tests only the residual;
+re-read the post-patch baseline before predicting a magnitude.
+
+## QUEUED iteration 3 — [procedure] batch the scout calls
+
+**Hypothesis.** The skill says Step 2 is parallel, but every baseline run requested its
+subagents in the foreground and none in the background: 14 scouts on average, up to 31 on nest.
+If they are issued one per turn, ordering dominates both wall-clock and the main-loop turn
+budget.
+
+**Edit.** Step 2 says to issue every scout call for the candidate list in a single message, and
+to cap the candidate list before scouting rather than after.
+
+**Prediction.** Wall-clock per run falls materially on repos with many candidates (nest,
+MAVSDK, flask). valid_nontrivial rises on nest. Cost per run is roughly unchanged, because the
+same scouts still run. Targeted repos: nest, MAVSDK, flask.
+
+## QUEUED iteration 4 — [definition] a stopping rule stated as a test
+
+**Hypothesis (rq1 H2).** The skill forbids one-unit-per-file but gives no positive criterion
+for when a split is justified, so the lead splits until it runs out of files. Singleton
+fraction reached 0.75 on requests and 0.72 on flask.
+
+**Edit.** A unit must have at least one entrypoint that is entered from outside itself. The
+static resolver already computes exactly this, so the rule is checkable rather than advisory.
+
+**Prediction.** singleton_unit_frac falls on requests and flask. jaccard rises on requests
+(0.23 at baseline). valid_nontrivial does not fall anywhere.
+
+**Note.** Iteration 1 tested a *different* merge rule — "keep two units apart only if each has
+an entrypoint the other calls" — and it failed: requests lost gain and validity while flask
+gained both. This version differs by testing each unit against the outside world rather than
+against its neighbour, which does not force leaf utilities into their single caller. That
+distinction is the reason to run it rather than treat iteration 1 as having settled the
+question.
+
+## QUEUED iteration 5 — [definition] allow a declared shared kernel
+
+**Hypothesis (rq1 B3).** Exclusive file ownership forces cross-cutting code into one unit. In a
+modularity metric a misplaced hub is maximally expensive, which is a plausible mechanical cause
+of the negative scores on flat repos.
+
+**Evidence available before running.** `harness/headroom.py` (patch 02) reports the share of
+import-edge endpoints landing on the top 5% most-connected files: fastapi 50%, nest 38%,
+MAVSDK 30%, flask 11%. The prediction should be strongest where that number is highest.
+
+**Edit.** A unit may be declared `kind: kernel`, owning files that other units legitimately
+import without that counting as an internal-reach violation.
+
+**Prediction.** q_gain_dir rises on the repos with the highest hub share. Requires a scorer
+change to treat kernel-owned files correctly, so it is blocked until that exists — and a
+scoring change of this kind is a pre-registration decision, not a bug fix.
+
+**Do not run this before the metric question in rq1 H4 is settled.** If gold agreement becomes
+the primary outcome, this hypothesis needs rewriting against that measure instead.
