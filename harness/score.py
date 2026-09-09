@@ -89,8 +89,12 @@ def label_propagation(g):
     try:
         import networkx as nx
         G = nx.Graph()
-        for a, bs in g.items():
-            for b in bs: G.add_edge(a, b)
+        # Sort before inserting. g's values are sets of str, and set iteration order varies
+        # between processes under hash randomisation, which changed Louvain's tie-breaking and
+        # made q_ceiling non-reproducible for identical input (observed 0.0969 vs 0.0934 on
+        # the same run). Sorting makes the ceiling a function of the graph alone.
+        for a in sorted(g):
+            for b in sorted(g[a]): G.add_edge(a, b)
         if G.number_of_edges() == 0: return {}
         comms = nx.community.louvain_communities(G, seed=0)
         return {n: i for i, c in enumerate(comms) for n in c}

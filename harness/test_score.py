@@ -134,6 +134,24 @@ def t_undeclared(tmp):
     assert s_declared["coverage"] >= 0.95, (
         f"coverage {s_declared['coverage']} — declaring the tree by directory must restore it")
 
+@case("scoring is reproducible", "q_ceiling drifted between identical invocations under hash randomisation")
+def t_deterministic(tmp):
+    """label_propagation built the networkx graph by iterating sets of str. Set order varies
+    per process, which changed Louvain tie-breaking and moved q_ceiling for identical input
+    (0.0969 vs 0.0934 observed on the same run). Scores must be a function of the input."""
+    files = {f"pkg/m{i}.py": "".join(f"import m{j}\n" for j in range(6) if j != i) for i in range(6)}
+    files["pkg/leaf.py"] = "import m0\n"
+    manifest = {"repo": "x/y",
+                "units": [unit("a", ["pkg/m0.py", "pkg/m1.py", "pkg/m2.py"], ["m0"]),
+                          unit("b", ["pkg/m3.py", "pkg/m4.py", "pkg/m5.py", "pkg/leaf.py"], ["m3"])],
+                "excluded": [], "unpartitioned": []}
+    seen = []
+    for i in range(3):
+        run, repo = build(f"{tmp}/i{i}", files, manifest)
+        s = run_score(run, repo)
+        seen.append((s["q_ceiling"], s["q_llm"], s["q_gain_dir"]))
+    assert len(set(seen)) == 1, f"scores differ across identical invocations: {seen}"
+
 # --------------------------------------------------------------------------- runner
 
 def main():

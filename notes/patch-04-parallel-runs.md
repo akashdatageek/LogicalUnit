@@ -1,5 +1,7 @@
 # Patch 04 — per-run output path, so repositories can run concurrently
 
+> **APPLIED** in `7541feb`. Kept as the rationale and evidence record; the change is live in the tree.
+
 **Priority: apply before the next full sweep.** Largest available throughput win. It changes
 no measurement, only where a run writes its manifest.
 

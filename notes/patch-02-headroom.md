@@ -1,5 +1,7 @@
 # Patch 02 — harness/headroom.py: pre-flight a repo before it costs anything
 
+> **APPLIED** in `7b1bf52`. Kept as the rationale and evidence record; the change is live in the tree.
+
 **Priority: apply and run before selecting the next corpus.**
 
 The program spent $253 and 22 hours to discover that its primary metric cannot move on most

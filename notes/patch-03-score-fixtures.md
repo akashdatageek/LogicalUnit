@@ -1,5 +1,7 @@
 # Patch 03 — harness/test_score.py: fixture tests for the scorer
 
+> **APPLIED** in `7b1bf52`. Kept as the rationale and evidence record; the change is live in the tree.
+
 **Priority: apply with patch 01; it is how you verify patch 01.**
 
 The scorer is the one component every result depends on and the only one with no tests. Four

@@ -1,5 +1,7 @@
 # Patch 01 — honour directory-prefix exclusions (score.py + lint_stub.py)
 
+> **APPLIED** in `7b1bf52`. Kept as the rationale and evidence record; the change is live in the tree.
+
 **Priority: apply before any further runs.** This is one bug in two files. It causes the
 coverage artefact (M1), the scorer crash (M3), *and* it is the mechanical driver of F8, the
 dominant failure mode. Fixing it is the highest-value change available.
@@ -86,8 +88,9 @@ hardcoded `SKIP` set. **Do not.** Two reasons:
    honour it. Letting the manifest declare scope is the more principled design and it is what
    the schema already intends.
 
-The fixture `non-source trees stay out of the denominator` in patch 03 covers this case; after
-this patch it passes whenever the manifest excludes the tree.
+The fixture `undeclared tree counts against coverage` in patch 03 pins this decision in both
+directions: an undeclared tree must lower coverage, and declaring it by directory must restore
+it. If someone later widens `SKIP`, that test fails loudly.
 
 ## Verification
 
@@ -105,8 +108,10 @@ Both must pass after this patch, and the five currently-passing cases must stay 
   reduce F8. This is a prediction, not a certainty: log it as such and measure it.
 - Re-score existing runs in place rather than re-running them:
 
-      for d in runs/*/*/*/*/; do [ -s "$d/manifest.json" ] && \
-        python3 harness/score.py "$d" "/work/$(echo "$d" | cut -d/ -f2)" > "$d/score.json"; done
+      python3 harness/rescore.py            # see notes/patch-06; resolves each run's checkout
 
   Historical labels stay comparable because the same scorer version is applied to all of them.
   Note the re-score changes recorded numbers, so record which scorer sha produced results.tsv.
+  A hand-rolled loop over `/work/<name>` no longer works: patch 04 made checkouts per-run
+  (`/work/<name>-<sha>-<rep>`), so the re-scorer has to map a run directory back to a tree
+  that matches its pinned sha. `rescore.py` does that.
