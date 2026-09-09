@@ -7,7 +7,7 @@ instruction change is a git commit.
 ## 0. Prerequisites (human, once)
 
     # container image needs: claude (Claude Code CLI), git, jq, python3 >= 3.10
-    pip install tree-sitter tree-sitter-language-pack networkx   # or rely on the SessionStart hook
+    pip install -r requirements.txt   # or rely on the SessionStart hook, which reads the same file
     # code-intelligence plugins for python/typescript/go/rust/java/cpp in Claude Code
     cd lu-bench && git init && git add -A && git commit -m "lu-bench v1.1"
     ./harness/pin_corpus.sh && git commit -am "pin corpus"   # or leave it: Phase 0 does this itself now
@@ -62,9 +62,9 @@ The resume prompt (same for all three):
                                             # is what killed the first Phase 0 attempt. Anyone using the environment
                                             # can read it, so use a scoped key on a personal environment.
    - Setup script (cached as a snapshot, so it runs once):
-         pip install tree-sitter tree-sitter-language-pack networkx
-     (The repo's SessionStart hook also installs these if missing, so the setup script
-     is an optimisation, not a requirement.)
+         pip install -r requirements.txt
+     (The repo's SessionStart hook installs from the same file if they are missing, so the
+     setup script is an optimisation, not a requirement.)
    - Network: Trusted is enough (GitHub, PyPI, api.anthropic.com are in the default list).
 2. Start a session on the branch you want the results on, paste the resume prompt.
    The session keeps running when you close the browser.

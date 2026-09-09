@@ -14,6 +14,12 @@ Everything else is fixed for the experiment. A hook enforces this.
 and ends with
     ./harness/checkpoint.sh "…"  # commit + push runs/ notes/ results.tsv; uncommitted work dies with the VM
 
+## Before you trust a number
+    python3 harness/test_score.py                         8 scorer fixtures; must be 8/8 (2 s)
+    python3 harness/headroom.py --corpus                  which repos can show a gain at all (48 s, no model call)
+A repo whose q_dir is ~0 cannot produce a positive q_gain_dir however good the decomposition
+is. Four of the seven current dev repos are in that state; treat them as controls.
+
 ## Commands
     ./harness/pin_corpus.sh                               replace PIN_ME with HEAD shas (mechanical; allowed)
     ./harness/run_one.sh <owner/name> <sha> <rep> [--condition noskill] [--hide-docs]
@@ -21,6 +27,7 @@ and ends with
     python3 harness/aggregate.py [--label <sha>]          per-repo table, corpus primaries
     python3 harness/aggregate.py --decide <before> <after> KEEP/REVERT — final, not advisory
     python3 harness/aggregate.py --tsv >> results.tsv     one row per kept skill version
+    python3 harness/rescore.py [--apply]                  re-score runs in place after a scorer change
 
 Second model for the transfer check (RQ5): set LU_MODEL to it. Ask the human to fill this in:
     LU_MODEL_SECONDARY=<model-id>
