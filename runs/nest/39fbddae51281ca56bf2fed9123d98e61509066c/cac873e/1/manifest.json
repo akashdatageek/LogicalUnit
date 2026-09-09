@@ -1,0 +1,1047 @@
+{
+  "repo": "nestjs/nest@HEAD",
+  "units": [
+    {
+      "name": "common-kernel",
+      "kind": "infra",
+      "role": "Shared low-level types, constants and utility functions used throughout the framework.",
+      "description": "This is the shared vocabulary and toolbox that almost every other part of Nest relies on. It defines the basic 'shapes' of things (interfaces for what a module, controller, or exception filter looks like), fixed lists of values (HTTP status codes, request methods), and the hidden labels ('metadata keys') Nest attaches to classes. It also has small helper functions used everywhere: checking if a value is a string, generating random IDs, coloring console output, safely loading optional third-party packages, and turning HTTP status codes into ready-made error objects. It implements no feature of Nest itself; it is the plumbing and shared definitions other units build on.",
+      "files": [
+        "packages/common/utils/validate-module-keys.util.ts","packages/common/utils/random-string-generator.util.ts","packages/common/utils/index.ts","packages/common/utils/validate-each.util.ts","packages/common/utils/parameter-decorator-options.util.ts","packages/common/utils/merge-with-values.util.ts","packages/common/utils/cli-colors.util.ts","packages/common/utils/shared.utils.ts","packages/common/utils/load-package.util.ts","packages/common/utils/select-exception-filter-metadata.util.ts","packages/common/utils/http-error-by-code.util.ts","packages/common/utils/forward-ref.util.ts","packages/common/utils/assign-custom-metadata.util.ts","packages/common/utils/extend-metadata.util.ts",
+        "packages/common/enums/http-status.enum.ts","packages/common/enums/index.ts","packages/common/enums/request-method.enum.ts","packages/common/enums/route-paramtypes.enum.ts","packages/common/enums/shutdown-signal.enum.ts","packages/common/enums/version-type.enum.ts",
+        "packages/common/interfaces/abstract.interface.ts","packages/common/interfaces/controllers/controller-metadata.interface.ts","packages/common/interfaces/controllers/controller.interface.ts","packages/common/interfaces/controllers/index.ts","packages/common/interfaces/exceptions/exception-filter-metadata.interface.ts","packages/common/interfaces/exceptions/exception-filter.interface.ts","packages/common/interfaces/exceptions/index.ts","packages/common/interfaces/exceptions/rpc-exception-filter-metadata.interface.ts","packages/common/interfaces/exceptions/rpc-exception-filter.interface.ts","packages/common/interfaces/exceptions/ws-exception-filter.interface.ts","packages/common/interfaces/external/class-transform-options.interface.ts","packages/common/interfaces/external/cors-options.interface.ts","packages/common/interfaces/external/https-options.interface.ts","packages/common/interfaces/external/transformer-package.interface.ts","packages/common/interfaces/external/validation-error.interface.ts","packages/common/interfaces/external/validator-options.interface.ts","packages/common/interfaces/external/validator-package.interface.ts","packages/common/interfaces/features/arguments-host.interface.ts","packages/common/interfaces/features/can-activate.interface.ts","packages/common/interfaces/features/custom-route-param-factory.interface.ts","packages/common/interfaces/features/execution-context.interface.ts","packages/common/interfaces/features/nest-interceptor.interface.ts","packages/common/interfaces/features/paramtype.interface.ts","packages/common/interfaces/features/pipe-transform.interface.ts","packages/common/interfaces/global-prefix-options.interface.ts","packages/common/interfaces/hooks/before-application-shutdown.interface.ts","packages/common/interfaces/hooks/index.ts","packages/common/interfaces/hooks/on-application-bootstrap.interface.ts","packages/common/interfaces/hooks/on-application-shutdown.interface.ts","packages/common/interfaces/hooks/on-destroy.interface.ts","packages/common/interfaces/hooks/on-init.interface.ts","packages/common/interfaces/http/http-exception-body.interface.ts","packages/common/interfaces/http/http-redirect-response.interface.ts","packages/common/interfaces/http/http-server.interface.ts","packages/common/interfaces/http/index.ts","packages/common/interfaces/http/message-event.interface.ts","packages/common/interfaces/http/raw-body-request.interface.ts","packages/common/interfaces/index.ts","packages/common/interfaces/injectable.interface.ts","packages/common/interfaces/microservices/nest-hybrid-application-options.interface.ts","packages/common/interfaces/microservices/nest-microservice-options.interface.ts","packages/common/interfaces/microservices/pre-request-hook.interface.ts","packages/common/interfaces/microservices/transport-server.interface.ts","packages/common/interfaces/middleware/index.ts","packages/common/interfaces/middleware/middleware-config-proxy.interface.ts","packages/common/interfaces/middleware/middleware-configuration.interface.ts","packages/common/interfaces/middleware/middleware-consumer.interface.ts","packages/common/interfaces/middleware/nest-middleware.interface.ts","packages/common/interfaces/modules/dynamic-module.interface.ts","packages/common/interfaces/modules/forward-reference.interface.ts","packages/common/interfaces/modules/index.ts","packages/common/interfaces/modules/injection-token.interface.ts","packages/common/interfaces/modules/introspection-result.interface.ts","packages/common/interfaces/modules/module-metadata.interface.ts","packages/common/interfaces/modules/nest-module.interface.ts","packages/common/interfaces/modules/optional-factory-dependency.interface.ts","packages/common/interfaces/modules/provider.interface.ts","packages/common/interfaces/nest-application-context-options.interface.ts","packages/common/interfaces/nest-application-context.interface.ts","packages/common/interfaces/nest-application-options.interface.ts","packages/common/interfaces/nest-application.interface.ts","packages/common/interfaces/nest-microservice.interface.ts","packages/common/interfaces/router-options.interface.ts","packages/common/interfaces/scope-options.interface.ts","packages/common/interfaces/shutdown-hooks-options.interface.ts","packages/common/interfaces/type.interface.ts","packages/common/interfaces/version-options.interface.ts","packages/common/interfaces/websockets/web-socket-adapter.interface.ts",
+        "packages/common/constants.ts","packages/common/internal.ts","packages/common/index.ts"
+      ],
+      "entrypoints": [
+        { "name": "loadPackage", "kind": "function", "location": "packages/common/utils/load-package.util.ts:16", "plain": "Lazily loads an optional peer dependency, exiting the process with a helpful message if it is missing." },
+        { "name": "randomStringGenerator", "kind": "function", "location": "packages/common/utils/random-string-generator.util.ts:3", "plain": "Generates a random, non-cryptographic ID string." },
+        { "name": "forwardRef", "kind": "function", "location": "packages/common/utils/forward-ref.util.ts:6", "plain": "Wraps a reference to a class that has not been declared yet, so circular module references can be resolved later." },
+        { "name": "extendArrayMetadata", "kind": "function", "location": "packages/common/utils/extend-metadata.util.ts:1", "plain": "Appends a value onto an array stored in a class/method's reflect-metadata entry." },
+        { "name": "HttpErrorByCode", "kind": "constant", "location": "packages/common/utils/http-error-by-code.util.ts:50", "plain": "A lookup table from HTTP status code to the matching typed exception class." },
+        { "name": "clc", "kind": "constant", "location": "packages/common/utils/cli-colors.util.ts:3", "plain": "ANSI color helper functions used to colorize console output." },
+        { "name": "MODULE_METADATA", "kind": "constant", "location": "packages/common/constants.ts:1", "plain": "The full table of reflect-metadata key names Nest uses to tag classes and methods." },
+        { "name": "HttpStatus", "kind": "type", "location": "packages/common/enums/http-status.enum.ts:1", "plain": "The enumeration of standard HTTP status codes used across the framework." },
+        { "name": "Type", "kind": "type", "location": "packages/common/interfaces/type.interface.ts:1", "plain": "The generic 'a class constructor' type used throughout every unit's public signatures." },
+        { "name": "shared-predicates", "kind": "function", "location": "packages/common/utils/shared.utils.ts:1", "plain": "isFunction/isNil/isString/isObject/isUndefined and similar type-guard helpers used pervasively." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "other", "description": "load-package.util.ts dynamically import()s or require()s optional peer dependencies at runtime, caching the result, and calls process.exit(1) if a required optional package fails to load." },
+        { "kind": "env", "description": "cli-colors.util.ts reads process.env.NO_COLOR to decide whether to emit ANSI color codes." },
+        { "kind": "random", "description": "random-string-generator.util.ts delegates to the npm 'uid' package to generate random IDs." },
+        { "kind": "other", "description": "extend-metadata.util.ts and other helpers read/write the global reflect-metadata registry via Reflect.getMetadata/defineMetadata." }
+      ]
+    },
+
+    {
+      "name": "di-decorators",
+      "kind": "domain",
+      "role": "The decorator vocabulary for declaring injectable classes, modules, controllers, and per-class execution-pipeline attachments.",
+      "description": "This is the vocabulary developers use to describe the shape of a Nest application: marking a class as an injectable service, a controller, or a module; declaring what a class needs injected into its constructor; attaching guards, interceptors, pipes, and exception filters to a class or method; and a builder that generates the boilerplate for configurable modules (the register()/registerAsync() style API). These decorators don't do any work themselves — they attach small notes ('metadata') to classes that the rest of the framework reads later to wire the application together.",
+      "files": [
+        "packages/common/decorators/core/bind.decorator.ts","packages/common/decorators/core/injectable.decorator.ts","packages/common/decorators/core/optional.decorator.ts","packages/common/decorators/core/index.ts","packages/common/decorators/core/exception-filters.decorator.ts","packages/common/decorators/core/inject.decorator.ts","packages/common/decorators/core/set-metadata.decorator.ts","packages/common/decorators/core/controller.decorator.ts","packages/common/decorators/core/use-pipes.decorator.ts","packages/common/decorators/core/use-guards.decorator.ts","packages/common/decorators/core/version.decorator.ts","packages/common/decorators/core/use-interceptors.decorator.ts","packages/common/decorators/core/apply-decorators.ts","packages/common/decorators/core/catch.decorator.ts","packages/common/decorators/core/dependencies.decorator.ts",
+        "packages/common/decorators/modules/module.decorator.ts","packages/common/decorators/modules/global.decorator.ts","packages/common/decorators/modules/index.ts","packages/common/decorators/index.ts",
+        "packages/common/module-utils/configurable-module.builder.ts","packages/common/module-utils/index.ts","packages/common/module-utils/interfaces/configurable-module-cls.interface.ts","packages/common/module-utils/interfaces/index.ts","packages/common/module-utils/interfaces/configurable-module-async-options.interface.ts","packages/common/module-utils/interfaces/configurable-module-host.interface.ts","packages/common/module-utils/constants.ts","packages/common/module-utils/utils/index.ts","packages/common/module-utils/utils/generate-options-injection-token.util.ts","packages/common/module-utils/utils/get-injection-providers.util.ts"
+      ],
+      "entrypoints": [
+        { "name": "Injectable", "kind": "function", "location": "packages/common/decorators/core/injectable.decorator.ts:46", "plain": "Marks a class as something the DI container can create and hand out." },
+        { "name": "Inject", "kind": "function", "location": "packages/common/decorators/core/inject.decorator.ts:38", "plain": "Marks a constructor parameter or property as needing a specific dependency injected." },
+        { "name": "Optional", "kind": "function", "location": "packages/common/decorators/core/optional.decorator.ts:20", "plain": "Marks an injected dependency as not required." },
+        { "name": "SetMetadata", "kind": "function", "location": "packages/common/decorators/core/set-metadata.decorator.ts:22", "plain": "Attaches an arbitrary custom metadata key/value to a class or method." },
+        { "name": "Catch", "kind": "function", "location": "packages/common/decorators/core/catch.decorator.ts:21", "plain": "Marks a class as an exception filter for the given exception types." },
+        { "name": "Controller", "kind": "function", "location": "packages/common/decorators/core/controller.decorator.ts:151", "plain": "Marks a class as an HTTP/RPC controller with an optional route prefix." },
+        { "name": "UseGuards", "kind": "function", "location": "packages/common/decorators/core/use-guards.decorator.ts:1", "plain": "Attaches one or more guards to a class or handler." },
+        { "name": "UseInterceptors", "kind": "function", "location": "packages/common/decorators/core/use-interceptors.decorator.ts:1", "plain": "Attaches one or more interceptors to a class or handler." },
+        { "name": "UsePipes", "kind": "function", "location": "packages/common/decorators/core/use-pipes.decorator.ts:1", "plain": "Attaches one or more pipes to a class or handler." },
+        { "name": "Version", "kind": "function", "location": "packages/common/decorators/core/version.decorator.ts:1", "plain": "Marks a handler as belonging to a specific API version." },
+        { "name": "Module", "kind": "function", "location": "packages/common/decorators/modules/module.decorator.ts:18", "plain": "Marks a class as a module: a group of providers/controllers/imports/exports." },
+        { "name": "Global", "kind": "function", "location": "packages/common/decorators/modules/global.decorator.ts:14", "plain": "Marks a module's exports as available everywhere without importing the module." },
+        { "name": "ConfigurableModuleBuilder", "kind": "class", "location": "packages/common/module-utils/configurable-module.builder.ts:56", "plain": "Generates the register()/registerAsync() boilerplate for a module that takes options." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "MODULE_METADATA" },
+        { "unit": "common-kernel", "entrypoint": "randomStringGenerator" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Every decorator writes to the global reflect-metadata registry via Reflect.defineMetadata; this is the mechanism by which decorated classes communicate configuration to the rest of the framework." },
+        { "kind": "random", "description": "injectable.decorator.ts's mixin() and the configurable-module option-token generator call the npm 'uid' package for non-cryptographic random IDs." }
+      ]
+    },
+
+    {
+      "name": "http-decorators",
+      "kind": "domain",
+      "role": "The decorator vocabulary for declaring HTTP routes and extracting data from an incoming HTTP request.",
+      "description": "This is the set of decorators developers place on controller classes and their methods/parameters to describe an HTTP API: things like @Get/@Post (which URL and verb a method handles), @Param/@Query/@Body/@Headers (which piece of the incoming request to hand to a method argument), and response-shaping decorators like @HttpCode, @Header, @Redirect, @Render, @Sse and @SseSignal. None of these decorators talk to the network themselves — they attach descriptive tags to the class so that the routing engine, elsewhere, can read those tags later and wire up real request handling.",
+      "files": [
+        "packages/common/decorators/http/header.decorator.ts","packages/common/decorators/http/sse.decorator.ts","packages/common/decorators/http/index.ts","packages/common/decorators/http/render.decorator.ts","packages/common/decorators/http/sse-signal.decorator.ts","packages/common/decorators/http/http-code.decorator.ts","packages/common/decorators/http/create-route-param-metadata.decorator.ts","packages/common/decorators/http/route-params.decorator.ts","packages/common/decorators/http/request-mapping.decorator.ts","packages/common/decorators/http/redirect.decorator.ts"
+      ],
+      "entrypoints": [
+        { "name": "RequestMapping", "kind": "function", "location": "packages/common/decorators/http/request-mapping.decorator.ts:14", "plain": "The base decorator behind Get/Post/Put/Delete/etc; declares a method as the handler for a URL pattern and HTTP verb." },
+        { "name": "createParamDecorator", "kind": "function", "location": "packages/common/decorators/http/create-route-param-metadata.decorator.ts:22", "plain": "Lets a developer build a custom parameter decorator that extracts a piece of the request." },
+        { "name": "assignMetadata", "kind": "function", "location": "packages/common/decorators/http/route-params.decorator.ts:48", "plain": "Records which request piece (param/query/body/etc) a given method parameter should receive." },
+        { "name": "HttpCode", "kind": "function", "location": "packages/common/decorators/http/http-code.decorator.ts:13", "plain": "Overrides the default success status code for a handler." },
+        { "name": "Header", "kind": "function", "location": "packages/common/decorators/http/header.decorator.ts:18", "plain": "Sets a fixed response header for a handler." },
+        { "name": "Redirect", "kind": "function", "location": "packages/common/decorators/http/redirect.decorator.ts:8", "plain": "Marks a handler's return value as a redirect target." },
+        { "name": "Render", "kind": "function", "location": "packages/common/decorators/http/render.decorator.ts:14", "plain": "Marks a handler as rendering a named view template." },
+        { "name": "Sse", "kind": "function", "location": "packages/common/decorators/http/sse.decorator.ts:13", "plain": "Marks a handler as a Server-Sent-Events stream." },
+        { "name": "SseSignal", "kind": "function", "location": "packages/common/decorators/http/sse-signal.decorator.ts:51", "plain": "Injects an AbortSignal tied to an SSE connection's lifetime." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "MODULE_METADATA" },
+        { "unit": "common-kernel", "entrypoint": "shared-predicates" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "All decorators write route/handler descriptors via Reflect.defineMetadata, later read by the router." },
+        { "kind": "random", "description": "create-route-param-metadata.decorator.ts calls uid(21) once per createParamDecorator() invocation to mint a unique metadata key." }
+      ]
+    },
+
+    {
+      "name": "http-exceptions",
+      "kind": "domain",
+      "role": "Typed HTTP error classes, one per standard status code, built on a common base.",
+      "description": "This is the shared vocabulary of HTTP error types used throughout the framework. It defines one class for each standard HTTP error status (Not Found, Bad Request, Unauthorized, Conflict, and so on), all built on top of a common base 'HttpException' class that knows how to format an error message and response body with the right status code. Application code and other framework parts throw these typed exceptions when something goes wrong in a web request, and the framework's error-handling machinery catches them to produce the correct HTTP response.",
+      "files": [
+        "packages/common/exceptions/not-found.exception.ts","packages/common/exceptions/internal-server-error.exception.ts","packages/common/exceptions/precondition-failed.exception.ts","packages/common/exceptions/index.ts","packages/common/exceptions/service-unavailable.exception.ts","packages/common/exceptions/http.exception.ts","packages/common/exceptions/not-implemented.exception.ts","packages/common/exceptions/request-timeout.exception.ts","packages/common/exceptions/bad-request.exception.ts","packages/common/exceptions/intrinsic.exception.ts","packages/common/exceptions/forbidden.exception.ts","packages/common/exceptions/gateway-timeout.exception.ts","packages/common/exceptions/http-version-not-supported.exception.ts","packages/common/exceptions/unsupported-media-type.exception.ts","packages/common/exceptions/method-not-allowed.exception.ts","packages/common/exceptions/misdirected.exception.ts","packages/common/exceptions/unauthorized.exception.ts","packages/common/exceptions/conflict.exception.ts","packages/common/exceptions/unprocessable-entity.exception.ts","packages/common/exceptions/gone.exception.ts","packages/common/exceptions/bad-gateway.exception.ts","packages/common/exceptions/not-acceptable.exception.ts","packages/common/exceptions/im-a-teapot.exception.ts","packages/common/exceptions/payload-too-large.exception.ts"
+      ],
+      "entrypoints": [
+        { "name": "HttpException", "kind": "class", "location": "packages/common/exceptions/http.exception.ts:28", "plain": "The base class every HTTP error extends; knows how to format a response body and status code." },
+        { "name": "IntrinsicException", "kind": "class", "location": "packages/common/exceptions/intrinsic.exception.ts:7", "plain": "A marker base class for exceptions that should bypass generic logging." },
+        { "name": "NotFoundException", "kind": "class", "location": "packages/common/exceptions/not-found.exception.ts:11", "plain": "Signals a 404 Not Found response." },
+        { "name": "BadRequestException", "kind": "class", "location": "packages/common/exceptions/bad-request.exception.ts:11", "plain": "Signals a 400 Bad Request response." },
+        { "name": "UnauthorizedException", "kind": "class", "location": "packages/common/exceptions/unauthorized.exception.ts:11", "plain": "Signals a 401 Unauthorized response." },
+        { "name": "ForbiddenException", "kind": "class", "location": "packages/common/exceptions/forbidden.exception.ts:11", "plain": "Signals a 403 Forbidden response." },
+        { "name": "ConflictException", "kind": "class", "location": "packages/common/exceptions/conflict.exception.ts:11", "plain": "Signals a 409 Conflict response." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "HttpStatus" },
+        { "unit": "common-kernel", "entrypoint": "shared-predicates" }
+      ],
+      "effects": []
+    },
+
+    {
+      "name": "validation-pipes",
+      "kind": "domain",
+      "role": "Built-in Pipe classes that validate or transform a route parameter, body, or uploaded file before it reaches a handler.",
+      "description": "This unit provides NestJS's collection of built-in 'Pipes' — small pieces of code that inspect and clean up a single value (a route parameter, query string, request body, or uploaded file) before it is handed to the code the developer wrote to handle a web request. It covers converting text into numbers, booleans, dates, UUIDs, enums, and arrays; running full object validation against a DTO class (via the optional class-validator/class-transformer libraries) or against any Standard-Schema-compatible library (e.g. Zod); and validating uploaded files. If a value does not pass validation, the pipe raises an HTTP error so the request is rejected before it reaches business logic.",
+      "files": [
+        "packages/common/pipes/file/file-type.validator.ts","packages/common/pipes/file/index.ts","packages/common/pipes/file/parse-file-options.interface.ts","packages/common/pipes/file/parse-file-pipe.builder.ts","packages/common/pipes/file/interfaces/index.ts","packages/common/pipes/file/interfaces/file.interface.ts","packages/common/pipes/file/max-file-size.validator.ts","packages/common/pipes/file/file-validator-context.interface.ts","packages/common/pipes/file/parse-file.pipe.ts","packages/common/pipes/file/file-validator.interface.ts",
+        "packages/common/pipes/parse-int.pipe.ts","packages/common/pipes/index.ts","packages/common/pipes/parse-enum.pipe.ts","packages/common/pipes/parse-bool.pipe.ts","packages/common/pipes/standard-schema-validation.pipe.ts","packages/common/pipes/parse-uuid.pipe.ts","packages/common/pipes/parse-float.pipe.ts","packages/common/pipes/parse-date.pipe.ts","packages/common/pipes/default-value.pipe.ts","packages/common/pipes/parse-array.pipe.ts","packages/common/pipes/validation.pipe.ts"
+      ],
+      "entrypoints": [
+        { "name": "ValidationPipe", "kind": "class", "location": "packages/common/pipes/validation.pipe.ts:71", "plain": "Validates and transforms a value against a DTO class using class-validator/class-transformer." },
+        { "name": "StandardSchemaValidationPipe", "kind": "class", "location": "packages/common/pipes/standard-schema-validation.pipe.ts:68", "plain": "Validates and transforms a value using any Standard-Schema-compatible validator (e.g. Zod)." },
+        { "name": "ParseIntPipe", "kind": "class", "location": "packages/common/pipes/parse-int.pipe.ts:44", "plain": "Converts a string value to an integer, rejecting it if it isn't one." },
+        { "name": "ParseUUIDPipe", "kind": "class", "location": "packages/common/pipes/parse-uuid.pipe.ts:48", "plain": "Validates that a value is a UUID." },
+        { "name": "ParseArrayPipe", "kind": "class", "location": "packages/common/pipes/parse-array.pipe.ts:57", "plain": "Splits/validates a value as an array." },
+        { "name": "DefaultValuePipe", "kind": "class", "location": "packages/common/pipes/default-value.pipe.ts:16", "plain": "Substitutes a default value when the incoming value is missing." },
+        { "name": "ParseFilePipe", "kind": "class", "location": "packages/common/pipes/file/parse-file.pipe.ts:20", "plain": "Runs a set of file validators against an uploaded file." },
+        { "name": "ParseFilePipeBuilder", "kind": "class", "location": "packages/common/pipes/file/parse-file-pipe.builder.ts:16", "plain": "Fluent builder for composing a ParseFilePipe from common validators." },
+        { "name": "FileTypeValidator", "kind": "class", "location": "packages/common/pipes/file/file-type.validator.ts:76", "plain": "Checks an uploaded file's true content type." },
+        { "name": "MaxFileSizeValidator", "kind": "class", "location": "packages/common/pipes/file/max-file-size.validator.ts:47", "plain": "Checks an uploaded file does not exceed a size limit." },
+        { "name": "FileValidator", "kind": "class", "location": "packages/common/pipes/file/file-validator.interface.ts:9", "plain": "Abstract base a developer extends to write a custom file validator." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "HttpErrorByCode" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" },
+        { "unit": "http-exceptions", "entrypoint": "HttpException" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "ValidationPipe lazily loads the optional 'class-validator'/'class-transformer' packages via loadPackage()/import(); on failure to load a required package the underlying loader logs and calls process.exit(1)." },
+        { "kind": "other", "description": "FileTypeValidator dynamically imports the optional 'file-type' package to inspect a file buffer's magic numbers, falling back to mimetype comparison if that import fails." }
+      ]
+    },
+
+    {
+      "name": "serializer",
+      "kind": "domain",
+      "role": "Response-shaping interceptors that strip or transform fields from outgoing controller return values.",
+      "description": "This code lets a NestJS application automatically clean up the data it sends back to clients. When a controller method returns an object (for example a database record with sensitive fields like a password), these interceptors run just before the response leaves the server and strip out or reshape fields according to rules the developer attached to the returned class or handler. There are two flavors: one using the 'class-transformer' library and @Exclude()-style decorators, and a newer one that validates/transforms the response through any Standard-Schema-compliant validator. A shared @SerializeOptions() decorator configures either interceptor per-route or per-controller.",
+      "files": [
+        "packages/common/serializer/standard-schema-serializer.interceptor.ts","packages/common/serializer/index.ts","packages/common/serializer/class-serializer.interfaces.ts","packages/common/serializer/standard-schema-serializer.interfaces.ts","packages/common/serializer/class-serializer.constants.ts","packages/common/serializer/class-serializer.interceptor.ts","packages/common/serializer/decorators/index.ts","packages/common/serializer/decorators/serialize-options.decorator.ts"
+      ],
+      "entrypoints": [
+        { "name": "ClassSerializerInterceptor", "kind": "class", "location": "packages/common/serializer/class-serializer.interceptor.ts:39", "plain": "Strips/transforms an outgoing response object using class-transformer rules." },
+        { "name": "StandardSchemaSerializerInterceptor", "kind": "class", "location": "packages/common/serializer/standard-schema-serializer.interceptor.ts:56", "plain": "Transforms an outgoing response object through a Standard-Schema validator." },
+        { "name": "SerializeOptions", "kind": "function", "location": "packages/common/serializer/decorators/serialize-options.decorator.ts:9", "plain": "Configures per-route/per-controller options for either serializer interceptor." }
+      ],
+      "depends_on": [
+        { "unit": "di-decorators", "entrypoint": "Injectable" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" },
+        { "unit": "file-stream", "entrypoint": "StreamableFile" },
+        { "unit": "discovery-service", "entrypoint": "Reflector" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "class-serializer.interceptor.ts lazily loads the optional 'class-transformer' package via loadPackage()/import()." },
+        { "kind": "other", "description": "Both interceptors call reflector.getAllAndOverride to read @SerializeOptions() metadata." }
+      ]
+    },
+
+    {
+      "name": "logger",
+      "kind": "infra",
+      "role": "Defines the logging contract, the default console-based logger implementation, and the static Logger facade used framework-wide.",
+      "description": "This is the built-in logging system that Nest and every application built on it use to print status messages, warnings, and errors to the terminal. It defines what a 'logger' looks like (the LoggerService contract and severity levels), provides a ready-to-use console-based implementation that formats messages with timestamps, colors, and process info, and provides a static-facing 'Logger' facade class the rest of the framework calls without needing to know which concrete logger is installed.",
+      "files": [
+        "packages/common/services/index.ts","packages/common/services/console-logger.service.ts","packages/common/services/logger.service.ts","packages/common/services/utils/index.ts","packages/common/services/utils/is-log-level.util.ts","packages/common/services/utils/filter-log-levels.util.ts","packages/common/services/utils/is-log-level-enabled.util.ts"
+      ],
+      "entrypoints": [
+        { "name": "Logger", "kind": "class", "location": "packages/common/services/logger.service.ts:88", "plain": "The main logger class app and framework code instantiate or call statically to print messages." },
+        { "name": "ConsoleLogger", "kind": "class", "location": "packages/common/services/console-logger.service.ts:136", "plain": "The default concrete logger implementation, writing formatted colorized text to stdout/stderr." },
+        { "name": "LoggerService", "kind": "type", "location": "packages/common/services/logger.service.ts:23", "plain": "The interface a custom logger must implement to be accepted by Nest's logging APIs." },
+        { "name": "filterLogLevels", "kind": "function", "location": "packages/common/services/utils/filter-log-levels.util.ts:7", "plain": "Parses a config string into the array of LogLevel values that should be enabled." }
+      ],
+      "depends_on": [
+        { "unit": "di-decorators", "entrypoint": "Injectable" },
+        { "unit": "common-kernel", "entrypoint": "clc" },
+        { "unit": "common-kernel", "entrypoint": "shared-predicates" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Writes formatted log output directly to stdout/stderr (process.stdout.write/process.stderr.write), or to console.log/console.error when 'forceConsole' is set." },
+        { "kind": "clock", "description": "Reads the current time via Date.now()/Intl.DateTimeFormat to timestamp log lines and compute elapsed time since the previous log." },
+        { "kind": "other", "description": "Reads process.pid to embed the process ID in each formatted log line." }
+      ]
+    },
+
+    {
+      "name": "file-stream",
+      "kind": "domain",
+      "role": "Wraps a readable stream or buffer so it can be returned from a handler and sent to the client as a file download.",
+      "description": "This is a small helper for sending files (or any binary data) back to a client from a web request. A developer wraps a file's bytes or an open data stream in a StreamableFile object, optionally naming its content type, and returns it from their request-handling code. Later, whichever web server technology is in use reads its data stream and pipes it out to the client as a file download, and this unit provides a default way to react if something goes wrong partway through.",
+      "files": [
+        "packages/common/file-stream/index.ts","packages/common/file-stream/streamable-file.ts","packages/common/file-stream/interfaces/streamable-handler-response.interface.ts","packages/common/file-stream/interfaces/index.ts","packages/common/file-stream/interfaces/streamable-options.interface.ts"
+      ],
+      "entrypoints": [
+        { "name": "StreamableFile", "kind": "class", "location": "packages/common/file-stream/streamable-file.ts:16", "plain": "Wraps a Readable stream or in-memory buffer so a controller can return it as a file download." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "HttpStatus" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "The default error logger calls logger.error(err), writing to stdout/stderr via the shared Logger service." }
+      ]
+    },
+
+    {
+      "name": "di-container",
+      "kind": "domain",
+      "role": "The dependency-injection engine: the module/provider graph, instantiation order, and DI-graph validation errors.",
+      "description": "This is the heart of the NestJS framework: the dependency-injection engine. It keeps an in-memory map of every module an application declares, along with the providers, controllers, and injectable helpers each module owns. When the application starts, this code figures out, for every class, what other classes it needs, creates them in the right order (including per-request or transient instances), and wires them together. If the wiring is impossible — a missing provider, a class used where a module was expected, an unresolved circular dependency — it raises a clear, actionable error. Everything else in a Nest application ultimately asks this engine for object instances rather than building them itself.",
+      "files": [
+        "packages/core/injector/helpers/provider-classifier.ts","packages/core/injector/helpers/silent-logger.ts","packages/core/injector/opaque-key-factory/deep-hashed-module-opaque-key-factory.ts","packages/core/injector/opaque-key-factory/by-reference-module-opaque-key-factory.ts","packages/core/injector/opaque-key-factory/interfaces/module-opaque-key-factory.interface.ts","packages/core/injector/module.ts","packages/core/injector/abstract-instance-resolver.ts","packages/core/injector/module-ref.ts","packages/core/injector/internal-providers-storage.ts","packages/core/injector/index.ts","packages/core/injector/instance-links-host.ts","packages/core/injector/instance-loader.ts","packages/core/injector/internal-core-module/internal-core-module.ts","packages/core/injector/internal-core-module/index.ts","packages/core/injector/internal-core-module/internal-core-module-factory.ts","packages/core/injector/injector.ts","packages/core/injector/constants.ts","packages/core/injector/settlement-signal.ts","packages/core/injector/inquirer/index.ts","packages/core/injector/inquirer/inquirer-constants.ts","packages/core/injector/inquirer/inquirer-providers.ts","packages/core/injector/instance-wrapper.ts","packages/core/injector/lazy-module-loader/lazy-module-loader.ts","packages/core/injector/lazy-module-loader/lazy-module-loader-options.interface.ts","packages/core/injector/topology-tree/topology-tree.ts","packages/core/injector/topology-tree/tree-node.ts","packages/core/injector/compiler.ts","packages/core/injector/container.ts","packages/core/injector/modules-container.ts",
+        "packages/core/errors/exceptions/undefined-dependency.exception.ts","packages/core/errors/exceptions/index.ts","packages/core/errors/exceptions/circular-dependency.exception.ts","packages/core/errors/exceptions/unknown-dependencies.exception.ts","packages/core/errors/exceptions/invalid-class.exception.ts","packages/core/errors/exceptions/unknown-element.exception.ts","packages/core/errors/exceptions/invalid-class-scope.exception.ts","packages/core/errors/exceptions/unknown-export.exception.ts","packages/core/errors/exceptions/undefined-forwardref.exception.ts","packages/core/errors/exceptions/runtime.exception.ts","packages/core/errors/exceptions/unknown-module.exception.ts","packages/core/errors/messages.ts",
+        "packages/core/helpers/is-durable.ts","packages/core/helpers/get-class-scope.ts","packages/core/helpers/barrier.ts","packages/core/helpers/safe-instance-decorator.ts","packages/core/helpers/context-id-factory.ts","packages/core/helpers/rethrow.ts",
+        "packages/core/interfaces/index.ts","packages/core/interfaces/module-definition.interface.ts","packages/core/interfaces/module-override.interface.ts"
+      ],
+      "entrypoints": [
+        { "name": "NestContainer", "kind": "class", "location": "packages/core/injector/container.ts:32", "plain": "Creates the in-memory registry of modules/providers for an application." },
+        { "name": "Injector", "kind": "class", "location": "packages/core/injector/injector.ts:89", "plain": "Resolves and instantiates one provider's dependency tree." },
+        { "name": "InstanceLoader", "kind": "class", "location": "packages/core/injector/instance-loader.ts:10", "plain": "Walks every registered module and creates real instances of its providers/controllers." },
+        { "name": "Module", "kind": "class", "location": "packages/core/injector/module.ts:43", "plain": "Represents one @Module()'s providers/controllers/exports as a live object." },
+        { "name": "ModuleRef", "kind": "class", "location": "packages/core/injector/module-ref.ts:26", "plain": "Lets code look up or create provider instances at runtime." },
+        { "name": "InstanceWrapper", "kind": "class", "location": "packages/core/injector/instance-wrapper.ts:72", "plain": "Per-provider metadata/instance holder used across the framework." },
+        { "name": "ModulesContainer", "kind": "class", "location": "packages/core/injector/modules-container.ts:5", "plain": "The map of every module in the running application; injectable via @Inject(ModulesContainer)." },
+        { "name": "LazyModuleLoader", "kind": "class", "location": "packages/core/injector/lazy-module-loader/lazy-module-loader.ts:12", "plain": "Loads a module and its dependency tree on demand after bootstrap." },
+        { "name": "InternalCoreModuleFactory", "kind": "class", "location": "packages/core/injector/internal-core-module/internal-core-module-factory.ts:18", "plain": "Builds the framework's hidden internal module (Reflector, ModulesContainer, etc)." },
+        { "name": "InstanceLinksHost", "kind": "class", "location": "packages/core/injector/instance-links-host.ts:17", "plain": "Index of every DI token to its instance wrapper across all modules." },
+        { "name": "ModuleCompiler", "kind": "class", "location": "packages/core/injector/compiler.ts:10", "plain": "Turns a module class or DynamicModule into a canonical token." },
+        { "name": "INQUIRER", "kind": "constant", "location": "packages/core/injector/inquirer/inquirer-constants.ts:1", "plain": "Injection token letting a provider ask 'who is injecting me'." },
+        { "name": "createContextId", "kind": "function", "location": "packages/core/helpers/context-id-factory.ts:1", "plain": "Creates a unique identity for one request-scoped/durable resolution pass." },
+        { "name": "isDurable", "kind": "function", "location": "packages/core/helpers/is-durable.ts:1", "plain": "Reads whether a provider was declared with durable scope." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "MODULE_METADATA" },
+        { "unit": "common-kernel", "entrypoint": "randomStringGenerator" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "discovery-service", "entrypoint": "Reflector" },
+        { "unit": "discovery-service", "entrypoint": "DiscoverableMetaHostCollection" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "inspector-graph", "entrypoint": "UuidFactory" },
+        { "unit": "inspector-graph", "entrypoint": "InitializeOnPreviewAllowlist" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "execution-context", "entrypoint": "ExternalContextCreator" },
+        { "unit": "app-bootstrap", "entrypoint": "HttpAdapterHost" }
+      ],
+      "effects": [
+        { "kind": "env", "description": "Reads process.env.NEST_DEBUG to decide whether to emit verbose dependency-resolution debug logs." },
+        { "kind": "clock", "description": "Uses perf_hooks performance.now() to time provider instantiation and warn about slow module-token serialization." },
+        { "kind": "random", "description": "Generates random IDs via randomStringGenerator()/uid(21) for module/controller IDs and application instance IDs." },
+        { "kind": "other", "description": "Computes SHA-256 hashes (node:crypto createHash) to derive deterministic, content-based module tokens." },
+        { "kind": "other", "description": "Writes structured log lines through the Logger service for module-init and dependency-resolution tracing." }
+      ]
+    },
+
+    {
+      "name": "app-bootstrap",
+      "kind": "infra",
+      "role": "Assembles and starts a Nest application: scans modules, builds the DI container, wires the HTTP adapter, and owns process lifecycle.",
+      "description": "This is the 'ignition switch' for a NestJS application. When a developer writes NestFactory.create(AppModule), this code takes over: it reads all the declared modules/controllers/providers, drives the DI container's construction, picks or accepts an HTTP adapter such as Express or Fastify, and hands back a running application object with methods like listen(), get(), and close(). It also owns whole-of-life concerns: starting up, responding to OS shutdown signals, and tearing everything down cleanly.",
+      "files": [
+        "packages/core/nest-factory.ts","packages/core/nest-application.ts","packages/core/nest-application-context.ts","packages/core/application-config.ts","packages/core/scanner.ts","packages/core/metadata-scanner.ts","packages/core/adapters/index.ts","packages/core/adapters/http-adapter.ts","packages/core/constants.ts","packages/core/internal.ts","packages/core/index.ts",
+        "packages/core/helpers/optional-require.ts","packages/core/helpers/load-adapter.ts","packages/core/helpers/http-adapter-host.ts","packages/core/helpers/index.ts",
+        "packages/core/errors/exceptions-zone.ts","packages/core/errors/exception-handler.ts","packages/core/errors/exceptions/invalid-class-module.exception.ts","packages/core/errors/exceptions/invalid-module.exception.ts","packages/core/errors/exceptions/undefined-module.exception.ts"
+      ],
+      "entrypoints": [
+        { "name": "NestFactory", "kind": "class", "location": "packages/core/nest-factory.ts:410", "plain": "The static factory application code calls to create/start a Nest application, microservice, or bare application context." },
+        { "name": "NestApplication", "kind": "class", "location": "packages/core/nest-application.ts:48", "plain": "The running HTTP application object returned by NestFactory.create(), with listen()/get()/close() etc." },
+        { "name": "NestApplicationContext", "kind": "class", "location": "packages/core/nest-application-context.ts:38", "plain": "A running application without an HTTP server, used for CLI/worker/testing scenarios." },
+        { "name": "AbstractHttpAdapter", "kind": "class", "location": "packages/core/adapters/http-adapter.ts:12", "plain": "The base class a concrete platform (Express, Fastify) implements to plug into Nest." },
+        { "name": "MetadataScanner", "kind": "class", "location": "packages/core/metadata-scanner.ts:8", "plain": "Enumerates the methods of a class, used to discover route/handler methods." },
+        { "name": "ApplicationConfig", "kind": "class", "location": "packages/core/application-config.ts:16", "plain": "Holds global pipes/guards/interceptors/filters and other app-wide configuration." },
+        { "name": "DependenciesScanner", "kind": "class", "location": "packages/core/scanner.ts:73", "plain": "Reads a root module's decorated metadata and populates the DI container accordingly." },
+        { "name": "HttpAdapterHost", "kind": "class", "location": "packages/core/helpers/http-adapter-host.ts:1", "plain": "Injectable holder giving access to whichever HTTP adapter the app is using." },
+        { "name": "loadAdapter", "kind": "function", "location": "packages/core/helpers/load-adapter.ts:1", "plain": "Dynamically loads an optional platform adapter package at bootstrap, exiting the process if it's missing." },
+        { "name": "ExceptionsZone", "kind": "class", "location": "packages/core/errors/exceptions-zone.ts:1", "plain": "Runs bootstrap code inside a zone that catches and reports fatal startup errors." }
+      ],
+      "depends_on": [
+        { "unit": "di-container", "entrypoint": "NestContainer" },
+        { "unit": "di-container", "entrypoint": "Injector" },
+        { "unit": "di-container", "entrypoint": "InstanceLoader" },
+        { "unit": "http-router", "entrypoint": "RoutesResolver" },
+        { "unit": "middleware-pipeline", "entrypoint": "MiddlewareModule" },
+        { "unit": "lifecycle-hooks", "entrypoint": "callModuleInitHook" },
+        { "unit": "lifecycle-hooks", "entrypoint": "callAppShutdownHook" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Starts the HTTP listener and reports the bound address/port, delegating the actual socket I/O to the chosen HttpServer adapter." },
+        { "kind": "other", "description": "Listens for and reacts to OS shutdown signals (SIGTERM/SIGINT) via process.on, terminating the process with process.exit()/process.kill() when appropriate." },
+        { "kind": "other", "description": "Lazily imports optional sibling packages (@nestjs/platform-express, @nestjs/microservices, @nestjs/websockets) at runtime to keep them optional peer dependencies." },
+        { "kind": "other", "description": "Reads os.platform() to decide how to format a Unix-socket address." },
+        { "kind": "other", "description": "Reads design-time and custom decorator metadata via Reflect.getMetadata to discover modules/providers/controllers." }
+      ]
+    },
+
+    {
+      "name": "http-router",
+      "kind": "domain",
+      "role": "Turns controller/route decorator metadata into a live HTTP routing table and the per-route guard/pipe/interceptor execution pipeline.",
+      "description": "This unit is the part of NestJS that turns a controller's route decorators (@Get, @Post, versions, hosts, etc.) into a live HTTP routing table on the actual web server, and that builds the pipeline each incoming request runs through: apply guards, resolve method arguments through pipes, invoke the controller method, then hand the return value to the framework's response-writing code (including redirects, templates, and Server-Sent-Event streams). It also composes route paths, detects and reports overlapping/duplicate routes, and normalizes legacy wildcard route syntax.",
+      "files": [
+        "packages/core/router/router-response-controller.ts","packages/core/router/legacy-route-converter.ts","packages/core/router/request/index.ts","packages/core/router/request/request-constants.ts","packages/core/router/request/request-providers.ts","packages/core/router/index.ts","packages/core/router/route-conflict-detector.ts","packages/core/router/router-module.ts","packages/core/router/route-params-factory.ts","packages/core/router/route-path-factory.ts","packages/core/router/router-proxy.ts","packages/core/router/interfaces/index.ts","packages/core/router/interfaces/routes.interface.ts","packages/core/router/interfaces/resolved-route.interface.ts","packages/core/router/interfaces/route-params-factory.interface.ts","packages/core/router/interfaces/route-path-metadata.interface.ts","packages/core/router/interfaces/exclude-route-metadata.interface.ts","packages/core/router/interfaces/exceptions-filter.interface.ts","packages/core/router/interfaces/route-resolution-options.interface.ts","packages/core/router/interfaces/resolver.interface.ts","packages/core/router/interfaces/route-conflict.interface.ts","packages/core/router/router-explorer.ts","packages/core/router/router-exception-filters.ts","packages/core/router/paths-explorer.ts","packages/core/router/router-execution-context.ts","packages/core/router/sse-stream.ts","packages/core/router/route-specificity-sorter.ts","packages/core/router/utils/index.ts","packages/core/router/utils/flatten-route-paths.util.ts","packages/core/router/utils/exclude-route.util.ts","packages/core/router/routes-resolver.ts",
+        "packages/core/helpers/router-method-factory.ts","packages/core/helpers/messages.ts",
+        "packages/core/errors/exceptions/route-conflict.exception.ts","packages/core/errors/exceptions/unknown-request-mapping.exception.ts"
+      ],
+      "entrypoints": [
+        { "name": "RoutesResolver", "kind": "class", "location": "packages/core/router/routes-resolver.ts:33", "plain": "Registers every controller's routes onto the HTTP adapter when the app starts." },
+        { "name": "RouterModule", "kind": "class", "location": "packages/core/router/router-module.ts:19", "plain": "Public API letting a developer nest/re-map controller route prefixes." },
+        { "name": "RouterExceptionFilters", "kind": "class", "location": "packages/core/router/router-exception-filters.ts:16", "plain": "Builds the default per-route exception-filter chain, used by the middleware unit too." },
+        { "name": "RouterProxy", "kind": "class", "location": "packages/core/router/router-proxy.ts:10", "plain": "Wraps a route/middleware callback so thrown errors are routed to exception handling." },
+        { "name": "PathsExplorer", "kind": "class", "location": "packages/core/router/paths-explorer.ts:23", "plain": "Extracts the list of route paths a controller exposes." },
+        { "name": "RoutePathFactory", "kind": "class", "location": "packages/core/router/route-path-factory.ts:18", "plain": "Computes a concrete route path from prefix/version/controller/method metadata." },
+        { "name": "isRouteExcluded", "kind": "function", "location": "packages/core/router/utils/exclude-route.util.ts:9", "plain": "Checks whether a given route was excluded from a middleware/route-mapping rule." },
+        { "name": "LegacyRouteConverter", "kind": "class", "location": "packages/core/router/legacy-route-converter.ts:6", "plain": "Converts legacy wildcard route syntax to the modern path-matching syntax." },
+        { "name": "REQUEST", "kind": "constant", "location": "packages/core/router/request/request-constants.ts:1", "plain": "The DI token for injecting the current request-scoped incoming request object." },
+        { "name": "RouterMethodFactory", "kind": "class", "location": "packages/core/helpers/router-method-factory.ts:1", "plain": "Maps a RequestMethod enum value to the matching concrete HTTP-adapter method call." },
+        { "name": "RouteConflictDetector", "kind": "class", "location": "packages/core/router/route-conflict-detector.ts:114", "plain": "Detects and reports overlapping/shadowed routes at startup." }
+      ],
+      "depends_on": [
+        { "unit": "request-enhancers-runtime", "entrypoint": "GuardsContextCreator" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "PipesContextCreator" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "InterceptorsContextCreator" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "ExceptionsHandler" },
+        { "unit": "execution-context", "entrypoint": "ExecutionContextHost" },
+        { "unit": "execution-context", "entrypoint": "HandlerMetadataStorage" },
+        { "unit": "di-container", "entrypoint": "NestContainer" },
+        { "unit": "di-container", "entrypoint": "InstanceWrapper" },
+        { "unit": "di-container", "entrypoint": "createContextId" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "app-bootstrap", "entrypoint": "MetadataScanner" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Delegates status/header/body writes, redirects, and template rendering to the injected HttpServer adapter (applicationRef.reply/redirect/render/setHeader/status)." },
+        { "kind": "network", "description": "sse-stream.ts tunes the raw TCP socket (setKeepAlive/setNoDelay/setTimeout(0)) to keep an SSE connection open and writes 'data:'/'event:' lines directly to the response stream." },
+        { "kind": "clock", "description": "Uses setTimeout(0)/process.nextTick to defer header commits and drain handling on the response stream." },
+        { "kind": "other", "description": "Writes route-mapped/conflict/legacy-path-conversion messages to the console via Logger." },
+        { "kind": "other", "description": "Reads route/version/path metadata at startup via Reflect.getMetadata/getMetadataKeys." }
+      ]
+    },
+
+    {
+      "name": "middleware-pipeline",
+      "kind": "domain",
+      "role": "Resolves which registered middleware applies to which routes and applies that decision to the underlying HTTP adapter.",
+      "description": "This part of NestJS figures out which pieces of custom request-handling code (middleware) should run before which web routes, and then wires that decision into the underlying web server. Developers describe their intent using a small builder API ('apply this middleware to these routes, but exclude those'); this unit translates that description into concrete route paths, creates and stores the middleware instances per module, and finally registers a handler function with the HTTP server so the middleware actually runs when a matching request arrives.",
+      "files": [
+        "packages/core/middleware/route-info-path-extractor.ts","packages/core/middleware/index.ts","packages/core/middleware/utils.ts","packages/core/middleware/builder.ts","packages/core/middleware/resolver.ts","packages/core/middleware/middleware-module.ts","packages/core/middleware/routes-mapper.ts","packages/core/middleware/container.ts",
+        "packages/core/errors/exceptions/invalid-middleware.exception.ts","packages/core/errors/exceptions/invalid-middleware-configuration.exception.ts"
+      ],
+      "entrypoints": [
+        { "name": "MiddlewareModule", "kind": "class", "location": "packages/core/middleware/middleware-module.ts:52", "plain": "Resolves and registers every module's middleware onto the HTTP adapter." },
+        { "name": "MiddlewareContainer", "kind": "class", "location": "packages/core/middleware/container.ts:18", "plain": "Per-module storage of middleware instance wrappers and their route configuration." },
+        { "name": "mapToExcludeRoute", "kind": "function", "location": "packages/core/middleware/utils.ts:16", "plain": "Converts a route-exclusion rule into a concrete matchable route." }
+      ],
+      "depends_on": [
+        { "unit": "di-container", "entrypoint": "Injector" },
+        { "unit": "di-container", "entrypoint": "createContextId" },
+        { "unit": "http-router", "entrypoint": "RouterExceptionFilters" },
+        { "unit": "http-router", "entrypoint": "RouterProxy" },
+        { "unit": "http-router", "entrypoint": "isRouteExcluded" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Logs a warning via Logger when a module's configure() throws in preview mode." },
+        { "kind": "random", "description": "Calls uid(21) to generate a unique token name for anonymous/wrapped middleware classes." },
+        { "kind": "other", "description": "Calls out to the injected HttpServer adapter (createMiddlewareFactory, getRequestMethod, getRequestUrl) to bind and inspect real HTTP requests." }
+      ]
+    },
+
+    {
+      "name": "discovery-service",
+      "kind": "domain",
+      "role": "Lets code list/filter providers and controllers by attached metadata, and read decorator metadata off any class/method.",
+      "description": "This unit lets code inspect a running Nest application from the inside: it can list every provider and controller currently registered, filter them by custom metadata tags placed with decorators, and read back arbitrary metadata attached to a class or method. It keeps a lightweight index, built as the app starts up, so looking things up by tag is fast, and it plugs into the dependency injection system so any part of the app can ask 'who has this metadata?' at runtime.",
+      "files": [
+        "packages/core/discovery/index.ts","packages/core/discovery/discoverable-meta-host-collection.ts","packages/core/discovery/discovery-service.ts","packages/core/discovery/discovery-module.ts","packages/core/services/index.ts","packages/core/services/reflector.service.ts"
+      ],
+      "entrypoints": [
+        { "name": "DiscoveryService", "kind": "class", "location": "packages/core/discovery/discovery-service.ts:50", "plain": "Lists/filters providers and controllers registered in the running app." },
+        { "name": "DiscoveryModule", "kind": "class", "location": "packages/core/discovery/discovery-module.ts:8", "plain": "The module a developer imports to use DiscoveryService." },
+        { "name": "DiscoverableMetaHostCollection", "kind": "class", "location": "packages/core/discovery/discoverable-meta-host-collection.ts:48", "plain": "The index of providers/controllers by metadata tag, populated as the DI container instantiates them." },
+        { "name": "Reflector", "kind": "class", "location": "packages/core/services/reflector.service.ts:44", "plain": "Reads decorator metadata off a class or method; injectable via @Inject(Reflector)." }
+      ],
+      "depends_on": [
+        { "unit": "di-decorators", "entrypoint": "Injectable" },
+        { "unit": "di-decorators", "entrypoint": "SetMetadata" },
+        { "unit": "di-container", "entrypoint": "InstanceWrapper" },
+        { "unit": "di-container", "entrypoint": "Module" },
+        { "unit": "app-bootstrap", "entrypoint": "MetadataScanner" }
+      ],
+      "effects": [
+        { "kind": "random", "description": "uid(21) generates a random metadata key for every decorator created via DiscoveryService.createDecorator/Reflector.createDecorator." },
+        { "kind": "other", "description": "Reads/writes class and method metadata via the reflect-metadata registry." }
+      ]
+    },
+
+    {
+      "name": "lifecycle-hooks",
+      "kind": "domain",
+      "role": "Calls onModuleInit/onApplicationBootstrap/onModuleDestroy/onApplicationShutdown/beforeApplicationShutdown on every instance in the correct DI-hierarchy order.",
+      "description": "This code is responsible for calling the special 'lifecycle' methods that a NestJS application's services and controllers can optionally define. When the application starts up or shuts down, this code walks through every registered service, controller and middleware, groups them by their position in the dependency tree, and calls the appropriate lifecycle method on each one in the correct order, collecting and logging any errors that occur along the way so shutdown can still complete cleanly.",
+      "files": [
+        "packages/core/hooks/before-app-shutdown.hook.ts","packages/core/hooks/index.ts","packages/core/hooks/on-app-shutdown.hook.ts","packages/core/hooks/on-module-init.hook.ts","packages/core/hooks/on-app-bootstrap.hook.ts","packages/core/hooks/utils/get-instances-grouped-by-hierarchy-level.ts","packages/core/hooks/utils/get-sorted-hierarchy-levels.ts","packages/core/hooks/on-module-destroy.hook.ts"
+      ],
+      "entrypoints": [
+        { "name": "callModuleInitHook", "kind": "function", "location": "packages/core/hooks/on-module-init.hook.ts:34", "plain": "Calls onModuleInit on every instance, children before parents." },
+        { "name": "callModuleBootstrapHook", "kind": "function", "location": "packages/core/hooks/on-app-bootstrap.hook.ts:40", "plain": "Calls onApplicationBootstrap on every instance once the app has fully initialized." },
+        { "name": "callModuleDestroyHook", "kind": "function", "location": "packages/core/hooks/on-module-destroy.hook.ts:39", "plain": "Calls onModuleDestroy on every instance, parents before children, during shutdown." },
+        { "name": "callAppShutdownHook", "kind": "function", "location": "packages/core/hooks/on-app-shutdown.hook.ts:40", "plain": "Calls onApplicationShutdown on every instance in response to an OS signal." },
+        { "name": "callBeforeAppShutdownHook", "kind": "function", "location": "packages/core/hooks/before-app-shutdown.hook.ts:44", "plain": "Calls beforeApplicationShutdown on every instance before teardown begins." }
+      ],
+      "depends_on": [
+        { "unit": "di-container", "entrypoint": "Module" },
+        { "unit": "di-container", "entrypoint": "InstanceWrapper" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Logger.error() is called to report failures from individual instances' hook methods without aborting the overall shutdown sequence." }
+      ]
+    },
+
+    {
+      "name": "execution-context",
+      "kind": "domain",
+      "role": "Builds the ExecutionContext/ArgumentsHost objects and wraps a controller method so guards/pipes/interceptors/filters run uniformly regardless of transport.",
+      "description": "This is the machinery Nest uses to describe 'the call currently happening' in a way that works the same whether it came in over HTTP, a websocket, or a microservice message. It builds a small object (the ExecutionContext/ArgumentsHost) that lets guards, interceptors, pipes, and exception filters ask 'what controller method is this, and what are its raw arguments' without caring which transport delivered the request. On top of that, it provides the 'external context creator', which wraps a controller method so that whenever it's called, its arguments are resolved and validated, guards are checked, interceptors run, and thrown errors are routed to exception filters.",
+      "files": [
+        "packages/core/helpers/external-proxy.ts","packages/core/helpers/interfaces/index.ts","packages/core/helpers/interfaces/params-metadata.interface.ts","packages/core/helpers/interfaces/external-handler-metadata.interface.ts","packages/core/helpers/external-context-creator.ts","packages/core/helpers/context-utils.ts","packages/core/helpers/handler-metadata-storage.ts","packages/core/helpers/execution-context-host.ts"
+      ],
+      "entrypoints": [
+        { "name": "ExecutionContextHost", "kind": "class", "location": "packages/core/helpers/execution-context-host.ts:9", "plain": "The concrete ExecutionContext/ArgumentsHost object handed to guards/pipes/interceptors/filters." },
+        { "name": "ExternalContextCreator", "kind": "class", "location": "packages/core/helpers/external-context-creator.ts:59", "plain": "Wraps a controller method so its full guard/pipe/interceptor/filter pipeline runs on every call, regardless of transport." },
+        { "name": "ContextUtils", "kind": "class", "location": "packages/core/helpers/context-utils.ts:21", "plain": "Reads a method's parameter metadata to build the argument-resolution plan." },
+        { "name": "HandlerMetadataStorage", "kind": "class", "location": "packages/core/helpers/handler-metadata-storage.ts:45", "plain": "Caches the computed metadata for a handler so it's only built once." }
+      ],
+      "depends_on": [
+        { "unit": "request-enhancers-runtime", "entrypoint": "GuardsConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "PipesConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "InterceptorsConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "ExternalExceptionFilterContext" },
+        { "unit": "di-container", "entrypoint": "NestContainer" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Reads design-time and custom decorator metadata via Reflect.getMetadata to discover a controller method's parameters and their param-decorator configuration." }
+      ]
+    },
+
+    {
+      "name": "request-enhancers-runtime",
+      "kind": "domain",
+      "role": "Runs a handler's guards, pipes, interceptors and exception filters around a call, independent of transport.",
+      "description": "This is the machinery that puts Nest's request-processing rules into effect on every incoming call, no matter whether it arrived over HTTP, a microservice transport, or a WebSocket. When a controller or message handler is decorated with guards, pipes, interceptors, or exception filters, this code resolves those decorations to real instances and runs them in the correct order around the real handler. It does not know or care what transport the call came from — it just orchestrates the enhancers and reports the result, or forwards the error to the matching exception filter.",
+      "files": [
+        "packages/core/guards/index.ts","packages/core/guards/guards-context-creator.ts","packages/core/guards/constants.ts","packages/core/guards/guards-consumer.ts",
+        "packages/core/pipes/index.ts","packages/core/pipes/pipes-context-creator.ts","packages/core/pipes/pipes-consumer.ts","packages/core/pipes/params-token-factory.ts",
+        "packages/core/interceptors/index.ts","packages/core/interceptors/interceptors-consumer.ts","packages/core/interceptors/interceptors-context-creator.ts",
+        "packages/core/exceptions/external-exception-filter.ts","packages/core/exceptions/index.ts","packages/core/exceptions/external-exceptions-handler.ts","packages/core/exceptions/base-exception-filter.ts","packages/core/exceptions/external-exception-filter-context.ts","packages/core/exceptions/base-exception-filter-context.ts","packages/core/exceptions/exceptions-handler.ts",
+        "packages/core/helpers/context-creator.ts",
+        "packages/core/errors/exceptions/invalid-exception-filter.exception.ts"
+      ],
+      "entrypoints": [
+        { "name": "GuardsContextCreator", "kind": "class", "location": "packages/core/guards/guards-context-creator.ts:16", "plain": "Resolves the guards attached to a handler into live guard instances." },
+        { "name": "GuardsConsumer", "kind": "class", "location": "packages/core/guards/guards-consumer.ts:8", "plain": "Runs a handler's resolved guards and reports whether the call may proceed." },
+        { "name": "PipesContextCreator", "kind": "class", "location": "packages/core/pipes/pipes-context-creator.ts:15", "plain": "Resolves the pipes attached to a handler's parameters into live pipe instances." },
+        { "name": "PipesConsumer", "kind": "class", "location": "packages/core/pipes/pipes-consumer.ts:8", "plain": "Runs a value through its resolved pipes and returns the transformed value." },
+        { "name": "InterceptorsContextCreator", "kind": "class", "location": "packages/core/interceptors/interceptors-context-creator.ts:15", "plain": "Resolves the interceptors attached to a handler into live interceptor instances." },
+        { "name": "InterceptorsConsumer", "kind": "class", "location": "packages/core/interceptors/interceptors-consumer.ts:10", "plain": "Wraps a handler call with its resolved interceptors' before/after logic." },
+        { "name": "ExceptionsHandler", "kind": "class", "location": "packages/core/exceptions/exceptions-handler.ts:11", "plain": "Selects and runs the right HTTP exception filter for a thrown error." },
+        { "name": "BaseExceptionFilterContext", "kind": "class", "location": "packages/core/exceptions/base-exception-filter-context.ts:13", "plain": "Resolves the exception filters attached to a handler." },
+        { "name": "ExternalExceptionFilterContext", "kind": "class", "location": "packages/core/exceptions/external-exception-filter-context.ts:16", "plain": "Resolves exception filters for non-HTTP (RPC/WS) handlers." },
+        { "name": "ExternalExceptionsHandler", "kind": "class", "location": "packages/core/exceptions/external-exceptions-handler.ts:10", "plain": "Selects and runs the right exception filter for a non-HTTP thrown error." },
+        { "name": "BaseExceptionFilter", "kind": "class", "location": "packages/core/exceptions/base-exception-filter.ts:17", "plain": "The default HTTP exception filter used when no custom filter matches." },
+        { "name": "ContextCreator", "kind": "class", "location": "packages/core/helpers/context-creator.ts:1", "plain": "Shared base class other context-creators (guards/pipes/interceptors/filters) extend to walk a handler's decorator metadata." }
+      ],
+      "depends_on": [
+        { "unit": "execution-context", "entrypoint": "ExecutionContextHost" },
+        { "unit": "di-container", "entrypoint": "NestContainer" },
+        { "unit": "di-container", "entrypoint": "InstanceWrapper" },
+        { "unit": "http-exceptions", "entrypoint": "HttpException" },
+        { "unit": "http-exceptions", "entrypoint": "IntrinsicException" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "app-bootstrap", "entrypoint": "HttpAdapterHost" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "BaseExceptionFilter/ExternalExceptionFilter log unhandled errors via Logger." },
+        { "kind": "other", "description": "BaseExceptionFilter writes the final HTTP response by calling applicationRef.reply/end on the injected HttpServer adapter when an exception reaches it unhandled." },
+        { "kind": "other", "description": "InterceptorsConsumer uses Node's async_hooks AsyncResource.bind to preserve async-context across the deferred interceptor/handler chain." }
+      ]
+    },
+
+    {
+      "name": "inspector-graph",
+      "kind": "infra",
+      "role": "Records a serialized graph of the app's modules/providers/routes/edges for introspection tooling (e.g. Nest Devtools).",
+      "description": "This is the part of NestJS that draws a 'map' of a running application: every module, controller, provider, and the wiring between them. Other parts of the framework report what they built into this map as the app starts up; this unit records that information into a serializable graph that developer tools can read to visualize or debug the application. It also hands out unique IDs for graph nodes/edges, and can freeze those IDs into a deterministic form for snapshot/replay. It does not participate in actually wiring the application together — it only observes and records.",
+      "files": [
+        "packages/core/inspector/index.ts","packages/core/inspector/noop-graph-inspector.ts","packages/core/inspector/graph-inspector.ts","packages/core/inspector/serialized-graph.ts","packages/core/inspector/initialize-on-preview.allowlist.ts","packages/core/inspector/interfaces/enhancer-metadata-cache-entry.interface.ts","packages/core/inspector/interfaces/serialized-graph-metadata.interface.ts","packages/core/inspector/interfaces/serialized-graph-json.interface.ts","packages/core/inspector/interfaces/entrypoint.interface.ts","packages/core/inspector/interfaces/node.interface.ts","packages/core/inspector/interfaces/edge.interface.ts","packages/core/inspector/interfaces/extras.interface.ts","packages/core/inspector/deterministic-uuid-registry.ts","packages/core/inspector/partial-graph.host.ts","packages/core/inspector/uuid-factory.ts"
+      ],
+      "entrypoints": [
+        { "name": "GraphInspector", "kind": "class", "location": "packages/core/inspector/graph-inspector.ts:13", "plain": "Records modules/providers/routes/edges into the serialized graph as the app starts up." },
+        { "name": "NoopGraphInspector", "kind": "class", "location": "packages/core/inspector/noop-graph-inspector.ts:1", "plain": "A do-nothing GraphInspector used when introspection is disabled." },
+        { "name": "InitializeOnPreviewAllowlist", "kind": "class", "location": "packages/core/inspector/initialize-on-preview.allowlist.ts:1", "plain": "Tracks which providers are safe to instantiate in Devtools 'preview' mode." },
+        { "name": "UuidFactory", "kind": "class", "location": "packages/core/inspector/uuid-factory.ts:1", "plain": "Generates random or deterministic IDs for graph nodes/edges depending on the configured mode." },
+        { "name": "SerializedGraph", "kind": "class", "location": "packages/core/inspector/serialized-graph.ts:1", "plain": "The JSON-serializable graph object itself, exposed for external tooling." },
+        { "name": "PartialGraphHost", "kind": "class", "location": "packages/core/inspector/partial-graph.host.ts:1", "plain": "Holds the graph captured so far if bootstrap fails partway through." }
+      ],
+      "depends_on": [
+        { "unit": "di-container", "entrypoint": "NestContainer" },
+        { "unit": "di-container", "entrypoint": "InstanceWrapper" },
+        { "unit": "di-container", "entrypoint": "Module" }
+      ],
+      "effects": [
+        { "kind": "random", "description": "UuidFactory falls back to randomStringGenerator() (the npm 'uid' package) to generate a random ID whenever deterministic mode is not set." },
+        { "kind": "other", "description": "DeterministicUuidRegistry computes a simple rolling hash to produce stable IDs as the deterministic counterpart to random ID generation." },
+        { "kind": "other", "description": "DeterministicUuidRegistry and InitializeOnPreviewAllowlist keep process-lifetime static Map/WeakMap state." }
+      ]
+    },
+
+    {
+      "name": "repl",
+      "kind": "infra",
+      "role": "An interactive REPL that lets a developer inspect and call into a running Nest application from a terminal.",
+      "description": "This unit provides a developer-facing interactive console (REPL) for a running NestJS application. When a developer runs a small bootstrap script that calls repl(AppModule) instead of the normal HTTP server start, this code spins up the application without a network listener, then hands the developer a Node.js command prompt pre-loaded with helper commands (get, resolve, select, debug, methods, help) for inspecting and calling into the app's providers and controllers.",
+      "files": [
+        "packages/core/repl/repl-native-commands.ts","packages/core/repl/repl.interfaces.ts","packages/core/repl/native-functions/help-repl-fn.ts","packages/core/repl/native-functions/index.ts","packages/core/repl/native-functions/select-relp-fn.ts","packages/core/repl/native-functions/resolve-repl-fn.ts","packages/core/repl/native-functions/debug-repl-fn.ts","packages/core/repl/native-functions/get-repl-fn.ts","packages/core/repl/native-functions/methods-repl-fn.ts","packages/core/repl/index.ts","packages/core/repl/repl-context.ts","packages/core/repl/repl-function.ts","packages/core/repl/repl-logger.ts","packages/core/repl/constants.ts","packages/core/repl/assign-to-object.util.ts","packages/core/repl/repl.ts"
+      ],
+      "entrypoints": [
+        { "name": "repl", "kind": "function", "location": "packages/core/repl/repl.ts:11", "plain": "Boots the given module and hands the developer an interactive terminal prompt into it." }
+      ],
+      "depends_on": [
+        { "unit": "app-bootstrap", "entrypoint": "NestFactory" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "logger", "entrypoint": "ConsoleLogger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Writes formatted text directly to process.stdout." },
+        { "kind": "other", "description": "Starts a Node.js REPL session (node:repl start()), which reads from stdin and drives an interactive terminal prompt." },
+        { "kind": "other", "description": "Closes the Nest application context when the REPL server emits 'exit'." }
+      ]
+    },
+
+    {
+      "name": "mq-clients",
+      "kind": "infra",
+      "role": "Client-side connectors that send messages/events to a message broker or RPC server over TCP, Redis, NATS, MQTT, Kafka, RabbitMQ, or gRPC.",
+      "description": "This code provides the outgoing side of NestJS microservices communication: the client objects an application uses to send requests and events to a message broker or RPC server. It supports seven transports, each implemented as a class that knows how to open a connection to that specific technology, serialize a message, send it, and route the reply back to the caller. A factory class picks the right client class based on configuration, and small 'record builder' helpers let a developer attach transport-specific extras to an outgoing payload.",
+      "files": [
+        "packages/microservices/client/client-nats.ts","packages/microservices/client/index.ts","packages/microservices/client/client-tcp.ts","packages/microservices/client/client-grpc.ts","packages/microservices/client/client-proxy.ts","packages/microservices/client/client-redis.ts","packages/microservices/client/client-proxy-factory.ts","packages/microservices/client/client-kafka.ts","packages/microservices/client/client-mqtt.ts","packages/microservices/client/client-rmq.ts",
+        "packages/microservices/record-builders/index.ts","packages/microservices/record-builders/mqtt.record-builder.ts","packages/microservices/record-builders/nats.record-builder.ts","packages/microservices/record-builders/rmq.record-builder.ts",
+        "packages/microservices/helpers/kafka-reply-partition-assigner.ts"
+      ],
+      "entrypoints": [
+        { "name": "ClientProxyFactory", "kind": "class", "location": "packages/microservices/client/client-proxy-factory.ts:33", "plain": "Picks and constructs the right client class for a given transport configuration." },
+        { "name": "ClientProxy", "kind": "class", "location": "packages/microservices/client/client-proxy.ts:37", "plain": "Base class for sending a message/event and awaiting/observing a reply." },
+        { "name": "MqttRecord", "kind": "class", "location": "packages/microservices/record-builders/mqtt.record-builder.ts:35", "plain": "Attaches MQTT-specific options (QoS, retain, etc) to an outgoing payload." },
+        { "name": "NatsRecordBuilder", "kind": "class", "location": "packages/microservices/record-builders/nats.record-builder.ts:14", "plain": "Attaches NATS-specific headers to an outgoing payload." },
+        { "name": "RmqRecord", "kind": "class", "location": "packages/microservices/record-builders/rmq.record-builder.ts:25", "plain": "Attaches RabbitMQ-specific message options to an outgoing payload." },
+        { "name": "KafkaReplyPartitionAssigner", "kind": "class", "location": "packages/microservices/helpers/kafka-reply-partition-assigner.ts:14", "plain": "Custom kafkajs partition-assignment strategy for a Kafka client's reply queue." }
+      ],
+      "depends_on": [
+        { "unit": "mq-serialization", "entrypoint": "IdentitySerializer" },
+        { "unit": "mq-serialization", "entrypoint": "IncomingResponseDeserializer" },
+        { "unit": "mq-transport-support", "entrypoint": "InvalidMessageException" },
+        { "unit": "mq-transport-support", "entrypoint": "MicroservicesConstants" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "common-kernel", "entrypoint": "randomStringGenerator" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "client-tcp.ts opens raw TCP (or TLS) sockets to a configurable host:port." },
+        { "kind": "network", "description": "client-redis.ts/client-nats.ts/client-mqtt.ts/client-kafka.ts/client-rmq.ts each dynamically load and drive their respective npm client library to open a real broker connection." },
+        { "kind": "network", "description": "client-grpc.ts dynamically loads '@grpc/grpc-js' and '@grpc/proto-loader' and opens HTTP/2 gRPC channels." },
+        { "kind": "other", "description": "All client classes use Logger to write connection/error/status messages." },
+        { "kind": "random", "description": "client-proxy.ts and client-rmq.ts call randomStringGenerator() to create correlation IDs for request/response matching." }
+      ]
+    },
+
+    {
+      "name": "mq-servers",
+      "kind": "infra",
+      "role": "Server-side listeners that receive incoming messages over TCP, Redis, NATS, MQTT, Kafka, RabbitMQ, or gRPC and hand them to dispatch.",
+      "description": "This is the set of 'listener' components that let a NestJS application receive messages or remote-procedure calls over different messaging technologies. Each listener knows how to open the right kind of network connection, wait for incoming messages or calls, and hand each one off in a common format to the rest of the framework, which then routes it to the appropriate application code and sends a reply back over the same channel. A factory picks the right listener based on configured transport.",
+      "files": [
+        "packages/microservices/server/index.ts","packages/microservices/server/server.ts","packages/microservices/server/server-factory.ts","packages/microservices/server/server-tcp.ts","packages/microservices/server/server-redis.ts","packages/microservices/server/server-nats.ts","packages/microservices/server/server-mqtt.ts","packages/microservices/server/server-kafka.ts","packages/microservices/server/server-rmq.ts","packages/microservices/server/server-grpc.ts"
+      ],
+      "entrypoints": [
+        { "name": "ServerFactory", "kind": "class", "location": "packages/microservices/server/server-factory.ts:21", "plain": "Picks and constructs the right server listener for a given transport configuration." },
+        { "name": "Server", "kind": "class", "location": "packages/microservices/server/server.ts:47", "plain": "Base class every transport listener extends: registers handlers, tracks connection status, listens, and closes." },
+        { "name": "ServerGrpc", "kind": "class", "location": "packages/microservices/server/server-grpc.ts:56", "plain": "gRPC-specific listener, special-cased elsewhere because it doesn't support generic event listeners." }
+      ],
+      "depends_on": [
+        { "unit": "mq-serialization", "entrypoint": "IncomingRequestDeserializer" },
+        { "unit": "mq-transport-support", "entrypoint": "TcpSocket" },
+        { "unit": "mq-transport-support", "entrypoint": "getGrpcPackageDefinition" },
+        { "unit": "mq-transport-support", "entrypoint": "InvalidTcpDataReceptionException" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Opens a raw TCP (or TLS) listening socket via Node's net/tls modules." },
+        { "kind": "network", "description": "Connects as a client/consumer to Redis, NATS, MQTT, Kafka, and RabbitMQ brokers via their respective dynamically-loaded npm libraries." },
+        { "kind": "network", "description": "Binds and starts a gRPC server via dynamically-loaded '@grpc/grpc-js' and '@grpc/proto-loader'." },
+        { "kind": "clock", "description": "Uses setTimeout for TCP reconnect retry and NATS graceful-shutdown grace period." },
+        { "kind": "other", "description": "Writes connection/error/status messages to the Logger throughout all transport files." }
+      ]
+    },
+
+    {
+      "name": "mq-serialization",
+      "kind": "infra",
+      "role": "Converts between Nest's internal packet shapes and each microservice transport's wire format, in both directions.",
+      "description": "This code is the translation layer for NestJS microservices: it takes a message a program wants to send and packages it into the exact byte/JSON format each messaging system expects, and does the reverse when a message arrives — unwrapping it back into a standard internal shape the rest of the framework understands. It does not open any network connections or files itself; it is purely about the shape and format of messages, not about sending or receiving them.",
+      "files": [
+        "packages/microservices/deserializers/index.ts","packages/microservices/deserializers/nats-response-json.deserializer.ts","packages/microservices/deserializers/kafka-request.deserializer.ts","packages/microservices/deserializers/identity.deserializer.ts","packages/microservices/deserializers/kafka-response.deserializer.ts","packages/microservices/deserializers/incoming-request.deserializer.ts","packages/microservices/deserializers/nats-request-json.deserializer.ts","packages/microservices/deserializers/incoming-response.deserializer.ts",
+        "packages/microservices/serializers/index.ts","packages/microservices/serializers/kafka-request.serializer.ts","packages/microservices/serializers/nats-record.serializer.ts","packages/microservices/serializers/mqtt-record.serializer.ts","packages/microservices/serializers/rmq-record.serializer.ts","packages/microservices/serializers/identity.serializer.ts",
+        "packages/microservices/enums/kafka-headers.enum.ts"
+      ],
+      "entrypoints": [
+        { "name": "IdentitySerializer", "kind": "class", "location": "packages/microservices/serializers/identity.serializer.ts:3", "plain": "A no-op serializer used as the default when a transport needs no wrapping." },
+        { "name": "IncomingRequestDeserializer", "kind": "class", "location": "packages/microservices/deserializers/incoming-request.deserializer.ts:11", "plain": "Unwraps a generic incoming request packet into Nest's internal shape." },
+        { "name": "IncomingResponseDeserializer", "kind": "class", "location": "packages/microservices/deserializers/incoming-response.deserializer.ts:7", "plain": "Unwraps a generic incoming response packet into Nest's internal shape." },
+        { "name": "KafkaRequestDeserializer", "kind": "class", "location": "packages/microservices/deserializers/kafka-request.deserializer.ts:8", "plain": "Unwraps a raw Kafka message into Nest's internal request shape." },
+        { "name": "KafkaRequestSerializer", "kind": "class", "location": "packages/microservices/serializers/kafka-request.serializer.ts:19", "plain": "Packs an outgoing request into Kafka's message/header format." },
+        { "name": "NatsRecordSerializer", "kind": "class", "location": "packages/microservices/serializers/nats-record.serializer.ts:6", "plain": "Packs an outgoing NatsRecord into the wire format NATS expects." },
+        { "name": "MqttRecordSerializer", "kind": "class", "location": "packages/microservices/serializers/mqtt-record.serializer.ts:5", "plain": "Packs an outgoing MqttRecord into the wire format MQTT expects." },
+        { "name": "RmqRecordSerializer", "kind": "class", "location": "packages/microservices/serializers/rmq-record.serializer.ts:6", "plain": "Packs an outgoing RmqRecord into the wire format RabbitMQ expects." },
+        { "name": "KafkaHeaders", "kind": "type", "location": "packages/microservices/enums/kafka-headers.enum.ts:1", "plain": "The set of well-known Kafka message header names used by the Kafka serializer/deserializer pair." }
+      ],
+      "depends_on": [
+        { "unit": "mq-transport-support", "entrypoint": "InterfacesBarrel" }
+      ],
+      "effects": []
+    },
+
+    {
+      "name": "mq-transport-support",
+      "kind": "infra",
+      "role": "Shared low-level plumbing for every microservice transport: TCP framing, third-party type declarations, event names, wire-level exceptions.",
+      "description": "This unit is the shared low-level wiring underneath every NestJS microservice transport. It contains: the code that turns raw network bytes into framed JSON messages and back over a plain TCP socket; type definitions describing the connection/status events each transport's client library can emit; type declarations describing the configuration options and data shapes of the third-party libraries each transport wraps; and the specific error objects thrown when something goes wrong at the wire level. Both the client-facing and server-facing transport units import from here; this unit implements no client or server logic of its own.",
+      "files": [
+        "packages/microservices/helpers/index.ts","packages/microservices/helpers/tcp-socket.ts","packages/microservices/helpers/json-socket.ts","packages/microservices/helpers/kafka-parser.ts","packages/microservices/helpers/kafka-logger.ts","packages/microservices/helpers/grpc-helpers.ts",
+        "packages/microservices/external/grpc-options.interface.ts","packages/microservices/external/redis.interface.ts","packages/microservices/external/rmq-url.interface.ts","packages/microservices/external/kafka.interface.ts","packages/microservices/external/mqtt-options.interface.ts","packages/microservices/external/nats-codec.interface.ts",
+        "packages/microservices/events/mqtt.events.ts","packages/microservices/events/index.ts","packages/microservices/events/redis.events.ts","packages/microservices/events/nats.events.ts","packages/microservices/events/tcp.events.ts","packages/microservices/events/kafka.events.ts","packages/microservices/events/rmq.events.ts",
+        "packages/microservices/errors/invalid-grpc-package.exception.ts","packages/microservices/errors/invalid-grpc-message-decorator.exception.ts","packages/microservices/errors/invalid-grpc-service.exception.ts","packages/microservices/errors/invalid-proto-definition.exception.ts","packages/microservices/errors/invalid-message.exception.ts","packages/microservices/errors/net-socket-closed.exception.ts","packages/microservices/errors/empty-response.exception.ts","packages/microservices/errors/invalid-kafka-client-topic.exception.ts","packages/microservices/errors/corrupted-packet-length.exception.ts","packages/microservices/errors/invalid-grpc-package-definition-mutex.exception.ts","packages/microservices/errors/invalid-grpc-package-definition-missing-package-definition.exception.ts","packages/microservices/errors/max-packet-length-exceeded.exception.ts","packages/microservices/errors/invalid-tcp-data-reception.exception.ts","packages/microservices/errors/invalid-json-format.exception.ts",
+        "packages/microservices/constants.ts",
+        "packages/microservices/interfaces/client-grpc.interface.ts","packages/microservices/interfaces/client-kafka-proxy.interface.ts","packages/microservices/interfaces/client-metadata.interface.ts","packages/microservices/interfaces/custom-transport-strategy.interface.ts","packages/microservices/interfaces/deserializer.interface.ts","packages/microservices/interfaces/index.ts","packages/microservices/interfaces/message-handler.interface.ts","packages/microservices/interfaces/microservice-configuration.interface.ts","packages/microservices/interfaces/microservice-entrypoint-metadata.interface.ts","packages/microservices/interfaces/packet.interface.ts","packages/microservices/interfaces/pattern-metadata.interface.ts","packages/microservices/interfaces/pattern.interface.ts","packages/microservices/interfaces/request-context.interface.ts","packages/microservices/interfaces/serializer.interface.ts"
+      ],
+      "entrypoints": [
+        { "name": "TcpSocket", "kind": "class", "location": "packages/microservices/helpers/tcp-socket.ts:7", "plain": "Base class wrapping a raw net.Socket with message-framing hooks." },
+        { "name": "JsonSocket", "kind": "class", "location": "packages/microservices/helpers/json-socket.ts:13", "plain": "Concrete TcpSocket that frames JSON messages with a length prefix." },
+        { "name": "getGrpcPackageDefinition", "kind": "function", "location": "packages/microservices/helpers/grpc-helpers.ts:5", "plain": "Loads/validates a gRPC package definition from a .proto file or pre-built definition." },
+        { "name": "KafkaParser", "kind": "class", "location": "packages/microservices/helpers/kafka-parser.ts:4", "plain": "Decodes raw Kafka message buffers/keys/headers." },
+        { "name": "KafkaLogger", "kind": "function", "location": "packages/microservices/helpers/kafka-logger.ts:3", "plain": "Adapts kafkajs' internal log entries to Nest's logger." },
+        { "name": "InvalidMessageException", "kind": "class", "location": "packages/microservices/errors/invalid-message.exception.ts:6", "plain": "Thrown for a null/undefined message pattern." },
+        { "name": "InvalidTcpDataReceptionException", "kind": "class", "location": "packages/microservices/errors/invalid-tcp-data-reception.exception.ts:1", "plain": "Thrown for malformed data received over TCP." },
+        { "name": "MicroservicesConstants", "kind": "constant", "location": "packages/microservices/constants.ts:1", "plain": "Shared default hosts/ports/timeouts and metadata keys used across every transport." },
+        { "name": "InterfacesBarrel", "kind": "type", "location": "packages/microservices/interfaces/index.ts:1", "plain": "The shared type surface (ClientOptions, ReadPacket, WritePacket, MsPattern, per-transport option types) every microservices unit is typed against." }
+      ],
+      "depends_on": [
+        { "unit": "common-kernel", "entrypoint": "loadPackage" },
+        { "unit": "logger", "entrypoint": "LoggerService" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "tcp-socket.ts/json-socket.ts wrap Node's net.Socket directly, listening for data/connect/close/error events and writing length-prefixed JSON frames." },
+        { "kind": "filesystem", "description": "grpc-helpers.ts calls the proto-loader's loadSync(file, ...), which reads a .proto file from disk when a protoPath is given." },
+        { "kind": "other", "description": "kafka-logger.ts forwards kafkajs log entries to an injected logger's log/warn/error/debug methods." }
+      ]
+    },
+
+    {
+      "name": "mq-dispatch",
+      "kind": "domain",
+      "role": "Routes a decoded incoming microservice message to the right @MessagePattern/@EventPattern handler and runs its guard/pipe/interceptor/filter pipeline.",
+      "description": "This is the traffic-control center for NestJS microservices. When a message arrives over any supported transport, this code figures out which method on which controller class should handle it — matching the message's pattern/topic against methods tagged with decorators like @MessagePattern or @EventPattern. It then assembles the right context object for that call, applies guards/pipes/interceptors, invokes the handler, and if anything goes wrong, routes the error through the correct exception filter. It also defines the decorators developers use to opt into this system and the exception classes developers throw to signal specific RPC error conditions.",
+      "files": [
+        "packages/microservices/context/rpc-proxy.ts","packages/microservices/context/rpc-metadata-constants.ts","packages/microservices/context/rpc-context-creator.ts","packages/microservices/context/request-context-host.ts","packages/microservices/context/exception-filters-context.ts",
+        "packages/microservices/ctx-host/kafka.context.ts","packages/microservices/ctx-host/rmq.context.ts","packages/microservices/ctx-host/tcp.context.ts","packages/microservices/ctx-host/index.ts","packages/microservices/ctx-host/mqtt.context.ts","packages/microservices/ctx-host/redis.context.ts","packages/microservices/ctx-host/base-rpc.context.ts","packages/microservices/ctx-host/nats.context.ts",
+        "packages/microservices/listeners-controller.ts","packages/microservices/listener-metadata-explorer.ts",
+        "packages/microservices/decorators/index.ts","packages/microservices/decorators/payload.decorator.ts","packages/microservices/decorators/client.decorator.ts","packages/microservices/decorators/event-pattern.decorator.ts","packages/microservices/decorators/ctx.decorator.ts","packages/microservices/decorators/message-pattern.decorator.ts","packages/microservices/decorators/grpc-service.decorator.ts",
+        "packages/microservices/factories/rpc-params-factory.ts",
+        "packages/microservices/exceptions/grpc-exception.ts","packages/microservices/exceptions/index.ts","packages/microservices/exceptions/rpc-exceptions-handler.ts","packages/microservices/exceptions/grpc-exception-filter.ts","packages/microservices/exceptions/kafka-retriable-exception.ts","packages/microservices/exceptions/base-rpc-exception-filter.ts","packages/microservices/exceptions/rpc-exception.ts",
+        "packages/microservices/enums/pattern-handler.enum.ts","packages/microservices/enums/index.ts","packages/microservices/enums/grpc-status.enum.ts","packages/microservices/enums/rpc-paramtype.enum.ts","packages/microservices/enums/transport.enum.ts",
+        "packages/microservices/utils/index.ts","packages/microservices/utils/transform-pattern.utils.ts","packages/microservices/utils/param.utils.ts",
+        "packages/microservices/tokens.ts"
+      ],
+      "entrypoints": [
+        { "name": "ListenersController", "kind": "class", "location": "packages/microservices/listeners-controller.ts:66", "plain": "Registers every controller's @MessagePattern/@EventPattern handlers against the running server(s) when the app starts." },
+        { "name": "MessagePattern", "kind": "function", "location": "packages/microservices/decorators/message-pattern.decorator.ts:27", "plain": "Marks a method as the handler for a request/response message pattern." },
+        { "name": "EventPattern", "kind": "function", "location": "packages/microservices/decorators/event-pattern.decorator.ts:27", "plain": "Marks a method as the handler for a fire-and-forget event pattern." },
+        { "name": "Payload", "kind": "function", "location": "packages/microservices/decorators/payload.decorator.ts:87", "plain": "Injects the incoming message's payload into a handler parameter." },
+        { "name": "Ctx", "kind": "function", "location": "packages/microservices/decorators/ctx.decorator.ts:4", "plain": "Injects the transport-specific context object into a handler parameter." },
+        { "name": "Client", "kind": "function", "location": "packages/microservices/decorators/client.decorator.ts:15", "plain": "Injects a configured ClientProxy into a class property." },
+        { "name": "GrpcService", "kind": "function", "location": "packages/microservices/decorators/grpc-service.decorator.ts:7", "plain": "Marks a class as implementing a gRPC service." },
+        { "name": "RpcException", "kind": "class", "location": "packages/microservices/exceptions/rpc-exception.ts:6", "plain": "The base error type a handler throws to signal an RPC-level failure." },
+        { "name": "GrpcException", "kind": "class", "location": "packages/microservices/exceptions/grpc-exception.ts:11", "plain": "A typed gRPC-status-aware error a handler can throw." },
+        { "name": "BaseRpcExceptionFilter", "kind": "class", "location": "packages/microservices/exceptions/base-rpc-exception-filter.ts:15", "plain": "The default exception filter applied to RPC handlers." },
+        { "name": "Transport", "kind": "type", "location": "packages/microservices/enums/transport.enum.ts:1", "plain": "The enumeration of supported microservice transports." },
+        { "name": "transformPatternToRoute", "kind": "function", "location": "packages/microservices/utils/transform-pattern.utils.ts:17", "plain": "Normalizes a message pattern into the internal route key used for matching." },
+        { "name": "CONTEXT", "kind": "constant", "location": "packages/microservices/tokens.ts:1", "plain": "DI token (re-export of @nestjs/core's REQUEST) for injecting the current RPC request-scoped context." }
+      ],
+      "depends_on": [
+        { "unit": "mq-clients", "entrypoint": "ClientProxyFactory" },
+        { "unit": "mq-servers", "entrypoint": "ServerGrpc" },
+        { "unit": "mq-transport-support", "entrypoint": "InterfacesBarrel" },
+        { "unit": "mq-transport-support", "entrypoint": "MicroservicesConstants" },
+        { "unit": "mq-bootstrap", "entrypoint": "ClientsContainer" },
+        { "unit": "execution-context", "entrypoint": "ExecutionContextHost" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "GuardsConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "PipesConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "InterceptorsConsumer" },
+        { "unit": "di-container", "entrypoint": "createContextId" },
+        { "unit": "app-bootstrap", "entrypoint": "MetadataScanner" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "BaseRpcExceptionFilter logs unhandled/unknown exceptions via Logger." }
+      ]
+    },
+
+    {
+      "name": "mq-bootstrap",
+      "kind": "infra",
+      "role": "Assembles a Nest microservice application and provides ClientsModule for DI-registering outgoing client connections.",
+      "description": "This code is the 'ignition and wiring' for a Nest microservice application. When a developer starts a microservice, this unit builds the running application object, figures out which network transport to use, wires up the internal machinery that will later route incoming messages to controller methods, and starts/stops the transport connection on demand. It also provides the ClientsModule, used to register outgoing connections to other microservices into Nest's dependency injection container, including a registry that tracks those connections so they can all be closed cleanly on shutdown.",
+      "files": [
+        "packages/microservices/nest-microservice.ts","packages/microservices/microservices-module.ts","packages/microservices/container.ts","packages/microservices/module/index.ts","packages/microservices/module/clients.module.ts","packages/microservices/module/interfaces/index.ts","packages/microservices/module/interfaces/clients-module.interface.ts","packages/microservices/index.ts"
+      ],
+      "entrypoints": [
+        { "name": "NestMicroservice", "kind": "class", "location": "packages/microservices/nest-microservice.ts:37", "plain": "The running microservice application object, built and returned by NestFactory.createMicroservice()." },
+        { "name": "ClientsModule", "kind": "class", "location": "packages/microservices/module/clients.module.ts:19", "plain": "Registers one or more outgoing ClientProxy connections into the DI container." },
+        { "name": "ClientsContainer", "kind": "class", "location": "packages/microservices/container.ts:3", "plain": "Tracks every registered client connection so they can all be closed on shutdown." }
+      ],
+      "depends_on": [
+        { "unit": "mq-servers", "entrypoint": "ServerFactory" },
+        { "unit": "mq-clients", "entrypoint": "ClientProxyFactory" },
+        { "unit": "mq-dispatch", "entrypoint": "ListenersController" },
+        { "unit": "app-bootstrap", "entrypoint": "NestApplicationContext" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Lazily requires/imports the optional '@nestjs/websockets/socket-module' package at runtime when hybrid HTTP+microservice apps are used." },
+        { "kind": "other", "description": "Wires each created client's close() into Nest's OnApplicationShutdown hook, and iterates all registered clients awaiting client.close() on shutdown." }
+      ]
+    },
+
+    {
+      "name": "ws-dispatch",
+      "kind": "domain",
+      "role": "The decorator API for declaring websocket gateways/handlers and the machinery that dispatches an incoming message to the right handler.",
+      "description": "This is the part of NestJS that lets a developer declare a WebSocket gateway class and mark its methods as handlers for specific incoming message names, using annotations like @WebSocketGateway and @SubscribeMessage. When a message arrives on a socket, this code figures out which handler method should run, gathers the right pieces of data to hand it, runs any guards/interceptors the developer configured, invokes the handler, and if anything goes wrong, catches the error and reports it back to the client through the appropriate error handler instead of crashing the connection.",
+      "files": [
+        "packages/websockets/context/ws-metadata-constants.ts","packages/websockets/context/ws-context-creator.ts","packages/websockets/context/ws-proxy.ts","packages/websockets/context/exception-filters-context.ts",
+        "packages/websockets/decorators/index.ts","packages/websockets/decorators/connected-socket.decorator.ts","packages/websockets/decorators/message-body.decorator.ts","packages/websockets/decorators/ack.decorator.ts","packages/websockets/decorators/subscribe-message.decorator.ts","packages/websockets/decorators/gateway-server.decorator.ts","packages/websockets/decorators/socket-gateway.decorator.ts",
+        "packages/websockets/gateway-metadata-explorer.ts","packages/websockets/web-sockets-controller.ts",
+        "packages/websockets/factories/ws-params-factory.ts",
+        "packages/websockets/utils/compare-element.util.ts","packages/websockets/utils/index.ts","packages/websockets/utils/param.utils.ts",
+        "packages/websockets/exceptions/index.ts","packages/websockets/exceptions/ws-exceptions-handler.ts","packages/websockets/exceptions/base-ws-exception-filter.ts",
+        "packages/websockets/errors/invalid-socket-port.exception.ts","packages/websockets/errors/index.ts","packages/websockets/errors/ws-exception.ts",
+        "packages/websockets/enums/ws-paramtype.enum.ts",
+        "packages/websockets/interfaces/index.ts","packages/websockets/interfaces/hooks/on-gateway-connection.interface.ts","packages/websockets/interfaces/hooks/index.ts","packages/websockets/interfaces/hooks/on-gateway-disconnect.interface.ts","packages/websockets/interfaces/hooks/on-gateway-init.interface.ts","packages/websockets/interfaces/websockets-entrypoint-metadata.interface.ts","packages/websockets/interfaces/ws-response.interface.ts","packages/websockets/interfaces/gateway-metadata.interface.ts","packages/websockets/interfaces/web-socket-server.interface.ts","packages/websockets/interfaces/server-and-event-streams-host.interface.ts","packages/websockets/interfaces/nest-gateway.interface.ts",
+        "packages/websockets/constants.ts","packages/websockets/internal.ts","packages/websockets/index.ts"
+      ],
+      "entrypoints": [
+        { "name": "connectGatewayToServer", "kind": "method", "location": "packages/websockets/web-sockets-controller.ts:62", "plain": "Binds a decorated gateway class to a live socket server and starts dispatching its messages." },
+        { "name": "WsContextCreator", "kind": "class", "location": "packages/websockets/context/ws-context-creator.ts:41", "plain": "Wraps a gateway handler method with argument resolution, guards, pipes, and interceptors." },
+        { "name": "ExceptionFiltersContext", "kind": "class", "location": "packages/websockets/context/exception-filters-context.ts:15", "plain": "Resolves the exception filters attached to a gateway handler." },
+        { "name": "WebSocketGateway", "kind": "function", "location": "packages/websockets/decorators/socket-gateway.decorator.ts:21", "plain": "Marks a class as a websocket gateway, optionally with port/namespace/adapter options." },
+        { "name": "SubscribeMessage", "kind": "function", "location": "packages/websockets/decorators/subscribe-message.decorator.ts:8", "plain": "Marks a method as the handler for a named incoming socket message." },
+        { "name": "MessageBody", "kind": "function", "location": "packages/websockets/decorators/message-body.decorator.ts:89", "plain": "Injects the incoming message payload into a handler parameter." },
+        { "name": "ConnectedSocket", "kind": "function", "location": "packages/websockets/decorators/connected-socket.decorator.ts:7", "plain": "Injects the raw client socket into a handler parameter." },
+        { "name": "WebSocketServer", "kind": "function", "location": "packages/websockets/decorators/gateway-server.decorator.ts:8", "plain": "Injects the live underlying server instance into a gateway property." },
+        { "name": "WsException", "kind": "class", "location": "packages/websockets/errors/ws-exception.ts:3", "plain": "The base error type a gateway handler throws to signal a websocket-level failure." },
+        { "name": "BaseWsExceptionFilter", "kind": "class", "location": "packages/websockets/exceptions/base-ws-exception-filter.ts:47", "plain": "The default exception filter applied to gateway handlers." },
+        { "name": "MessageMappingProperties", "kind": "type", "location": "packages/websockets/gateway-metadata-explorer.ts:14", "plain": "The type describing a discovered {message, handler} pairing, consumed by the concrete adapters to bind real socket events." }
+      ],
+      "depends_on": [
+        { "unit": "execution-context", "entrypoint": "ExecutionContextHost" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "GuardsConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "PipesConsumer" },
+        { "unit": "request-enhancers-runtime", "entrypoint": "InterceptorsConsumer" },
+        { "unit": "ws-adapters", "entrypoint": "SocketServerProvider" },
+        { "unit": "di-container", "entrypoint": "createContextId" },
+        { "unit": "app-bootstrap", "entrypoint": "MetadataScanner" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "WebSocketsController and BaseWsExceptionFilter create Logger instances and log gateway subscription info and unhandled exceptions." },
+        { "kind": "network", "description": "BaseWsExceptionFilter.emitMessage writes an error payload directly back to the client socket via client.send()/client.emit()." },
+        { "kind": "other", "description": "Decorators and context/explorer code read and write design-time metadata via Reflect.defineMetadata/getMetadata to mark and later discover gateways, message handlers, and parameter bindings." }
+      ]
+    },
+
+    {
+      "name": "ws-adapters",
+      "kind": "infra",
+      "role": "Discovers @WebSocketGateway classes, binds each to a concrete socket-server library, and holds the resulting live server instances.",
+      "description": "This code is the glue that turns a plain Nest application into one that can talk over WebSockets. When the app starts, it looks through all the registered classes to find the ones marked as WebSocket gateways, then picks or lazily loads a concrete WebSocket server library, and starts a real server instance for each port/path/namespace a gateway needs. It keeps track of those live server instances so that when a gateway asks to be handed 'the server', it gets the correct already-running instance, and it knows how to gracefully shut all those servers down when the application stops.",
+      "files": [
+        "packages/websockets/adapters/index.ts","packages/websockets/adapters/ws-adapter.ts","packages/websockets/socket-module.ts","packages/websockets/socket-server-provider.ts","packages/websockets/sockets-container.ts","packages/websockets/factories/server-and-event-streams-factory.ts"
+      ],
+      "entrypoints": [
+        { "name": "SocketModule", "kind": "class", "location": "packages/websockets/socket-module.ts:34", "plain": "Instantiated by Nest's core HTTP/microservice bootstrap code to discover and bind gateways when the app starts." },
+        { "name": "AbstractWsAdapter", "kind": "class", "location": "packages/websockets/adapters/ws-adapter.ts:13", "plain": "The base class a concrete socket-server library (Socket.IO, ws) implements to plug into Nest gateways." },
+        { "name": "SocketServerProvider", "kind": "class", "location": "packages/websockets/socket-server-provider.ts:8", "plain": "Resolves (creating if needed) the live server instance for a given gateway's port/namespace." },
+        { "name": "ServerAndEventStreamsFactory", "kind": "class", "location": "packages/websockets/factories/server-and-event-streams-factory.ts:1", "plain": "Wraps a raw socket server in observable event streams for connection/disconnection." }
+      ],
+      "depends_on": [
+        { "unit": "ws-dispatch", "entrypoint": "connectGatewayToServer" },
+        { "unit": "ws-dispatch", "entrypoint": "WsContextCreator" },
+        { "unit": "ws-dispatch", "entrypoint": "ExceptionFiltersContext" },
+        { "unit": "app-bootstrap", "entrypoint": "loadAdapter" },
+        { "unit": "app-bootstrap", "entrypoint": "ApplicationConfig" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "SocketModule.initializeAdapter() lazily dynamic-imports '@nestjs/platform-socket.io' at runtime if no adapter was configured." },
+        { "kind": "network", "description": "SocketServerProvider calls adapter.create(port, options) to stand up a live WebSocket/namespace server." },
+        { "kind": "network", "description": "SocketModule.close() iterates all cached servers and calls adapter.close()/adapter.dispose() to tear down open connections on shutdown." }
+      ]
+    },
+
+    {
+      "name": "platform-express",
+      "kind": "infra",
+      "role": "Implements Nest's HTTP-adapter interface on top of Express, plus Multer-based file-upload interceptors.",
+      "description": "This unit is the glue between a NestJS application and the Express web framework. It provides the ExpressAdapter, which starts an actual web server, reads incoming requests, and sends back responses, headers, redirects, and file downloads using Express under the hood. It also provides file-upload support: decorators/interceptors (FileInterceptor, FilesInterceptor, FileFieldsInterceptor, AnyFilesInterceptor, NoFilesInterceptor) and a MulterModule that let an application accept files uploaded by users, using the Multer library to store them on disk or in memory.",
+      "files": [
+        "packages/platform-express/adapters/express-adapter.ts","packages/platform-express/adapters/index.ts","packages/platform-express/adapters/utils/get-body-parser-options.util.ts","packages/platform-express/index.ts","packages/platform-express/interfaces/index.ts","packages/platform-express/interfaces/nest-express-application.interface.ts","packages/platform-express/interfaces/nest-express-body-parser-options.interface.ts","packages/platform-express/interfaces/nest-express-body-parser.interface.ts","packages/platform-express/interfaces/serve-static-options.interface.ts","packages/platform-express/multer/files.constants.ts","packages/platform-express/multer/index.ts","packages/platform-express/multer/interceptors/any-files.interceptor.ts","packages/platform-express/multer/interceptors/file-fields.interceptor.ts","packages/platform-express/multer/interceptors/file.interceptor.ts","packages/platform-express/multer/interceptors/files.interceptor.ts","packages/platform-express/multer/interceptors/index.ts","packages/platform-express/multer/interceptors/no-files.interceptor.ts","packages/platform-express/multer/interfaces/files-upload-module.interface.ts","packages/platform-express/multer/interfaces/index.ts","packages/platform-express/multer/interfaces/multer-options.interface.ts","packages/platform-express/multer/multer.constants.ts","packages/platform-express/multer/multer.module.ts","packages/platform-express/multer/multer/multer.constants.ts","packages/platform-express/multer/multer/multer.utils.ts"
+      ],
+      "entrypoints": [
+        { "name": "ExpressAdapter", "kind": "class", "location": "packages/platform-express/adapters/express-adapter.ts:54", "plain": "Implements Nest's HTTP-adapter interface using Express; instantiated by NestFactory.create() by default." },
+        { "name": "FileInterceptor", "kind": "function", "location": "packages/platform-express/multer/interceptors/file.interceptor.ts:25", "plain": "Parses a single uploaded file from a multipart/form-data request." },
+        { "name": "FilesInterceptor", "kind": "function", "location": "packages/platform-express/multer/interceptors/files.interceptor.ts:27", "plain": "Parses multiple uploaded files under one field name." },
+        { "name": "FileFieldsInterceptor", "kind": "function", "location": "packages/platform-express/multer/interceptors/file-fields.interceptor.ts:27", "plain": "Parses uploaded files across multiple named fields." },
+        { "name": "AnyFilesInterceptor", "kind": "function", "location": "packages/platform-express/multer/interceptors/any-files.interceptor.ts:24", "plain": "Parses any uploaded files regardless of field name." },
+        { "name": "NoFilesInterceptor", "kind": "function", "location": "packages/platform-express/multer/interceptors/no-files.interceptor.ts:24", "plain": "Parses a multipart form while rejecting any file fields." },
+        { "name": "MulterModule", "kind": "class", "location": "packages/platform-express/multer/multer.module.ts:15", "plain": "Registers Multer configuration (storage, limits) into the DI container." },
+        { "name": "NestExpressApplication", "kind": "type", "location": "packages/platform-express/interfaces/nest-express-application.interface.ts:19", "plain": "The typed application interface exposing Express-specific methods (useStaticAssets, setViewEngine, etc)." }
+      ],
+      "depends_on": [
+        { "unit": "app-bootstrap", "entrypoint": "AbstractHttpAdapter" },
+        { "unit": "http-router", "entrypoint": "RouterMethodFactory" },
+        { "unit": "http-router", "entrypoint": "LegacyRouteConverter" },
+        { "unit": "file-stream", "entrypoint": "StreamableFile" },
+        { "unit": "http-exceptions", "entrypoint": "HttpException" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Creates and listens on a real TCP HTTP/HTTPS server (http.createServer/https.createServer, httpServer.listen)." },
+        { "kind": "network", "description": "Tracks and force-closes open socket connections on shutdown via raw 'connection'/'close' socket events." },
+        { "kind": "filesystem", "description": "The Multer-based interceptors read multipart/form-data request bodies and, depending on configured storage, write uploaded files to disk or buffer them in memory." },
+        { "kind": "filesystem", "description": "useStaticAssets() mounts express.static(path, options), serving files from the filesystem over HTTP." },
+        { "kind": "random", "description": "MulterModule uses randomStringGenerator() to create a unique module-instance ID." }
+      ]
+    },
+
+    {
+      "name": "platform-fastify",
+      "kind": "infra",
+      "role": "Implements Nest's HTTP-adapter interface on top of Fastify.",
+      "description": "This unit is the plug-in that lets a Nest application run on top of the Fastify web server instead of the default Express server. It translates Nest's generic idea of 'an HTTP server' into the specific calls Fastify expects, and it starts and stops the actual network listener that accepts incoming HTTP/HTTPS/HTTP2 requests. It also ships a few small decorators that let route handlers carry Fastify-specific metadata, and a bundled copy of the Fastify 'middie' plugin used to run legacy Express-style middleware inside Fastify.",
+      "files": [
+        "packages/platform-fastify/adapters/fastify-adapter.ts","packages/platform-fastify/adapters/index.ts","packages/platform-fastify/adapters/middie/fastify-middie.ts","packages/platform-fastify/constants.ts","packages/platform-fastify/decorators/index.ts","packages/platform-fastify/decorators/route-config.decorator.ts","packages/platform-fastify/decorators/route-constraints.decorator.ts","packages/platform-fastify/decorators/route-schema.decorator.ts","packages/platform-fastify/index.ts","packages/platform-fastify/interfaces/external/fastify-static-options.interface.ts","packages/platform-fastify/interfaces/external/fastify-view-options.interface.ts","packages/platform-fastify/interfaces/external/index.ts","packages/platform-fastify/interfaces/index.ts","packages/platform-fastify/interfaces/nest-fastify-application.interface.ts","packages/platform-fastify/interfaces/nest-fastify-body-parser-options.interface.ts"
+      ],
+      "entrypoints": [
+        { "name": "FastifyAdapter", "kind": "class", "location": "packages/platform-fastify/adapters/fastify-adapter.ts:133", "plain": "Implements Nest's HTTP-adapter interface using Fastify." },
+        { "name": "NestFastifyApplication", "kind": "type", "location": "packages/platform-fastify/interfaces/nest-fastify-application.interface.ts:27", "plain": "The typed application interface exposing Fastify-specific methods." },
+        { "name": "RouteConfig", "kind": "function", "location": "packages/platform-fastify/decorators/route-config.decorator.ts:9", "plain": "Attaches Fastify route 'config' metadata to a handler." },
+        { "name": "RouteConstraints", "kind": "function", "location": "packages/platform-fastify/decorators/route-constraints.decorator.ts:10", "plain": "Attaches Fastify route 'constraints' metadata to a handler." },
+        { "name": "RouteSchema", "kind": "function", "location": "packages/platform-fastify/decorators/route-schema.decorator.ts:14", "plain": "Attaches a Fastify JSON validation schema to a handler." }
+      ],
+      "depends_on": [
+        { "unit": "app-bootstrap", "entrypoint": "AbstractHttpAdapter" },
+        { "unit": "app-bootstrap", "entrypoint": "loadAdapter" },
+        { "unit": "http-router", "entrypoint": "LegacyRouteConverter" },
+        { "unit": "http-exceptions", "entrypoint": "HttpException" },
+        { "unit": "file-stream", "entrypoint": "StreamableFile" },
+        { "unit": "logger", "entrypoint": "Logger" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "FastifyAdapter.listen() binds and starts a real TCP HTTP/HTTPS/HTTP2 server; close() shuts it down." },
+        { "kind": "other", "description": "inject() performs in-process fake HTTP requests via 'light-my-request' for testing without a real socket." },
+        { "kind": "other", "description": "useStaticAssets()/setViewEngine()/enableCors() lazily import the @fastify/static, @fastify/view, and @fastify/cors plugins at call time." },
+        { "kind": "other", "description": "setViewEngine() calls process.exit(1) if given an invalid argument." }
+      ]
+    },
+
+    {
+      "name": "platform-socket-io",
+      "kind": "infra",
+      "role": "Implements Nest's WebSocket adapter interface on top of socket.io.",
+      "description": "This unit lets a Nest application speak WebSockets using the socket.io library. It provides an adapter class, IoAdapter, that Nest's gateway system plugs into: it can start a new socket.io server on a given port (or attach to an existing HTTP server), route incoming socket events to the handler methods a developer wrote in their @WebSocketGateway() classes, send responses/acknowledgements back down the socket, and clean up connections when a client disconnects or the server shuts down.",
+      "files": [
+        "packages/platform-socket.io/adapters/index.ts","packages/platform-socket.io/adapters/io-adapter.ts","packages/platform-socket.io/index.ts"
+      ],
+      "entrypoints": [
+        { "name": "IoAdapter", "kind": "class", "location": "packages/platform-socket.io/adapters/io-adapter.ts:14", "plain": "Implements Nest's abstract websocket adapter using socket.io; passed to app.useWebSocketAdapter() or used as the default." }
+      ],
+      "depends_on": [
+        { "unit": "ws-adapters", "entrypoint": "AbstractWsAdapter" },
+        { "unit": "ws-dispatch", "entrypoint": "WsContextCreator" },
+        { "unit": "common-kernel", "entrypoint": "shared-predicates" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "IoAdapter.createIOServer opens a real socket.io/HTTP network server, either binding a new server to a port or attaching to an existing httpServer." },
+        { "kind": "network", "description": "bindMessageHandlers wires live socket event streams and emits responses/acks back over the connection; close() shuts down the underlying server." }
+      ]
+    },
+
+    {
+      "name": "platform-ws",
+      "kind": "infra",
+      "role": "Implements Nest's WebSocket adapter interface on top of the 'ws' library.",
+      "description": "This package lets a Nest application handle WebSocket connections using the lightweight 'ws' library instead of Socket.IO. It plugs into Nest's generic WebSocket-gateway system as a swappable adapter: it opens or reuses an HTTP server, listens for WebSocket upgrade requests, routes incoming messages to the right gateway handler method, sends responses back down the socket, and cleans up all servers/sockets when the application shuts down.",
+      "files": [
+        "packages/platform-ws/adapters/index.ts","packages/platform-ws/adapters/ws-adapter.ts","packages/platform-ws/index.ts"
+      ],
+      "entrypoints": [
+        { "name": "WsAdapter", "kind": "class", "location": "packages/platform-ws/adapters/ws-adapter.ts:51", "plain": "Implements Nest's abstract websocket adapter using the 'ws' library; passed to app.useWebSocketAdapter()." }
+      ],
+      "depends_on": [
+        { "unit": "ws-adapters", "entrypoint": "AbstractWsAdapter" },
+        { "unit": "ws-dispatch", "entrypoint": "WsContextCreator" },
+        { "unit": "logger", "entrypoint": "Logger" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Creates and starts a real Node HTTP server via http.createServer()/listen(port) when no existing server is supplied, to accept WebSocket upgrade requests." },
+        { "kind": "network", "description": "Instantiates the 'ws' library's Server/WebSocketServer, handling the raw HTTP 'upgrade' event and manually completing or destroying the underlying socket." },
+        { "kind": "other", "description": "Loads the optional peer dependency 'ws' at runtime via loadPackageSync/createRequire." }
+      ]
+    },
+
+    {
+      "name": "testing-module",
+      "kind": "infra",
+      "role": "Builds a Nest application/module for tests, with support for overriding providers/guards/pipes/interceptors/filters with mocks.",
+      "description": "This is the developer-facing testing toolkit that ships as the @nestjs/testing package. It lets a developer describe a small, fake version of their Nest application, optionally swap out any of those pieces for mocks or stub values, and then 'compile' that description into a real, working mini-application they can run assertions against in unit or end-to-end tests. It reuses the same dependency-injection machinery as the real framework but wraps it with test-friendly conveniences: a quieter logger, automatic mocking of missing dependencies, and helpers to spin up an HTTP server or microservice instance for e2e tests.",
+      "files": [
+        "packages/testing/index.ts","packages/testing/interfaces/index.ts","packages/testing/interfaces/mock-factory.ts","packages/testing/interfaces/override-by-factory-options.interface.ts","packages/testing/interfaces/override-by.interface.ts","packages/testing/interfaces/override-module.interface.ts","packages/testing/services/testing-logger.service.ts","packages/testing/test.ts","packages/testing/testing-injector.ts","packages/testing/testing-instance-loader.ts","packages/testing/testing-module.builder.ts","packages/testing/testing-module.ts"
+      ],
+      "entrypoints": [
+        { "name": "Test", "kind": "class", "location": "packages/testing/test.ts:11", "plain": "The static entry point: Test.createTestingModule({...}) starts building a fake application for a test." },
+        { "name": "TestingModule", "kind": "class", "location": "packages/testing/testing-module.ts:31", "plain": "The compiled fake application returned to the test, with createNestApplication()/get()/etc." },
+        { "name": "TestingModuleBuilder", "kind": "class", "location": "packages/testing/testing-module.builder.ts:44", "plain": "Fluent builder for overriding providers/guards/pipes/interceptors/filters before compiling." },
+        { "name": "MockFactory", "kind": "type", "location": "packages/testing/interfaces/mock-factory.ts:3", "plain": "The function signature a developer implements to supply a custom mock for an overridden provider." }
+      ],
+      "depends_on": [
+        { "unit": "app-bootstrap", "entrypoint": "MetadataScanner" },
+        { "unit": "app-bootstrap", "entrypoint": "NestApplicationContext" },
+        { "unit": "di-container", "entrypoint": "NestContainer" },
+        { "unit": "di-container", "entrypoint": "Injector" },
+        { "unit": "inspector-graph", "entrypoint": "GraphInspector" },
+        { "unit": "logger", "entrypoint": "ConsoleLogger" },
+        { "unit": "common-kernel", "entrypoint": "loadPackage" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Preloads and dynamically imports the optional peer packages @nestjs/platform-express and @nestjs/microservices via loadPackage/tryLoadPackage so createNestApplication/createNestMicroservice can stay synchronous." },
+        { "kind": "other", "description": "TestingLogger extends ConsoleLogger, silencing log/warn/debug/verbose but still writing error() output to the console." },
+        { "kind": "other", "description": "Calls the static Logger.overrideLogger(...), mutating process-wide logger state as a side effect of compiling/creating a test app." }
+      ]
+    }
+  ],
+  "excluded": [
+    { "path": "integration/**", "reason": "End-to-end sample applications used to test the framework itself; not part of the shipped packages." },
+    { "path": "sample/**", "reason": "Example applications demonstrating framework usage; not part of the shipped packages." },
+    { "path": "examples/**", "reason": "Skill-provided worked example manifest, not repository source." },
+    { "path": "tools/**", "reason": "Benchmark harness and gulp build tooling for the monorepo, not shipped package source." },
+    { "path": "scripts/**", "reason": "Developer shell/node scripts (release prep, integration test running), not shipped package source." },
+    { "path": "**/test/**", "reason": "Unit/e2e test suites for each package." },
+    { "path": "**/*.spec.ts", "reason": "Unit/e2e test files colocated with source." },
+    { "path": ".circleci/**", "reason": "CI configuration." },
+    { "path": ".github/**", "reason": "CI/issue-template configuration." },
+    { "path": ".husky/**", "reason": "Git hook scripts." },
+    { "path": ".claude/**", "reason": "This decomposition skill's own tooling/config, not repository source." },
+    { "path": "package.json", "reason": "Root package manifest / dev tooling config." },
+    { "path": "package-lock.json", "reason": "Dependency lockfile." },
+    { "path": "lerna.json", "reason": "Monorepo tooling config." },
+    { "path": "tsconfig.json", "reason": "Build configuration." },
+    { "path": "tsconfig.spec.json", "reason": "Build configuration." },
+    { "path": "packages/*/tsconfig.json", "reason": "Per-package build configuration." },
+    { "path": "packages/*/tsconfig.build.json", "reason": "Per-package build configuration." },
+    { "path": "packages/*/package.json", "reason": "Per-package npm manifest." },
+    { "path": "gulpfile.mjs", "reason": "Build tooling." },
+    { "path": "vitest.config.mts", "reason": "Test runner configuration." },
+    { "path": "vitest.config.coverage.mts", "reason": "Test runner configuration." },
+    { "path": "vitest.config.integration.mts", "reason": "Test runner configuration." },
+    { "path": ".oxlintrc.json", "reason": "Linter configuration." },
+    { "path": ".prettierrc", "reason": "Formatter configuration." },
+    { "path": ".prettierignore", "reason": "Formatter configuration." },
+    { "path": ".commitlintrc.json", "reason": "Commit-message linter configuration." },
+    { "path": ".gitattributes", "reason": "VCS configuration." },
+    { "path": ".gitignore", "reason": "VCS configuration." },
+    { "path": ".npmignore", "reason": "Publish configuration." },
+    { "path": "renovate.json", "reason": "Dependency-update bot configuration." },
+    { "path": "lu-manifest.schema.json", "reason": "This decomposition skill's schema file, not repository source." },
+    { "path": "Readme.md", "reason": "Documentation." },
+    { "path": "readme_jp.md", "reason": "Documentation." },
+    { "path": "readme_kr.md", "reason": "Documentation." },
+    { "path": "readme_zh.md", "reason": "Documentation." },
+    { "path": "CONTRIBUTING.md", "reason": "Documentation." },
+    { "path": "CODE_OF_CONDUCT.md", "reason": "Documentation." },
+    { "path": "SECURITY.md", "reason": "Documentation." },
+    { "path": "LICENSE", "reason": "Documentation/legal." },
+    { "path": "packages/*/Readme.md", "reason": "Per-package documentation." },
+    { "path": "packages/*/PACKAGE.md", "reason": "Per-package documentation." }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    { "from_unit": "app-bootstrap", "to_unit": "http-router", "location": "packages/core/scanner.ts", "note": "app-bootstrap's DependenciesScanner and metadata-scanner.ts are reached directly by router/discovery/websockets/microservices code outside app-bootstrap rather than through a declared app-bootstrap entrypoint; kept in app-bootstrap for lack of a better home, but this is a wide, informally-shared dependency rather than a narrow contract." },
+    { "from_unit": "mq-clients", "to_unit": "mq-transport-support", "location": "packages/microservices/helpers/kafka-reply-partition-assigner.ts", "note": "This file (assigned to mq-clients since its only consumer is client-kafka.ts) imports ClientKafka from mq-clients itself and is in turn imported back by client-kafka.ts — a tight, effectively single-unit coupling now resolved by keeping both in mq-clients, but originally scouted as a separate 'transport-support' file, showing the seam was not clean-cut." },
+    { "from_unit": "ws-dispatch", "to_unit": "ws-adapters", "location": "packages/websockets/socket-server-provider.ts", "note": "socket-server-provider.ts (ws-adapters) reaches into web-sockets-controller.ts (ws-dispatch) and vice versa for server/context wiring during gateway bootstrap; the two units are mutually dependent at startup even though message dispatch and server provisioning are conceptually distinct." },
+    { "from_unit": "http-router", "to_unit": "middleware-pipeline", "location": "packages/core/middleware/middleware-module.ts", "note": "middleware-module.ts constructs and drives RouterExceptionFilters and RouterProxy (http-router) directly rather than through a narrow published contract, reflecting that route-exception handling was originally written as router-internal machinery later reused by middleware." }
+  ]
+}

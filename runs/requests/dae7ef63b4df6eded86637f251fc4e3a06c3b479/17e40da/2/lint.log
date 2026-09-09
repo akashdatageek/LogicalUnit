@@ -1,0 +1,28 @@
+=== lint round 1788978411 ===
+I1 'docs/_themes/flask_theme_support.py' in no unit, not excluded, not unpartitioned
+I1 'docs/conf.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/__version__.py' in no unit, not excluded, not unpartitioned
+I1 'tests/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'tests/compat.py' in no unit, not excluded, not unpartitioned
+I1 'tests/conftest.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_adapters.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_help.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_hooks.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_lowlevel.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_packages.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_requests.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_structures.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_testserver.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_utils.py' in no unit, not excluded, not unpartitioned
+I1 'tests/testserver/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'tests/testserver/server.py' in no unit, not excluded, not unpartitioned
+I1 'tests/utils.py' in no unit, not excluded, not unpartitioned
+I4 'shared-primitives' file 'src/requests/status_codes.py' shows 'network' effect not declared
+I4 'request-response-model' file 'src/requests/models.py' shows 'network' effect not declared
+I4 'session' file 'src/requests/sessions.py' shows 'network' effect not declared
+I4 'session' file 'src/requests/api.py' shows 'network' effect not declared
+22 blocking error(s)
+exit=1
+=== lint round 1788978647 ===
+0 blocking error(s)
+exit=0

@@ -115,3 +115,26 @@ manifest can be traced to the reasoning that produced it.
 - One model family did most of the optimisation; transfer tested on one other model only.
 - Replicates are not seeded; run-to-run variance is the model's, not controllable.
 - Effects P/R depends on the static detector's own recall.
+
+## F. Found by the first live Phase 0 run (2026-09)
+
+**F1. `budget_exhausted` was computed from `num_turns >= max_turns`, but `num_turns` in the
+headless result counts subagent turns.** Every run that used scouts was marked exhausted and
+failed the validity gate. *Severity: critical — it would have zeroed the primary outcome.*
+→ Fixed: derived from the result's `subtype` / `terminal_reason` (`error_max_turns`,
+`error_max_budget_usd`). `run_error` and `result_subtype` are recorded so the failure mode is
+visible. Credit: the outer agent diagnosed this from the result fields and wrote the patch
+into notes/BLOCKED.md rather than editing a fixed file — the guard worked as intended.
+
+**F2. A repo's own package name matched the effect tables** (`requests` inside psf/requests).
+→ Fixed at the resolver: an import that resolves to an in-repo file is never an effect. The
+regex fallback in the lint stub no longer matches bare library names.
+
+**F3. The over-split failure mode is real and the trivial rule missed it** (11/13 singleton
+units, negative gain, `trivial=False`). → `singleton_unit_frac` reported; PILOT.md P6 asks for
+the threshold decision before `baseline` is tagged. Not changed unilaterally: it is a
+pre-registration decision.
+
+**F4. Plan usage limits kill long runs.** The inner `claude -p` calls inherited the session's
+subscription auth and hit the usage cap mid-run. → PROMPTS.md: set `ANTHROPIC_API_KEY` in the
+environment so inner runs bill to the API; `--shard i/n` added to spread the sweep across VMs.

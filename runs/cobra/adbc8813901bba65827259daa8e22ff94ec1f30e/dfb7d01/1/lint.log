@@ -1,0 +1,28 @@
+=== lint round 1788912975 ===
+I1 'active_help_test.go' in no unit, not excluded, not unpartitioned
+I1 'args_test.go' in no unit, not excluded, not unpartitioned
+I1 'bash_completionsV2_test.go' in no unit, not excluded, not unpartitioned
+I1 'bash_completions_test.go' in no unit, not excluded, not unpartitioned
+I1 'cobra_test.go' in no unit, not excluded, not unpartitioned
+I1 'command_test.go' in no unit, not excluded, not unpartitioned
+I1 'completions_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/cmd_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/man_docs_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/man_examples_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/md_docs_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/rest_docs_test.go' in no unit, not excluded, not unpartitioned
+I1 'doc/yaml_docs_test.go' in no unit, not excluded, not unpartitioned
+I1 'fish_completions_test.go' in no unit, not excluded, not unpartitioned
+I1 'flag_groups_test.go' in no unit, not excluded, not unpartitioned
+I1 'powershell_completions_test.go' in no unit, not excluded, not unpartitioned
+I1 'zsh_completions_test.go' in no unit, not excluded, not unpartitioned
+I3 'command-core' -> 'completion-engine.CompletionOptions (Command.CompletionOptions field)' is not a listed entrypoint
+I3 'command-core' -> 'completion-engine.CompletionFunc (Command.ValidArgsFunction field type)' is not a listed entrypoint
+I3 'command-core' -> 'completion-engine.ShellCompDirective and its constants (Error, NoSpace, NoFileComp, FilterFileExt, FilterDirs, KeepOrder, Default)' is not a listed entrypoint
+I4 'command-core' file 'command.go' shows 'filesystem' effect not declared
+I4 'flag-groups' file 'flag_groups.go' shows 'filesystem' effect not declared
+22 blocking error(s)
+exit=1
+=== lint round 1788913149 ===
+0 blocking error(s)
+exit=0

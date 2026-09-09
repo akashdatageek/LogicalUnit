@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+/work/
+/out/
+notes/launch-*.json
+notes/launch-*.err

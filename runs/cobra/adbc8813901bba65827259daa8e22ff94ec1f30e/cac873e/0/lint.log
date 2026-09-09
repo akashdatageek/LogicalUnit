@@ -1,0 +1,37 @@
+=== lint round 1788934874 ===
+I3 'positional-args' depends on unknown unit 'command-core'
+I3 'positional-args' depends on unknown unit 'command-core'
+I3 'positional-args' depends on unknown unit 'command-core'
+I3 'flag-groups' depends on unknown unit 'command-core'
+I3 'flag-groups' depends on unknown unit 'shell-completion-scripts'
+I3 'active-help' depends on unknown unit 'completion-engine'
+I3 'active-help' depends on unknown unit 'completion-engine'
+I3 'active-help' depends on unknown unit 'command-core'
+I3 'active-help' depends on unknown unit 'command-core'
+I4 'flag-groups' file 'flag_groups.go' shows 'filesystem' effect not declared
+10 blocking error(s)
+exit=1
+=== lint round 1788935103 ===
+I3 'flag-groups' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+I3 'completion-engine' depends on unknown unit 'shell-completion-scripts'
+10 blocking error(s)
+exit=1
+=== lint round 1788935230 ===
+I1 'doc/man_docs.go' in no unit, not excluded, not unpartitioned
+I1 'doc/md_docs.go' in no unit, not excluded, not unpartitioned
+I1 'doc/rest_docs.go' in no unit, not excluded, not unpartitioned
+I1 'doc/util.go' in no unit, not excluded, not unpartitioned
+I1 'doc/yaml_docs.go' in no unit, not excluded, not unpartitioned
+5 blocking error(s)
+exit=1
+=== lint round 1788935368 ===
+0 blocking error(s)
+exit=0

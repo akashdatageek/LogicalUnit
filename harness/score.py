@@ -5,6 +5,9 @@ Reports a VECTOR, not a composite. The decision rule lives in aggregate.py --dec
 
 Primary outcomes (pre-registered, see program.md):
   valid_nontrivial   bool   coverage>=0.95 and edge_resolution>=0.90 and not trivial and not budget_exhausted
+                            budget_exhausted comes from the result's subtype/terminal_reason (error_max_turns,
+                            error_max_budget_usd), NOT from num_turns, which also counts subagent turns.
+  singleton_unit_frac       fraction of units owning <=1 file (over-split indicator; reported, audited in pilot P6)
   q_gain_dir         float  Q_llm - max(Q_one, Q_dir) on the import graph  (Louvain is a ceiling, NOT a baseline)
 Secondary:
   q_cochange_gain    Q on the git co-change graph vs same baselines (orthogonal proxy)
@@ -86,8 +89,12 @@ def label_propagation(g):
     try:
         import networkx as nx
         G = nx.Graph()
-        for a, bs in g.items():
-            for b in bs: G.add_edge(a, b)
+        # Sort before inserting. g's values are sets of str, and set iteration order varies
+        # between processes under hash randomisation, which changed Louvain's tie-breaking and
+        # made q_ceiling non-reproducible for identical input (observed 0.0969 vs 0.0934 on
+        # the same run). Sorting makes the ceiling a function of the graph alone.
+        for a in sorted(g):
+            for b in sorted(g[a]): G.add_edge(a, b)
         if G.number_of_edges() == 0: return {}
         comms = nx.community.louvain_communities(G, seed=0)
         return {n: i for i, c in enumerate(comms) for n in c}
@@ -141,8 +148,11 @@ def main(run_dir, repo_dir):
     files = src_files(repo)
     units = m.get('units', [])
     owned = {f: u['name'] for u in units for f in u.get('files', [])}
-    excluded = {e['path'] for e in m.get('excluded', [])}
-    in_scope = [f for f in files if f not in excluded]
+    exc = [e['path'] for e in m.get('excluded', [])
+           if isinstance(e, dict) and isinstance(e.get('path'), str)]
+    excluded = set(exc)
+    exc_dirs = tuple(q.rstrip('/') + '/' for q in exc)
+    in_scope = [f for f in files if f not in excluded and not f.startswith(exc_dirs)]
     coverage = sum(1 for f in in_scope if f in owned) / max(1, len(in_scope))
 
     eps = {u['name']: {e['name'] for e in u.get('entrypoints', [])} for u in units}
@@ -151,8 +161,11 @@ def main(run_dir, repo_dir):
 
     n_units = len(units)
     trivial = n_units <= 1 or (len(owned) > 3 and n_units >= 0.8*len(owned))
-    max_turns = meta.get('max_turns'); turns = res.get('num_turns')
-    budget_exhausted = bool(max_turns and turns and turns >= max_turns)
+    turns = res.get('num_turns')   # counts subagent turns too; never compare it to --max-turns
+    subtype = str(res.get('subtype') or ''); term = str(res.get('terminal_reason') or '')
+    budget_exhausted = subtype in ('error_max_turns', 'error_max_budget_usd') or 'max_turns' in term or 'budget' in term
+    run_error = subtype.startswith('error_') or bool(res.get('is_error'))
+    singleton_frac = (sum(1 for u in units if len(u.get('files', [])) <= 1) / len(units)) if units else None
 
     # static graph: tree-sitter resolver, cached per (repo, sha); regex fallback only if tree-sitter is missing
     graph = None
@@ -206,6 +219,7 @@ def main(run_dir, repo_dir):
         valid_nontrivial=valid_nontrivial, q_gain_dir=round(q_gain_dir,4),
         # validity components
         coverage=round(coverage,3), edge_resolution=round(edge_res,3), trivial=trivial, budget_exhausted=budget_exhausted,
+        run_error=run_error, result_subtype=subtype or None, singleton_unit_frac=None if singleton_frac is None else round(singleton_frac,3),
         n_units=n_units, unpartitioned=len(m.get('unpartitioned', [])), lint_rounds=lint_rounds,
         # structure
         q_llm=round(q_llm,4), q_one=round(q_one,4), q_dir=round(q_dir,4), q_ceiling=round(q_ceiling,4),

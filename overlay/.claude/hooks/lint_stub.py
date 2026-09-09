@@ -8,7 +8,7 @@ from pathlib import Path
 SRC_EXT = {'.py','.js','.ts','.tsx','.go','.rs','.java','.c','.cc','.cpp','.h','.hpp'}
 SKIP_DIRS = {'.git','node_modules','vendor','target','build','dist','__pycache__','.claude','examples'}
 EFFECT_PATTERNS = {
-  'network':    r'\b(requests|httpx|urllib|socket|fetch\(|axios|net/http|reqwest|HttpClient)\b',
+  'network':    r'\b(import requests|import httpx|urllib\.request|socket\.socket|fetch\(|axios\.|net/http|reqwest::|HttpClient)\b',
   'filesystem': r'\b(open\(|os\.path|pathlib|fs\.|std::fs|ioutil|java\.io\.File)\b',
   'subprocess': r'\b(subprocess|child_process|os/exec|std::process|ProcessBuilder)\b',
   'env':        r'\b(os\.environ|process\.env|os\.Getenv|std::env|System\.getenv)\b',
@@ -26,11 +26,16 @@ def main(manifest_path, repo):
         for f in u.get('files', []):
             if f in owned: errors.append(f"I1 '{f}' owned by both '{owned[f]}' and '{u['name']}'")
             owned[f] = u['name']
-    excluded = {e['path'] for e in m.get('excluded', [])}
-    unpart   = {e['path'] for e in m.get('unpartitioned', [])}
+    def _paths(key):
+        return [e['path'] for e in m.get(key, [])
+                if isinstance(e, dict) and isinstance(e.get('path'), str)]
+    exc_l, unpart_l = _paths('excluded'), _paths('unpartitioned')
+    excluded, unpart = set(exc_l), set(unpart_l)
+    skip_dirs = tuple(q.rstrip('/') + '/' for q in exc_l + unpart_l)
     all_src  = {str(p.relative_to(repo)) for p in repo.rglob('*')
                 if p.is_file() and p.suffix in SRC_EXT and not (set(p.parts) & SKIP_DIRS)}
-    missing = sorted(all_src - set(owned) - excluded - unpart)
+    missing = sorted(f for f in (all_src - set(owned) - excluded - unpart)
+                     if not f.startswith(skip_dirs))
     errors += [f"I1 '{f}' in no unit, not excluded, not unpartitioned" for f in missing[:50]]
     if len(missing) > 50: errors.append(f"I1 ...and {len(missing)-50} more unassigned files")
 

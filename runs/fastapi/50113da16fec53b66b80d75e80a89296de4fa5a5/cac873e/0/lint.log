@@ -1,0 +1,56 @@
+=== lint round 1788939632 ===
+I1 'docs/en/docs/js/custom.js' in no unit, not excluded, not unpartitioned
+I1 'docs/en/docs/js/init_kapa_widget.js' in no unit, not excluded, not unpartitioned
+I1 'docs/en/docs/js/termynal.js' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_responses/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_responses/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_responses/tutorial002_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_responses/tutorial003_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_responses/tutorial004_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_status_codes/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_status_codes/tutorial001_an_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/additional_status_codes/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/advanced_middleware/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/advanced_middleware/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/advanced_middleware/tutorial002_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/advanced_middleware/tutorial003_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_a_py310/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_a_py310/main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_a_py310/test_main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_an_py310/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_an_py310/main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_an_py310/test_main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_py310/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_py310/main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/app_b_py310/test_main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/tutorial002_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/tutorial003_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/app_testing/tutorial004_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/async_tests/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/async_tests/app_a_py310/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/async_tests/app_a_py310/main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/async_tests/app_a_py310/test_main.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/authentication_error_status_code/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/authentication_error_status_code/tutorial001_an_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/background_tasks/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/background_tasks/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/background_tasks/tutorial002_an_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/background_tasks/tutorial002_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/tutorial001_01_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/tutorial001_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/tutorial002_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/tutorial003_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/behind_a_proxy/tutorial004_py310.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/bigger_applications/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/bigger_applications/app_an_py310/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/bigger_applications/app_an_py310/dependencies.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/bigger_applications/app_an_py310/internal/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'docs_src/bigger_applications/app_an_py310/internal/admin.py' in no unit, not excluded, not unpartitioned
+I1 ...and 1044 more unassigned files
+I4 'application-core' file 'fastapi/applications.py' shows 'clock' effect not declared
+I4 'json-encoding' file 'fastapi/encoders.py' shows 'filesystem' effect not declared
+53 blocking error(s)
+exit=1

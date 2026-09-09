@@ -1,0 +1,12 @@
+=== lint round 1788992031 ===
+I4 'http-api' file 'src/requests/api.py' shows 'network' effect not declared
+I4 'http-api' file 'src/requests/sessions.py' shows 'network' effect not declared
+I4 'request-response-model' file 'src/requests/models.py' shows 'network' effect not declared
+I4 'status-codes' file 'src/requests/status_codes.py' shows 'network' effect not declared
+I4 'foundation' file 'src/requests/compat.py' shows 'network' effect not declared
+I4 'foundation' file 'src/requests/__init__.py' shows 'network' effect not declared
+6 blocking error(s)
+exit=1
+=== lint round 1788992187 ===
+0 blocking error(s)
+exit=0

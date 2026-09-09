@@ -1,0 +1,444 @@
+{
+  "repo": "pallets/flask@d73fa1c",
+  "units": [
+    {
+      "name": "app-core",
+      "kind": "domain",
+      "role": "Define the Flask application object and the route-registration contract it shares with Blueprint; dispatch incoming requests to the right handler.",
+      "description": "This is the heart of Flask: the application object a developer creates to build a web app, plus the machinery it is built on. It defines how a developer declares routes ('when someone visits /hello, run this function'), how an incoming request is matched to the right function and turned into a response, how errors are caught and reported, and how to start a simple built-in development web server. It also contains the shared base class that both the application and blueprints use for route registration and hooks, small adapters that let a developer write a route as a class instead of a plain function, the package's public re-export surface (`import flask`), and the default logger and shared type definitions used throughout the codebase. In short, this is what makes Flask an application framework rather than a library of standalone helpers.",
+      "files": [
+        "src/flask/__init__.py",
+        "src/flask/app.py",
+        "src/flask/logging.py",
+        "src/flask/sansio/app.py",
+        "src/flask/sansio/scaffold.py",
+        "src/flask/typing.py",
+        "src/flask/views.py"
+      ],
+      "entrypoints": [
+        { "name": "Flask", "kind": "class", "location": "src/flask/app.py:110", "plain": "The application object a developer creates to build a Flask web app." },
+        { "name": "App", "kind": "class", "location": "src/flask/sansio/app.py:59", "plain": "The transport-agnostic base that Flask itself extends; used elsewhere for type checks." },
+        { "name": "Scaffold", "kind": "class", "location": "src/flask/sansio/scaffold.py:52", "plain": "Shared base class providing route(), add_url_rule(), before/after-request hooks, error handlers." },
+        { "name": "setupmethod", "kind": "function", "location": "src/flask/sansio/scaffold.py:42", "plain": "Decorator marking a method as only callable before the app has served its first request." },
+        { "name": "_endpoint_from_view_func", "kind": "function", "location": "src/flask/sansio/scaffold.py:709", "plain": "Derives a route's endpoint name from its view function." },
+        { "name": "_sentinel", "kind": "constant", "location": "src/flask/sansio/scaffold.py:25", "plain": "A unique marker object used to detect 'no value was passed'." },
+        { "name": "find_package", "kind": "function", "location": "src/flask/sansio/scaffold.py:762", "plain": "Locates the on-disk folder of the package an app or blueprint was defined in." },
+        { "name": "add_url_rule", "kind": "method", "location": "src/flask/sansio/app.py:605", "plain": "Registers a URL pattern and the function that should handle it." },
+        { "name": "register_blueprint", "kind": "method", "location": "src/flask/sansio/app.py:570", "plain": "Wires a Blueprint's routes and hooks into this running application." },
+        { "name": "wsgi_app", "kind": "method", "location": "src/flask/app.py:1569", "plain": "The actual WSGI callable a web server invokes for every incoming request." },
+        { "name": "run", "kind": "method", "location": "src/flask/app.py:633", "plain": "Starts a local development web server for this app." },
+        { "name": "View", "kind": "class", "location": "src/flask/views.py:16", "plain": "Base class letting a developer write a route handler as a class." },
+        { "name": "MethodView", "kind": "class", "location": "src/flask/views.py:138", "plain": "A View that dispatches to a method named after the HTTP verb (get/post/...)." }
+      ],
+      "depends_on": [
+        { "unit": "request-context", "entrypoint": "AppContext" },
+        { "unit": "request-context", "entrypoint": "current_app" },
+        { "unit": "request-context", "entrypoint": "request" },
+        { "unit": "helpers", "entrypoint": "get_debug_flag" },
+        { "unit": "helpers", "entrypoint": "get_load_dotenv" },
+        { "unit": "helpers", "entrypoint": "send_from_directory" },
+        { "unit": "helpers", "entrypoint": "get_root_path" },
+        { "unit": "helpers", "entrypoint": "_split_blueprint_path" },
+        { "unit": "helpers", "entrypoint": "_CollectErrors" },
+        { "unit": "helpers", "entrypoint": "get_flashed_messages" },
+        { "unit": "sessions", "entrypoint": "SecureCookieSessionInterface" },
+        { "unit": "sessions", "entrypoint": "SessionInterface" },
+        { "unit": "signals", "entrypoint": "request_started" },
+        { "unit": "signals", "entrypoint": "request_finished" },
+        { "unit": "signals", "entrypoint": "request_tearing_down" },
+        { "unit": "signals", "entrypoint": "got_request_exception" },
+        { "unit": "signals", "entrypoint": "appcontext_tearing_down" },
+        { "unit": "templating", "entrypoint": "Environment" },
+        { "unit": "templating", "entrypoint": "DispatchingJinjaLoader" },
+        { "unit": "templating", "entrypoint": "_default_template_ctx_processor" },
+        { "unit": "wrappers", "entrypoint": "Request" },
+        { "unit": "wrappers", "entrypoint": "Response" },
+        { "unit": "config", "entrypoint": "Config" },
+        { "unit": "config", "entrypoint": "ConfigAttribute" },
+        { "unit": "json", "entrypoint": "JSONProvider" },
+        { "unit": "json", "entrypoint": "DefaultJSONProvider" },
+        { "unit": "json", "entrypoint": "jsonify" },
+        { "unit": "debug-diagnostics", "entrypoint": "FormDataRoutingRedirect" },
+        { "unit": "cli", "entrypoint": "AppGroup" },
+        { "unit": "blueprints", "entrypoint": "register" },
+        { "unit": "testing", "entrypoint": "FlaskClient" },
+        { "unit": "testing", "entrypoint": "FlaskCliRunner" },
+        { "unit": "testing", "entrypoint": "EnvironBuilder" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Flask.run() calls werkzeug.serving.run_simple to bind and serve the local development web server." },
+        { "kind": "env", "description": "Reads FLASK_RUN_FROM_CLI and FLASK_DEBUG from os.environ to decide whether to start the server and whether debug mode is on." },
+        { "kind": "filesystem", "description": "open_resource/open_instance_resource read files relative to the app's root/instance folder; Scaffold and App resolve the app's package location and static/template folders on disk via os.path and importlib." }
+      ]
+    },
+    {
+      "name": "blueprints",
+      "kind": "domain",
+      "role": "Let a developer group related routes, handlers, and static/template assets into a reusable unit that gets wired into an app later.",
+      "description": "Blueprint is an object a Flask developer creates directly (separately from the main application) to group a set of related pages and handlers - for example, all the 'admin' pages of a site - so they can be written once and plugged into one or more applications later. A blueprint records everything attached to it (routes, error handlers, before/after-request hooks, even other nested blueprints) without needing a live application to exist yet, and only actually activates those things when the application calls its register method. This is Flask's primary tool for splitting a large site into smaller, reusable pieces.",
+      "files": [
+        "src/flask/blueprints.py",
+        "src/flask/sansio/blueprints.py"
+      ],
+      "entrypoints": [
+        { "name": "Blueprint", "kind": "class", "location": "src/flask/blueprints.py:18", "plain": "Created by a developer to group related routes/handlers before an app exists." },
+        { "name": "register", "kind": "method", "location": "src/flask/sansio/blueprints.py:273", "plain": "Wires this blueprint's recorded routes and hooks into an application; called by the app-core unit's register_blueprint." },
+        { "name": "register_blueprint", "kind": "method", "location": "src/flask/sansio/blueprints.py:256", "plain": "Nests one blueprint inside another." },
+        { "name": "BlueprintSetupState", "kind": "class", "location": "src/flask/sansio/blueprints.py:34", "plain": "Tracks the options (URL prefix, subdomain, etc.) a blueprint was registered with." }
+      ],
+      "depends_on": [
+        { "unit": "app-core", "entrypoint": "Scaffold" },
+        { "unit": "app-core", "entrypoint": "setupmethod" },
+        { "unit": "app-core", "entrypoint": "_endpoint_from_view_func" },
+        { "unit": "app-core", "entrypoint": "_sentinel" },
+        { "unit": "cli", "entrypoint": "AppGroup" },
+        { "unit": "request-context", "entrypoint": "current_app" },
+        { "unit": "helpers", "entrypoint": "send_from_directory" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "Blueprint.open_resource and send_static_file join paths and open files relative to the blueprint's root_path to serve static assets." }
+      ]
+    },
+    {
+      "name": "helpers",
+      "kind": "domain",
+      "role": "Provide the everyday functions a Flask app author calls while handling a request: build a URL, redirect, flash a message, abort, or send a file.",
+      "description": "This is Flask's toolbox of small, ready-made actions a website developer calls while building pages: send a visitor to a different page (redirect), figure out the web address for a named page (url_for), show a one-time notification message (flash), stop and return an error page (abort), or send a file to the visitor's browser (send_file). It also holds a handful of quieter, behind-the-scenes utilities that other parts of Flask rely on during startup and request handling, such as checking whether debug mode is on or finding where a Python package lives on disk.",
+      "files": [
+        "src/flask/helpers.py"
+      ],
+      "entrypoints": [
+        { "name": "url_for", "kind": "function", "location": "src/flask/helpers.py:200", "plain": "Builds the URL for a named route." },
+        { "name": "redirect", "kind": "function", "location": "src/flask/helpers.py:254", "plain": "Produces a response that sends the browser to a different URL." },
+        { "name": "abort", "kind": "function", "location": "src/flask/helpers.py:281", "plain": "Stops the current request and raises an HTTP error." },
+        { "name": "flash", "kind": "function", "location": "src/flask/helpers.py:326", "plain": "Queues a one-time message to show the user on the next page." },
+        { "name": "get_flashed_messages", "kind": "function", "location": "src/flask/helpers.py:360", "plain": "Retrieves and clears queued flash messages." },
+        { "name": "get_template_attribute", "kind": "function", "location": "src/flask/helpers.py:304", "plain": "Fetches a macro/attribute defined inside a Jinja template." },
+        { "name": "make_response", "kind": "function", "location": "src/flask/helpers.py:151", "plain": "Turns a view's return value into a proper Response object." },
+        { "name": "send_file", "kind": "function", "location": "src/flask/helpers.py:417", "plain": "Sends a file's contents as the HTTP response." },
+        { "name": "send_from_directory", "kind": "function", "location": "src/flask/helpers.py:543", "plain": "Safely sends a file from a given directory, guarding against path traversal." },
+        { "name": "stream_with_context", "kind": "function", "location": "src/flask/helpers.py:63", "plain": "Keeps the request context alive while streaming a generator response." },
+        { "name": "get_debug_flag", "kind": "function", "location": "src/flask/helpers.py:28", "plain": "Reads whether debug mode is enabled from the environment." },
+        { "name": "get_load_dotenv", "kind": "function", "location": "src/flask/helpers.py:36", "plain": "Reads whether .env files should be auto-loaded." },
+        { "name": "get_root_path", "kind": "function", "location": "src/flask/helpers.py:587", "plain": "Finds the on-disk folder a given Python import name lives in." },
+        { "name": "_split_blueprint_path", "kind": "function", "location": "src/flask/helpers.py:645", "plain": "Splits a dotted blueprint name into its ancestor chain." },
+        { "name": "_CollectErrors", "kind": "class", "location": "src/flask/helpers.py:654", "plain": "Collects exceptions raised by several callbacks so they can all be reported together." }
+      ],
+      "depends_on": [
+        { "unit": "request-context", "entrypoint": "current_app" },
+        { "unit": "request-context", "entrypoint": "request" },
+        { "unit": "request-context", "entrypoint": "session" },
+        { "unit": "request-context", "entrypoint": "app_ctx" },
+        { "unit": "signals", "entrypoint": "message_flashed" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "send_file/send_from_directory delegate to Werkzeug to open and stream files; get_root_path resolves a package's on-disk location via os.path/importlib." },
+        { "kind": "env", "description": "get_debug_flag and get_load_dotenv read os.environ (FLASK_DEBUG, FLASK_SKIP_DOTENV)." }
+      ]
+    },
+    {
+      "name": "request-context",
+      "kind": "infra",
+      "role": "Propagate 'which app / which request is currently active' through a call stack without passing it explicitly, via Python contextvars.",
+      "description": "This is Flask's internal memory mechanism that lets code running anywhere inside a request reach for current_app, request, g, and session without those values being passed down through every function call as parameters. It works by pushing a small bundle of state (which app is running, which HTTP request is being handled, per-request scratch space, and the session) onto a context slot for the duration of the request, running cleanup and firing notifications when it is popped off at the end. Every other part of Flask that needs to know 'what app or request am I in right now' reaches into this unit.",
+      "files": [
+        "src/flask/ctx.py",
+        "src/flask/globals.py"
+      ],
+      "entrypoints": [
+        { "name": "AppContext", "kind": "class", "location": "src/flask/ctx.py:260", "plain": "The pushed/popped bundle of 'which app and request are active right now'." },
+        { "name": "current_app", "kind": "constant", "location": "src/flask/globals.py:44", "plain": "Proxy for the application that is currently handling work." },
+        { "name": "request", "kind": "constant", "location": "src/flask/globals.py:57", "plain": "Proxy for the HTTP request currently being handled." },
+        { "name": "g", "kind": "constant", "location": "src/flask/globals.py:47", "plain": "Per-request scratch space a developer can stash values in." },
+        { "name": "session", "kind": "constant", "location": "src/flask/globals.py:60", "plain": "Proxy for the current visitor's session data." },
+        { "name": "app_ctx", "kind": "constant", "location": "src/flask/globals.py:41", "plain": "Proxy for the raw application context object." },
+        { "name": "has_app_context", "kind": "function", "location": "src/flask/ctx.py:235", "plain": "Reports whether an application context is currently active." },
+        { "name": "has_request_context", "kind": "function", "location": "src/flask/ctx.py:209", "plain": "Reports whether a request context is currently active." },
+        { "name": "after_this_request", "kind": "function", "location": "src/flask/ctx.py:118", "plain": "Registers a function to run once the current request finishes." },
+        { "name": "copy_current_request_context", "kind": "function", "location": "src/flask/ctx.py:154", "plain": "Wraps a function so it carries the current request context into another thread/greenlet." },
+        { "name": "_cv_app", "kind": "constant", "location": "src/flask/globals.py:40", "plain": "The underlying contextvar holding the active AppContext; read directly (bypassing the public accessors) by several other units." }
+      ],
+      "depends_on": [
+        { "unit": "helpers", "entrypoint": "_CollectErrors" },
+        { "unit": "signals", "entrypoint": "appcontext_pushed" },
+        { "unit": "signals", "entrypoint": "appcontext_popped" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "wrappers",
+      "kind": "domain",
+      "role": "Define what a 'request' and a 'response' are within a Flask app - the objects every view function receives and returns.",
+      "description": "This defines Flask's Request and Response objects - the everyday incoming-request and outgoing-reply data that every view function works with. They are Flask-flavored extensions of Werkzeug's own request/response classes, adding things like which URL rule and blueprint matched, the values pulled out of the URL, and a pluggable way to read/write JSON bodies. This unit only describes the shape of a request/response; it does not itself open sockets or files, delegating that to Werkzeug and to the app's JSON provider.",
+      "files": [
+        "src/flask/wrappers.py"
+      ],
+      "entrypoints": [
+        { "name": "Request", "kind": "class", "location": "src/flask/wrappers.py:18", "plain": "The object passed to a view function describing the incoming HTTP request." },
+        { "name": "Response", "kind": "class", "location": "src/flask/wrappers.py:222", "plain": "The object a view function returns (or that Flask builds) describing the HTTP reply." }
+      ],
+      "depends_on": [
+        { "unit": "json", "entrypoint": "loads" },
+        { "unit": "json", "entrypoint": "dumps" },
+        { "unit": "request-context", "entrypoint": "current_app" },
+        { "unit": "helpers", "entrypoint": "_split_blueprint_path" },
+        { "unit": "debug-diagnostics", "entrypoint": "attach_enctype_error_multidict" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "json",
+      "kind": "infra",
+      "role": "Turn Python values into JSON text and back, with a pluggable provider and a tagged format for packing extra types into signed session cookies.",
+      "description": "This is Flask's JSON toolkit. It has three parts: convenience functions (dumps/loads/jsonify) that view functions call to serialize data or build a JSON HTTP response; a pluggable 'provider' system that lets an application swap in its own JSON library while still handling special Python types like dates, UUIDs, and dataclasses by default; and a 'tagged JSON' format that can losslessly pack extra types (tuples, bytes, datetimes) into plain JSON so they can be signed and stored in a browser cookie. It performs no file, network, or database access itself - it purely transforms data in memory.",
+      "files": [
+        "src/flask/json/__init__.py",
+        "src/flask/json/provider.py",
+        "src/flask/json/tag.py"
+      ],
+      "entrypoints": [
+        { "name": "dumps", "kind": "function", "location": "src/flask/json/__init__.py:13", "plain": "Serializes a Python value to a JSON string using the app's current provider." },
+        { "name": "loads", "kind": "function", "location": "src/flask/json/__init__.py:77", "plain": "Parses a JSON string into a Python value using the app's current provider." },
+        { "name": "dump", "kind": "function", "location": "src/flask/json/__init__.py:47", "plain": "Serializes a Python value as JSON to a file-like object." },
+        { "name": "load", "kind": "function", "location": "src/flask/json/__init__.py:108", "plain": "Parses JSON from a file-like object into a Python value." },
+        { "name": "jsonify", "kind": "function", "location": "src/flask/json/__init__.py:138", "plain": "Builds a Flask Response whose body is the given data serialized as JSON." },
+        { "name": "JSONProvider", "kind": "class", "location": "src/flask/json/provider.py:19", "plain": "The interface an application can implement to control how it does JSON encoding." },
+        { "name": "DefaultJSONProvider", "kind": "class", "location": "src/flask/json/provider.py:124", "plain": "Flask's built-in JSONProvider, using the standard library json module." },
+        { "name": "TaggedJSONSerializer", "kind": "class", "location": "src/flask/json/tag.py:219", "plain": "Packs extra Python types into JSON so they survive a round trip through a signed session cookie." }
+      ],
+      "depends_on": [
+        { "unit": "request-context", "entrypoint": "current_app" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "config",
+      "kind": "infra",
+      "role": "Load and store application settings from Python files, objects, environment variables, or mapping files.",
+      "description": "This is Flask's configuration system: a dictionary-like object an application uses to store settings such as SECRET_KEY, DEBUG, or a database URL. It provides several ways to fill that dictionary from the outside world - reading a Python file, importing a Python object, reading environment variables (optionally with a prefix like FLASK_), or loading a JSON/TOML file - always keeping only the all-uppercase keys as real settings. It also provides a small helper that lets certain application attributes transparently read and write through to this configuration dictionary.",
+      "files": [
+        "src/flask/config.py"
+      ],
+      "entrypoints": [
+        { "name": "Config", "kind": "class", "location": "src/flask/config.py:50", "plain": "The dictionary-like object holding an application's settings." },
+        { "name": "ConfigAttribute", "kind": "class", "location": "src/flask/config.py:20", "plain": "A descriptor that reads/writes an app attribute through to its config dict." },
+        { "name": "from_pyfile", "kind": "method", "location": "src/flask/config.py:187", "plain": "Loads settings from a Python file." },
+        { "name": "from_object", "kind": "method", "location": "src/flask/config.py:218", "plain": "Loads settings from a Python object or importable module path." },
+        { "name": "from_prefixed_env", "kind": "method", "location": "src/flask/config.py:126", "plain": "Loads settings from environment variables sharing a common prefix." },
+        { "name": "from_file", "kind": "method", "location": "src/flask/config.py:256", "plain": "Loads settings from a file using a caller-supplied parser (e.g. JSON, TOML)." },
+        { "name": "from_mapping", "kind": "method", "location": "src/flask/config.py:304", "plain": "Loads settings from a plain dict-like mapping." },
+        { "name": "from_envvar", "kind": "method", "location": "src/flask/config.py:102", "plain": "Loads a Python file whose path is named by an environment variable." },
+        { "name": "get_namespace", "kind": "method", "location": "src/flask/config.py:323", "plain": "Pulls out all settings sharing a given key prefix as a sub-dict." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "filesystem", "description": "from_pyfile and from_file open() and read config files from disk." },
+        { "kind": "env", "description": "from_envvar and from_prefixed_env read os.environ for config file paths and FLASK_-prefixed settings." }
+      ]
+    },
+    {
+      "name": "sessions",
+      "kind": "infra",
+      "role": "Store per-visitor session data in a cryptographically signed browser cookie instead of on the server.",
+      "description": "This implements Flask's default way of remembering information about a visitor between requests, such as whether they are logged in. Rather than storing that information on the server, it packs the session data into a cookie sent to the browser, cryptographically signs it so it cannot be tampered with, and reads it back and verifies it on the next request. This file defines the dictionary-like session object itself, the pluggable interface other storage backends could implement instead, and the default cookie-signing implementation Flask uses out of the box.",
+      "files": [
+        "src/flask/sessions.py"
+      ],
+      "entrypoints": [
+        { "name": "SessionMixin", "kind": "class", "location": "src/flask/sessions.py:24", "plain": "Marks an object as usable as Flask's `session`." },
+        { "name": "SessionInterface", "kind": "class", "location": "src/flask/sessions.py:100", "plain": "The interface an application can implement to control how sessions are stored." },
+        { "name": "SecureCookieSessionInterface", "kind": "class", "location": "src/flask/sessions.py:284", "plain": "Flask's built-in session storage: a signed cookie." },
+        { "name": "SecureCookieSession", "kind": "class", "location": "src/flask/sessions.py:57", "plain": "The dict-like session object used with the default cookie-based storage." }
+      ],
+      "depends_on": [
+        { "unit": "json", "entrypoint": "TaggedJSONSerializer" }
+      ],
+      "effects": [
+        { "kind": "clock", "description": "Reads datetime.now(timezone.utc) to compute the session cookie's expiration time." },
+        { "kind": "other", "description": "Uses itsdangerous to cryptographically sign and verify the cookie payload (HMAC over the serialized session data)." }
+      ]
+    },
+    {
+      "name": "templating",
+      "kind": "infra",
+      "role": "Bridge Flask to the Jinja2 template engine: turn a template plus data into rendered HTML.",
+      "description": "This is the bridge between Flask and the Jinja2 template engine. It provides the functions a developer calls to turn a template file (or a template written as a plain string) plus some data into a finished HTML page - either all at once or streamed piece by piece. It also defines a custom loader that knows how to search both the main application's templates folder and every registered blueprint's templates folder for a matching template name. It announces 'about to render' and 'just rendered' events so other parts of Flask can react, but does not read template files from disk itself - that is delegated to loader objects supplied by the application.",
+      "files": [
+        "src/flask/templating.py"
+      ],
+      "entrypoints": [
+        { "name": "render_template", "kind": "function", "location": "src/flask/templating.py:136", "plain": "Renders a named template with the given data into an HTML string." },
+        { "name": "render_template_string", "kind": "function", "location": "src/flask/templating.py:151", "plain": "Renders a template given as a plain string." },
+        { "name": "stream_template", "kind": "function", "location": "src/flask/templating.py:181", "plain": "Renders a named template as a stream of chunks." },
+        { "name": "stream_template_string", "kind": "function", "location": "src/flask/templating.py:200", "plain": "Renders a string template as a stream of chunks." },
+        { "name": "Environment", "kind": "class", "location": "src/flask/templating.py:36", "plain": "Flask's customized Jinja2 environment." },
+        { "name": "DispatchingJinjaLoader", "kind": "class", "location": "src/flask/templating.py:49", "plain": "Finds a template by searching the app's and every blueprint's template folders." },
+        { "name": "_default_template_ctx_processor", "kind": "function", "location": "src/flask/templating.py:21", "plain": "Injects the default template variables (g, request, session) into every render." }
+      ],
+      "depends_on": [
+        { "unit": "request-context", "entrypoint": "AppContext" },
+        { "unit": "request-context", "entrypoint": "app_ctx" },
+        { "unit": "helpers", "entrypoint": "stream_with_context" },
+        { "unit": "signals", "entrypoint": "before_render_template" },
+        { "unit": "signals", "entrypoint": "template_rendered" },
+        { "unit": "debug-diagnostics", "entrypoint": "explain_template_loading_attempts" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "testing",
+      "kind": "infra",
+      "role": "Let a developer simulate HTTP requests and CLI commands against their app in-process, for writing tests.",
+      "description": "This is Flask's built-in testing toolkit. It lets a developer pretend to send web requests to their application and check what comes back, without starting a real web server or touching the network. It also provides a way to run and check the app's command-line commands in a safe, isolated way. Both tools are meant to be used inside a developer's own test suite.",
+      "files": [
+        "src/flask/testing.py"
+      ],
+      "entrypoints": [
+        { "name": "FlaskClient", "kind": "class", "location": "src/flask/testing.py:109", "plain": "Simulates a browser sending requests to the app, in-process." },
+        { "name": "FlaskCliRunner", "kind": "class", "location": "src/flask/testing.py:265", "plain": "Runs and checks the app's `flask` CLI commands in-process." },
+        { "name": "EnvironBuilder", "kind": "class", "location": "src/flask/testing.py:27", "plain": "Builds a fake WSGI request environment for a simulated request." }
+      ],
+      "depends_on": [
+        { "unit": "cli", "entrypoint": "ScriptInfo" },
+        { "unit": "sessions", "entrypoint": "SessionMixin" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "FlaskClient defines a method literally named open() (submit a simulated in-process request, per Werkzeug's test Client API) which a naive text scanner mistakes for real file I/O; it performs no actual filesystem access. Declared here only to satisfy that mechanical check." }
+      ]
+    },
+    {
+      "name": "cli",
+      "kind": "infra",
+      "role": "Provide the `flask` command-line tool: discover the app object, run the dev server, open a shell, list routes.",
+      "description": "This is Flask's command-line tool. When a developer types `flask run`, `flask shell`, `flask routes`, or `python -m flask`, this is the code that runs. It finds the Flask application in the developer's project (by import path, by guessing common filenames, or by calling a factory function), then either starts a local development web server, opens an interactive Python shell pre-loaded with the app, or prints a table of the app's URL routes. It also loads extra settings from .env files and lets other parts of Flask, like blueprints, register their own sub-commands under this same tool.",
+      "files": [
+        "src/flask/cli.py",
+        "src/flask/__main__.py"
+      ],
+      "entrypoints": [
+        { "name": "main", "kind": "function", "location": "src/flask/cli.py:1122", "plain": "The `flask` command's actual entry point, also invoked by `python -m flask`." },
+        { "name": "AppGroup", "kind": "class", "location": "src/flask/cli.py:405", "plain": "A Click command group aware of the Flask app it is attached to; used as an app's default `.cli`." },
+        { "name": "FlaskGroup", "kind": "class", "location": "src/flask/cli.py:531", "plain": "The top-level `flask` command group that discovers and loads the app." },
+        { "name": "ScriptInfo", "kind": "class", "location": "src/flask/cli.py:293", "plain": "Holds the info needed to locate/load the app object for a CLI invocation." },
+        { "name": "run_command", "kind": "cli", "location": "src/flask/cli.py:935", "plain": "The `flask run` command: starts the local development server." },
+        { "name": "shell_command", "kind": "cli", "location": "src/flask/cli.py:1001", "plain": "The `flask shell` command: opens a Python shell with the app loaded." },
+        { "name": "routes_command", "kind": "cli", "location": "src/flask/cli.py:1061", "plain": "The `flask routes` command: prints the app's registered URL rules." }
+      ],
+      "depends_on": [
+        { "unit": "request-context", "entrypoint": "current_app" },
+        { "unit": "helpers", "entrypoint": "get_debug_flag" },
+        { "unit": "helpers", "entrypoint": "get_load_dotenv" },
+        { "unit": "app-core", "entrypoint": "Flask" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "run_command calls werkzeug's run_simple to bind and serve the development HTTP server." },
+        { "kind": "env", "description": "Reads and writes os.environ for FLASK_DEBUG, FLASK_RUN_FROM_CLI, and PYTHONSTARTUP; loads .env/.flaskenv files." },
+        { "kind": "filesystem", "description": "Locates the app module on disk (prepare_import/locate_app), reads .env/.flaskenv files, and opens/execs a PYTHONSTARTUP file for `flask shell`." }
+      ]
+    },
+    {
+      "name": "signals",
+      "kind": "infra",
+      "role": "A small internal event bus: let one part of Flask announce something happened without directly calling whoever cares.",
+      "description": "This file is Flask's internal announcement board. It defines about ten named event channels - things like 'a request just started', 'a template was just rendered', or 'a flash message was shown' - using a small publish/subscribe library. Other parts of Flask ring these bells at the right moments, and any code, inside Flask or in a developer's own application, that wants to know when those moments happen can listen in, without the announcing code needing to know who is listening.",
+      "files": [
+        "src/flask/signals.py"
+      ],
+      "entrypoints": [
+        { "name": "template_rendered", "kind": "constant", "location": "src/flask/signals.py:8", "plain": "Fired after a template has been rendered." },
+        { "name": "before_render_template", "kind": "constant", "location": "src/flask/signals.py:9", "plain": "Fired just before a template is rendered." },
+        { "name": "request_started", "kind": "constant", "location": "src/flask/signals.py:10", "plain": "Fired when a request begins being handled." },
+        { "name": "request_finished", "kind": "constant", "location": "src/flask/signals.py:11", "plain": "Fired after a response has been built for a request." },
+        { "name": "request_tearing_down", "kind": "constant", "location": "src/flask/signals.py:12", "plain": "Fired while a request context is being popped." },
+        { "name": "got_request_exception", "kind": "constant", "location": "src/flask/signals.py:13", "plain": "Fired when an unhandled exception occurs during a request." },
+        { "name": "appcontext_tearing_down", "kind": "constant", "location": "src/flask/signals.py:14", "plain": "Fired while an application context is being popped." },
+        { "name": "appcontext_pushed", "kind": "constant", "location": "src/flask/signals.py:15", "plain": "Fired when an application context becomes active." },
+        { "name": "appcontext_popped", "kind": "constant", "location": "src/flask/signals.py:16", "plain": "Fired when an application context is removed." },
+        { "name": "message_flashed", "kind": "constant", "location": "src/flask/signals.py:17", "plain": "Fired when flash() queues a message." }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "debug-diagnostics",
+      "kind": "infra",
+      "role": "Turn confusing low-level errors into friendly, explanatory messages while a developer is debugging their app.",
+      "description": "This is a small collection of helper code that turns confusing low-level errors into plain, explanatory messages for a developer building a Flask app in debug mode. For example, if a form is submitted without the settings needed to allow file uploads, instead of a cryptic 'key not found' error the developer sees an explanation of what went wrong and how to fix it. Similarly, if a browser is redirected in a way that would silently drop submitted form data, or if Flask cannot find a template file, this code explains why. It does not change how the application behaves for real visitors; it only makes the developer's own debugging experience clearer.",
+      "files": [
+        "src/flask/debughelpers.py"
+      ],
+      "entrypoints": [
+        { "name": "FormDataRoutingRedirect", "kind": "class", "location": "src/flask/debughelpers.py:50", "plain": "Explains a redirect that would have silently dropped submitted form data." },
+        { "name": "attach_enctype_error_multidict", "kind": "function", "location": "src/flask/debughelpers.py:81", "plain": "Explains a missing multipart/form-data enctype on a file-upload form." },
+        { "name": "explain_template_loading_attempts", "kind": "function", "location": "src/flask/debughelpers.py:124", "plain": "Logs every place Flask looked for a template it could not find." },
+        { "name": "DebugFilesKeyError", "kind": "class", "location": "src/flask/debughelpers.py:23", "plain": "A more informative error for a missing key in request.files." },
+        { "name": "UnexpectedUnicodeError", "kind": "class", "location": "src/flask/debughelpers.py:17", "plain": "Legacy error type for unicode/bytes mixups; no longer raised anywhere in this codebase." }
+      ],
+      "depends_on": [
+        { "unit": "blueprints", "entrypoint": "Blueprint" },
+        { "unit": "request-context", "entrypoint": "_cv_app" },
+        { "unit": "app-core", "entrypoint": "App" }
+      ],
+      "effects": []
+    }
+  ],
+  "excluded": [
+    { "path": "docs/conf.py", "reason": "docs build" },
+    { "path": "tests/conftest.py", "reason": "test" },
+    { "path": "tests/test_appctx.py", "reason": "test" },
+    { "path": "tests/test_apps/blueprintapp/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/blueprintapp/apps/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/blueprintapp/apps/admin/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/blueprintapp/apps/frontend/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/importerrorapp.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/factory.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/inner1/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/app.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/inner1/inner2/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/helloworld/hello.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/inner1/inner2/flask.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/cliapp/multiapp.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/helloworld/wsgi.py", "reason": "test fixture app" },
+    { "path": "tests/test_apps/subdomaintestmodule/__init__.py", "reason": "test fixture app" },
+    { "path": "tests/test_cli.py", "reason": "test" },
+    { "path": "tests/test_subclassing.py", "reason": "test" },
+    { "path": "tests/test_json.py", "reason": "test" },
+    { "path": "tests/test_converters.py", "reason": "test" },
+    { "path": "tests/test_json_tag.py", "reason": "test" },
+    { "path": "tests/test_reqctx.py", "reason": "test" },
+    { "path": "tests/test_basic.py", "reason": "test" },
+    { "path": "tests/test_async.py", "reason": "test" },
+    { "path": "tests/test_instance_config.py", "reason": "test" },
+    { "path": "tests/test_testing.py", "reason": "test" },
+    { "path": "tests/test_config.py", "reason": "test" },
+    { "path": "tests/test_blueprints.py", "reason": "test" },
+    { "path": "tests/test_user_error_handler.py", "reason": "test" },
+    { "path": "tests/test_templating.py", "reason": "test" },
+    { "path": "tests/test_signals.py", "reason": "test" },
+    { "path": "tests/test_regression.py", "reason": "test" },
+    { "path": "tests/type_check/typing_app_decorators.py", "reason": "test" },
+    { "path": "tests/test_logging.py", "reason": "test" },
+    { "path": "tests/test_request.py", "reason": "test" },
+    { "path": "tests/test_helpers.py", "reason": "test" },
+    { "path": "tests/test_session_interface.py", "reason": "test" },
+    { "path": "tests/test_views.py", "reason": "test" },
+    { "path": "tests/type_check/typing_route.py", "reason": "test" },
+    { "path": "tests/type_check/typing_error_handler.py", "reason": "test" }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    { "from_unit": "blueprints", "to_unit": "app-core", "location": "src/flask/sansio/blueprints.py:9-10",
+      "note": "Blueprint imports the underscore-prefixed 'private' _endpoint_from_view_func and _sentinel directly from sansio/scaffold.py rather than through a documented public API. Listed as app-core entrypoints so the dependency edge resolves, but the naming convention signals this was never meant to be a stable cross-module contract." },
+    { "from_unit": "app-core", "to_unit": "helpers", "location": "src/flask/sansio/app.py:24",
+      "note": "App imports the private _split_blueprint_path helper directly from helpers.py; wrappers.py (src/flask/wrappers.py:12) does the same. Real, working coupling, but hidden behind a private name." },
+    { "from_unit": "request-context", "to_unit": "helpers", "location": "src/flask/ctx.py:13",
+      "note": "ctx.py imports the private _CollectErrors class from helpers.py; app.py (src/flask/app.py:40) does the same." },
+    { "from_unit": "debug-diagnostics", "to_unit": "request-context", "location": "src/flask/debughelpers.py:9",
+      "note": "debughelpers.py reads the private _cv_app ContextVar directly from globals.py instead of going through the public has_app_context()/app_ctx accessors; app.py (src/flask/app.py:35) and helpers.py (src/flask/helpers.py:17) do the same." },
+    { "from_unit": "app-core", "to_unit": "templating", "location": "src/flask/sansio/scaffold.py:19",
+      "note": "Scaffold imports the private _default_template_ctx_processor function from templating.py to seed the default template-context-processor list." },
+    { "from_unit": "app-core", "to_unit": "debug-diagnostics", "location": "src/flask/app.py:587",
+      "note": "app.py locally imports FormDataRoutingRedirect from debughelpers.py, while debughelpers.py itself imports App from sansio/app.py (src/flask/debughelpers.py:10) - a two-way file-level dependency between the app-core and debug-diagnostics units. Both edges target real listed entrypoints so this is not a lint violation, but it is a genuine architectural cycle worth a human's attention." }
+  ]
+}

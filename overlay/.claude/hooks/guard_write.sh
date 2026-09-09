@@ -3,7 +3,8 @@
 set -euo pipefail
 input=$(cat)
 path=$(printf '%s' "$input" | jq -r '.tool_input.file_path // empty')
+OUT="${LU_OUT:-/out}"
 case "$path" in
-  /out/manifest.json) exit 0 ;;
-  *) echo "BLOCKED: only /out/manifest.json may be written. Attempted: $path" >&2; exit 2 ;;
+  "$OUT/manifest.json") exit 0 ;;
+  *) echo "BLOCKED: only $OUT/manifest.json may be written. Attempted: $path" >&2; exit 2 ;;
 esac

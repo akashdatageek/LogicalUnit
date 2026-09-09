@@ -1,0 +1,670 @@
+{
+  "repo": "psf/requests@dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+  "units": [
+    {
+      "name": "version-metadata",
+      "kind": "infra",
+      "description": "Holds the package's static identity constants: its name, homepage URL, semantic version string, numeric build id, author, license, and copyright. These are plain string/int literals with no logic, imported by other units that need to report or embed the library's version (for example in the default User-Agent header or the diagnostics report).",
+      "role": "Single source of truth for the package version and metadata strings.",
+      "files": ["src/requests/__version__.py"],
+      "entrypoints": [
+        { "name": "__version__", "kind": "constant", "location": "src/requests/__version__.py:8", "signature": "__version__: str", "plain": "The current release version string, e.g. \"2.34.2\"." },
+        { "name": "__title__", "kind": "constant", "location": "src/requests/__version__.py:5", "signature": "__title__: str", "plain": "The distribution name, \"requests\"." },
+        { "name": "__build__", "kind": "constant", "location": "src/requests/__version__.py:9", "signature": "__build__: int", "plain": "Numeric encoding of the version, e.g. 0x023402." }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "compat-shims",
+      "kind": "infra",
+      "description": "A compatibility layer that re-exports names from the Python standard library (urllib.parse, urllib.request, http.cookiejar, http.cookies, collections) and picks between optional third-party JSON and character-detection libraries, so the rest of the codebase can import one stable set of names regardless of Python version or which optional packages are installed. Nothing here implements new behavior; it only selects and renames existing library functionality.",
+      "role": "Central place that resolves stdlib/optional-dependency differences into one consistent set of names for the rest of the package to import.",
+      "files": ["src/requests/compat.py"],
+      "entrypoints": [
+        { "name": "is_urllib3_1", "kind": "constant", "location": "src/requests/compat.py:26", "signature": "is_urllib3_1: bool", "plain": "True if the installed urllib3 is a 1.x release, used to pick encoding behavior elsewhere." },
+        { "name": "chardet", "kind": "constant", "location": "src/requests/compat.py:51", "signature": "chardet: ModuleType | None", "plain": "The chardet or charset_normalizer module, whichever is installed, or None if neither is." },
+        { "name": "json", "kind": "constant", "location": "src/requests/compat.py:69", "signature": "json: ModuleType", "plain": "The simplejson module if installed, otherwise the standard library json module." },
+        { "name": "JSONDecodeError", "kind": "type", "location": "src/requests/compat.py:78", "signature": "JSONDecodeError", "plain": "The JSON decoding error class matching whichever json module was selected." },
+        { "name": "cookielib", "kind": "constant", "location": "src/requests/compat.py:83", "signature": "cookielib: module", "plain": "Alias for the standard library http.cookiejar module." },
+        { "name": "Morsel", "kind": "type", "location": "src/requests/compat.py:84", "signature": "Morsel", "plain": "Re-export of http.cookies.Morsel, used when converting browser-style cookies." },
+        { "name": "basestring", "kind": "constant", "location": "src/requests/compat.py:113", "signature": "basestring: tuple[type, type]", "plain": "The tuple (str, bytes), used for isinstance checks accepting either text or binary strings." },
+        { "name": "builtin_str", "kind": "constant", "location": "src/requests/compat.py:110", "signature": "builtin_str: type", "plain": "Alias for the native str type." },
+        { "name": "str", "kind": "constant", "location": "src/requests/compat.py:111", "signature": "str: type", "plain": "Re-exported str type, kept for backward-compatible imports." },
+        { "name": "bytes", "kind": "constant", "location": "src/requests/compat.py:112", "signature": "bytes: type", "plain": "Re-exported bytes type." },
+        { "name": "integer_types", "kind": "constant", "location": "src/requests/compat.py:115", "signature": "integer_types: tuple[type]", "plain": "The tuple (int,), used for isinstance checks." },
+        { "name": "urlparse", "kind": "function", "location": "src/requests/compat.py:98", "signature": "urlparse(url) -> ParseResult", "plain": "Splits a URL string into its scheme/host/path/query/fragment components." },
+        { "name": "urlunparse", "kind": "function", "location": "src/requests/compat.py:100", "signature": "urlunparse(parts) -> str", "plain": "Reassembles a URL from its component parts." },
+        { "name": "urlsplit", "kind": "function", "location": "src/requests/compat.py:99", "signature": "urlsplit(url) -> SplitResult", "plain": "Splits a URL similarly to urlparse but without separating params." },
+        { "name": "urlencode", "kind": "function", "location": "src/requests/compat.py:96", "signature": "urlencode(query, doseq=False) -> str", "plain": "Encodes a mapping or sequence of pairs into a URL query string." },
+        { "name": "urljoin", "kind": "function", "location": "src/requests/compat.py:97", "signature": "urljoin(base, url) -> str", "plain": "Resolves a possibly-relative URL against a base URL." },
+        { "name": "quote", "kind": "function", "location": "src/requests/compat.py:91", "signature": "quote(s, safe='/') -> str", "plain": "Percent-encodes a string for safe inclusion in a URL." },
+        { "name": "unquote", "kind": "function", "location": "src/requests/compat.py:93", "signature": "unquote(s) -> str", "plain": "Reverses percent-encoding in a URL string." },
+        { "name": "getproxies", "kind": "function", "location": "src/requests/compat.py:103", "signature": "getproxies() -> dict", "plain": "Reads OS/environment proxy configuration into a scheme-to-proxy-URL mapping." },
+        { "name": "getproxies_environment", "kind": "function", "location": "src/requests/compat.py:104", "signature": "getproxies_environment() -> dict", "plain": "Reads only the *_proxy environment variables into a proxy mapping." },
+        { "name": "proxy_bypass", "kind": "function", "location": "src/requests/compat.py:106", "signature": "proxy_bypass(host) -> bool", "plain": "Reports whether a host should skip the configured proxy, per OS settings." },
+        { "name": "proxy_bypass_environment", "kind": "function", "location": "src/requests/compat.py:107", "signature": "proxy_bypass_environment(host) -> bool", "plain": "Reports whether a host is covered by the no_proxy environment variable." },
+        { "name": "parse_http_list", "kind": "function", "location": "src/requests/compat.py:105", "signature": "parse_http_list(s) -> list[str]", "plain": "Splits a comma-separated HTTP header list, respecting quoted substrings." },
+        { "name": "Mapping", "kind": "type", "location": "src/requests/compat.py:82", "signature": "Mapping", "plain": "Re-export of collections.abc.Mapping." },
+        { "name": "MutableMapping", "kind": "type", "location": "src/requests/compat.py:82", "signature": "MutableMapping", "plain": "Re-export of collections.abc.MutableMapping, the base used by dict-like classes elsewhere." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "other", "description": "At import time, probes for the optional 'chardet' and 'charset_normalizer' packages via importlib and silently falls back to None if neither is installed." },
+        { "kind": "network", "description": "Imports urllib3 (to read its version) and re-exports urllib.request's getproxies/getproxies_environment/proxy_bypass/proxy_bypass_environment, which read OS/environment HTTP(S) proxy configuration used elsewhere to route requests; this module itself opens no sockets." }
+      ]
+    },
+    {
+      "name": "internal-string-utils",
+      "kind": "infra",
+      "description": "A tiny set of low-level helpers used throughout the codebase: converting str/bytes values to the platform's native string type, checking whether a unicode string is pure ASCII, and precompiled regular expressions that validate HTTP header names and values contain no forbidden control characters. Deliberately kept dependency-light so almost every other unit can safely import it.",
+      "role": "Provides native-string conversion and HTTP header syntax validation primitives.",
+      "files": ["src/requests/_internal_utils.py"],
+      "entrypoints": [
+        { "name": "to_native_string", "kind": "function", "location": "src/requests/_internal_utils.py:26", "signature": "to_native_string(string: str | bytes, encoding: str = 'ascii') -> str", "plain": "Returns the given string as a native str, decoding bytes if necessary." },
+        { "name": "unicode_is_ascii", "kind": "function", "location": "src/requests/_internal_utils.py:39", "signature": "unicode_is_ascii(u_string: str) -> bool", "plain": "Returns True if a string contains only ASCII characters." },
+        { "name": "HEADER_VALIDATORS", "kind": "constant", "location": "src/requests/_internal_utils.py:20", "signature": "HEADER_VALIDATORS: dict[type, tuple[Pattern, Pattern]]", "plain": "Maps str/bytes to the pair of compiled regexes used to validate header names and values." },
+        { "name": "_HEADER_VALIDATORS_STR", "kind": "constant", "location": "src/requests/_internal_utils.py:18", "signature": "_HEADER_VALIDATORS_STR: tuple[Pattern, Pattern]", "plain": "Compiled regexes that validate a text header's name and value contain no illegal characters." },
+        { "name": "_HEADER_VALIDATORS_BYTE", "kind": "constant", "location": "src/requests/_internal_utils.py:19", "signature": "_HEADER_VALIDATORS_BYTE: tuple[Pattern, Pattern]", "plain": "Compiled regexes that validate a bytes header's name and value contain no illegal characters." }
+      ],
+      "depends_on": [
+        { "unit": "compat-shims", "entrypoint": "builtin_str" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "type-definitions",
+      "kind": "infra",
+      "description": "Defines the internal type-alias vocabulary (what a URL, request body, files payload, auth handler, or hook callback is allowed to look like) used to annotate the public API, plus two small runtime-checkable protocols and helper predicates for detecting file-like objects and fully-prepared requests. Almost all of its content only exists for static type checking; a couple of functions run at runtime.",
+      "role": "Defines the shared type vocabulary and file-like/prepared-request runtime checks used across the library.",
+      "files": ["src/requests/_types.py"],
+      "entrypoints": [
+        { "name": "SupportsRead", "kind": "type", "location": "src/requests/_types.py:28", "signature": "class SupportsRead(Protocol[_T_co])", "plain": "Structural type for any object exposing a .read() method, e.g. an open file." },
+        { "name": "has_read", "kind": "function", "location": "src/requests/_types.py:32", "signature": "has_read(obj: Any) -> bool", "plain": "Runtime check for whether an object behaves like a readable file object." },
+        { "name": "SupportsItems", "kind": "type", "location": "src/requests/_types.py:38", "signature": "class SupportsItems(Protocol[_KT_co, _VT_co])", "plain": "Structural type for any object exposing an .items() method, e.g. a dict." },
+        { "name": "HookType", "kind": "type", "location": "src/requests/_types.py:43", "signature": "HookType: TypeAlias = Callable[[Response], Any]", "plain": "The shape of a single event-hook callback function." },
+        { "name": "HooksInputType", "kind": "type", "location": "src/requests/_types.py:44", "signature": "HooksInputType: TypeAlias", "plain": "The shape accepted for the 'hooks' argument: one hook or a list of hooks per event name." },
+        { "name": "is_prepared", "kind": "function", "location": "src/requests/_types.py:47", "signature": "is_prepared(request: PreparedRequest) -> bool", "plain": "Type-narrowing check confirming a PreparedRequest has its url and method set; always True at runtime." }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "data-structures",
+      "kind": "infra",
+      "description": "Two general-purpose dict-like container classes with no HTTP-specific knowledge: a case-insensitive dictionary (used for headers, where 'Content-Type' and 'content-type' must be treated as the same key) and a lookup dictionary that returns None instead of raising for missing keys and exposes entries as attributes (used for the numeric-to-name HTTP status code table).",
+      "role": "Provides the case-insensitive dict and permissive lookup dict container types used elsewhere.",
+      "files": ["src/requests/structures.py"],
+      "entrypoints": [
+        { "name": "CaseInsensitiveDict", "kind": "class", "location": "src/requests/structures.py:20", "signature": "class CaseInsensitiveDict(MutableMapping[str, _VT])", "plain": "A dict whose keys are matched case-insensitively while preserving the original casing on iteration; used for HTTP headers." },
+        { "name": "LookupDict", "kind": "class", "location": "src/requests/structures.py:96", "signature": "class LookupDict(dict[str, _VT])", "plain": "A dict subclass that also exposes its entries as attributes and returns None (rather than raising) for missing keys." }
+      ],
+      "depends_on": [
+        { "unit": "compat-shims", "entrypoint": "MutableMapping" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "status-codes",
+      "kind": "domain",
+      "description": "Builds the public `codes` object mapping every standard (and several joke/legacy) HTTP status code to its numeric value, reachable either as `codes.ok` or `codes['ok']`, with many codes having multiple accepted aliases (e.g. `codes.okay`, `codes.all_good`). This is pure reference data with a one-time initialization step run at import.",
+      "role": "Publishes the human-readable-name-to-numeric-status-code lookup table used throughout the library and by users.",
+      "files": ["src/requests/status_codes.py"],
+      "entrypoints": [
+        { "name": "codes", "kind": "constant", "location": "src/requests/status_codes.py:106", "signature": "codes: LookupDict[int]", "plain": "Lookup table mapping status-code names (e.g. 'not_found', 'teapot') to their integer HTTP status code." }
+      ],
+      "depends_on": [
+        { "unit": "data-structures", "entrypoint": "LookupDict" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Defines no network I/O of its own; it is a static name-to-number table of HTTP status codes (its names and docstring are dense with the word 'HTTP', which is what a naive scan of this file will flag as network-related)." }
+      ]
+    },
+    {
+      "name": "exceptions",
+      "kind": "domain",
+      "description": "Defines the complete exception and warning hierarchy that Requests raises: a single ambiguous base error carrying the request/response context, and specific subclasses for connection failures, timeouts, redirects, malformed URLs/headers/schemas, JSON decoding errors, unrewindable request bodies, and deprecation-style warnings. Every other unit that can fail raises one of these types instead of a bare stdlib exception.",
+      "role": "Defines every error and warning type the library can raise, each optionally carrying the offending request/response.",
+      "files": ["src/requests/exceptions.py"],
+      "entrypoints": [
+        { "name": "RequestException", "kind": "class", "location": "src/requests/exceptions.py:20", "signature": "class RequestException(IOError)", "plain": "Base class for all Requests errors; carries the associated request and/or response object." },
+        { "name": "InvalidJSONError", "kind": "class", "location": "src/requests/exceptions.py:38", "signature": "class InvalidJSONError(RequestException)", "plain": "Raised when a JSON body could not be encoded or decoded." },
+        { "name": "JSONDecodeError", "kind": "class", "location": "src/requests/exceptions.py:42", "signature": "class JSONDecodeError(InvalidJSONError, CompatJSONDecodeError)", "plain": "Raised when Response.json() fails to parse the response body as JSON." },
+        { "name": "HTTPError", "kind": "class", "location": "src/requests/exceptions.py:66", "signature": "class HTTPError(RequestException)", "plain": "Raised by Response.raise_for_status() for 4xx/5xx responses." },
+        { "name": "ConnectionError", "kind": "class", "location": "src/requests/exceptions.py:70", "signature": "class ConnectionError(RequestException)", "plain": "Raised when the underlying TCP/TLS connection fails." },
+        { "name": "ProxyError", "kind": "class", "location": "src/requests/exceptions.py:74", "signature": "class ProxyError(ConnectionError)", "plain": "Raised when a configured proxy connection fails." },
+        { "name": "SSLError", "kind": "class", "location": "src/requests/exceptions.py:78", "signature": "class SSLError(ConnectionError)", "plain": "Raised for TLS/certificate verification failures." },
+        { "name": "Timeout", "kind": "class", "location": "src/requests/exceptions.py:82", "signature": "class Timeout(RequestException)", "plain": "Base class for connect and read timeouts." },
+        { "name": "ConnectTimeout", "kind": "class", "location": "src/requests/exceptions.py:91", "signature": "class ConnectTimeout(ConnectionError, Timeout)", "plain": "Raised when establishing the connection itself times out; safe to retry." },
+        { "name": "ReadTimeout", "kind": "class", "location": "src/requests/exceptions.py:98", "signature": "class ReadTimeout(Timeout)", "plain": "Raised when the server accepts the connection but doesn't send data in time." },
+        { "name": "URLRequired", "kind": "class", "location": "src/requests/exceptions.py:102", "signature": "class URLRequired(RequestException)", "plain": "Raised when a request is attempted without a URL." },
+        { "name": "TooManyRedirects", "kind": "class", "location": "src/requests/exceptions.py:106", "signature": "class TooManyRedirects(RequestException)", "plain": "Raised when a redirect chain exceeds the configured maximum." },
+        { "name": "MissingSchema", "kind": "class", "location": "src/requests/exceptions.py:110", "signature": "class MissingSchema(RequestException, ValueError)", "plain": "Raised when a URL has no scheme (e.g. missing 'https://')." },
+        { "name": "InvalidSchema", "kind": "class", "location": "src/requests/exceptions.py:114", "signature": "class InvalidSchema(RequestException, ValueError)", "plain": "Raised when a URL's scheme has no matching transport adapter mounted." },
+        { "name": "InvalidURL", "kind": "class", "location": "src/requests/exceptions.py:118", "signature": "class InvalidURL(RequestException, ValueError)", "plain": "Raised for a URL that cannot be parsed or is otherwise malformed." },
+        { "name": "InvalidHeader", "kind": "class", "location": "src/requests/exceptions.py:122", "signature": "class InvalidHeader(RequestException, ValueError)", "plain": "Raised when a header name or value contains illegal characters." },
+        { "name": "InvalidProxyURL", "kind": "class", "location": "src/requests/exceptions.py:126", "signature": "class InvalidProxyURL(InvalidURL)", "plain": "Raised when a configured proxy URL is malformed." },
+        { "name": "ChunkedEncodingError", "kind": "class", "location": "src/requests/exceptions.py:130", "signature": "class ChunkedEncodingError(RequestException)", "plain": "Raised when the server declares chunked transfer-encoding but sends an invalid chunk." },
+        { "name": "ContentDecodingError", "kind": "class", "location": "src/requests/exceptions.py:134", "signature": "class ContentDecodingError(RequestException, BaseHTTPError)", "plain": "Raised when response content (e.g. gzip) fails to decode." },
+        { "name": "StreamConsumedError", "kind": "class", "location": "src/requests/exceptions.py:138", "signature": "class StreamConsumedError(RequestException, TypeError)", "plain": "Raised when trying to iterate a response whose stream was already consumed." },
+        { "name": "RetryError", "kind": "class", "location": "src/requests/exceptions.py:142", "signature": "class RetryError(RequestException)", "plain": "Raised when the configured retry policy is exhausted." },
+        { "name": "UnrewindableBodyError", "kind": "class", "location": "src/requests/exceptions.py:146", "signature": "class UnrewindableBodyError(RequestException)", "plain": "Raised when a streamed request body can't be rewound to resend after a redirect or auth challenge." },
+        { "name": "RequestsWarning", "kind": "class", "location": "src/requests/exceptions.py:153", "signature": "class RequestsWarning(Warning)", "plain": "Base class for all warnings this library emits." },
+        { "name": "FileModeWarning", "kind": "class", "location": "src/requests/exceptions.py:157", "signature": "class FileModeWarning(RequestsWarning, DeprecationWarning)", "plain": "Warns that a file was opened in text mode but its length was computed as if binary." },
+        { "name": "RequestsDependencyWarning", "kind": "class", "location": "src/requests/exceptions.py:161", "signature": "class RequestsDependencyWarning(RequestsWarning)", "plain": "Warns that an installed dependency's version is outside the supported range." }
+      ],
+      "depends_on": [
+        { "unit": "compat-shims", "entrypoint": "JSONDecodeError" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "ca-certs",
+      "kind": "infra",
+      "description": "A one-function module that hands back the filesystem path to the bundled root CA certificate file, sourced from the third-party certifi package. Used as the default trust store when verifying TLS server certificates.",
+      "role": "Resolves the filesystem path of the default CA certificate bundle used to verify TLS connections.",
+      "files": ["src/requests/certs.py"],
+      "entrypoints": [
+        { "name": "where", "kind": "function", "location": "src/requests/certs.py:15", "signature": "where() -> str", "plain": "Returns the filesystem path to certifi's bundled root CA certificate file." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "filesystem", "description": "Resolves and returns the on-disk path of the CA bundle file installed by the certifi package." }
+      ]
+    },
+    {
+      "name": "hooks",
+      "kind": "domain",
+      "description": "A minimal event-callback system supporting a single event, 'response', which lets callers attach one or more functions to be invoked with each Response before it's returned to the caller. Used by Session and HTTPDigestAuth to implement redirect/auth-retry behavior via callbacks.",
+      "role": "Implements the response event-hook registration and dispatch mechanism.",
+      "files": ["src/requests/hooks.py"],
+      "entrypoints": [
+        { "name": "HOOKS", "kind": "constant", "location": "src/requests/hooks.py:22", "signature": "HOOKS: list[str]", "plain": "The list of supported hook event names; currently just ['response']." },
+        { "name": "default_hooks", "kind": "function", "location": "src/requests/hooks.py:25", "signature": "default_hooks() -> dict[str, list[HookType]]", "plain": "Builds a fresh empty hooks dictionary with one empty list per supported event." },
+        { "name": "dispatch_hook", "kind": "function", "location": "src/requests/hooks.py:32", "signature": "dispatch_hook(key, hooks, hook_data, **kwargs) -> Response", "plain": "Calls every registered hook function for the given event, letting each one optionally replace the data passed to the next." }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "cookie-jar",
+      "kind": "domain",
+      "description": "Bridges Requests' own request/response objects with Python's standard library http.cookiejar machinery, which expects urllib2-style request/response objects. Provides a dict-like, pickleable RequestsCookieJar users interact with directly, plus free functions to extract Set-Cookie headers from a response into a jar, build a Cookie request header from a jar, merge jars together, and construct individual Cookie objects from raw values or browser-style Morsels.",
+      "role": "Adapts requests' PreparedRequest/Response to the stdlib CookieJar interface and exposes a dict-like cookie jar to users.",
+      "files": ["src/requests/cookies.py"],
+      "entrypoints": [
+        { "name": "MockRequest", "kind": "class", "location": "src/requests/cookies.py:31", "signature": "class MockRequest", "plain": "Wraps a PreparedRequest so http.cookiejar's policy logic can read its URL, host and headers as if it were a urllib2 Request." },
+        { "name": "MockResponse", "kind": "class", "location": "src/requests/cookies.py:114", "signature": "class MockResponse", "plain": "Wraps a raw response's headers so http.cookiejar can read them as if it were an httplib response." },
+        { "name": "extract_cookies_to_jar", "kind": "function", "location": "src/requests/cookies.py:135", "signature": "extract_cookies_to_jar(jar, request, response) -> None", "plain": "Reads Set-Cookie headers from a raw urllib3 response into the given cookie jar." },
+        { "name": "get_cookie_header", "kind": "function", "location": "src/requests/cookies.py:153", "signature": "get_cookie_header(jar, request) -> str | None", "plain": "Computes the Cookie header value a jar would send for the given request." },
+        { "name": "remove_cookie_by_name", "kind": "function", "location": "src/requests/cookies.py:164", "signature": "remove_cookie_by_name(cookiejar, name, domain=None, path=None) -> None", "plain": "Deletes every cookie in the jar matching the given name (and optional domain/path)." },
+        { "name": "CookieConflictError", "kind": "class", "location": "src/requests/cookies.py:185", "signature": "class CookieConflictError(RuntimeError)", "plain": "Raised when a name/domain/path lookup matches more than one cookie." },
+        { "name": "RequestsCookieJar", "kind": "class", "location": "src/requests/cookies.py:191", "signature": "class RequestsCookieJar(CookieJar, MutableMapping[str, str | None])", "plain": "A cookie jar that behaves both like a stdlib CookieJar and like a plain dict (get/set/items/keys/values), and can be pickled." },
+        { "name": "_copy_cookie_jar", "kind": "function", "location": "src/requests/cookies.py:479", "signature": "_copy_cookie_jar(jar) -> CookieJar | None", "plain": "Returns a deep copy of any CookieJar-like object, used when duplicating a PreparedRequest." },
+        { "name": "create_cookie", "kind": "function", "location": "src/requests/cookies.py:494", "signature": "create_cookie(name, value, **kwargs) -> Cookie", "plain": "Builds a single stdlib Cookie object from a name/value and optional attributes, filling in sane defaults." },
+        { "name": "morsel_to_cookie", "kind": "function", "location": "src/requests/cookies.py:531", "signature": "morsel_to_cookie(morsel) -> Cookie", "plain": "Converts a browser-style http.cookies.Morsel into a stdlib Cookie object." },
+        { "name": "cookiejar_from_dict", "kind": "function", "location": "src/requests/cookies.py:579", "signature": "cookiejar_from_dict(cookie_dict, cookiejar=None, overwrite=True) -> CookieJar", "plain": "Builds (or adds to) a RequestsCookieJar from a plain {name: value} dictionary." },
+        { "name": "merge_cookies", "kind": "function", "location": "src/requests/cookies.py:604", "signature": "merge_cookies(cookiejar, cookies) -> CookieJar", "plain": "Adds the cookies from a dict or another CookieJar into the given jar and returns it." }
+      ],
+      "depends_on": [
+        { "unit": "internal-string-utils", "entrypoint": "to_native_string" },
+        { "unit": "type-definitions", "entrypoint": "is_prepared" },
+        { "unit": "compat-shims", "entrypoint": "cookielib" },
+        { "unit": "compat-shims", "entrypoint": "urlparse" },
+        { "unit": "compat-shims", "entrypoint": "urlunparse" },
+        { "unit": "compat-shims", "entrypoint": "Morsel" }
+      ],
+      "effects": [
+        { "kind": "clock", "description": "morsel_to_cookie computes a cookie's expiry either from a 'max-age' offset using time.time(), or by parsing an 'expires' date string with time.strptime()/calendar.timegm()." }
+      ]
+    },
+    {
+      "name": "auth-handlers",
+      "kind": "domain",
+      "description": "Implements the pluggable request-authentication callables users pass as the `auth=` argument: HTTP Basic, HTTP Proxy Basic, and HTTP Digest authentication (RFC 2617), including digest's challenge/response nonce bookkeeping and automatic retry-on-401 via a response hook. Each is a callable that mutates a PreparedRequest's headers before it is sent.",
+      "role": "Provides the Basic, Proxy and Digest HTTP authentication callables attached to outgoing requests.",
+      "files": ["src/requests/auth.py"],
+      "entrypoints": [
+        { "name": "_basic_auth_str", "kind": "function", "location": "src/requests/auth.py:34", "signature": "_basic_auth_str(username, password) -> str", "plain": "Builds the 'Basic <base64>' Authorization header value for a username/password pair." },
+        { "name": "AuthBase", "kind": "class", "location": "src/requests/auth.py:78", "signature": "class AuthBase", "plain": "Base class all auth callables derive from; defines the callable contract that mutates and returns a PreparedRequest." },
+        { "name": "HTTPBasicAuth", "kind": "class", "location": "src/requests/auth.py:85", "signature": "class HTTPBasicAuth(AuthBase)", "plain": "Attaches an HTTP Basic Authorization header built from a username and password." },
+        { "name": "HTTPProxyAuth", "kind": "class", "location": "src/requests/auth.py:116", "signature": "class HTTPProxyAuth(HTTPBasicAuth)", "plain": "Same as HTTPBasicAuth but sets Proxy-Authorization instead of Authorization." },
+        { "name": "HTTPDigestAuth", "kind": "class", "location": "src/requests/auth.py:124", "signature": "class HTTPDigestAuth(AuthBase)", "plain": "Implements RFC 2617 Digest auth: on a 401 challenge it computes the digest response and automatically resends the request with credentials." }
+      ],
+      "depends_on": [
+        { "unit": "internal-string-utils", "entrypoint": "to_native_string" },
+        { "unit": "compat-shims", "entrypoint": "basestring" },
+        { "unit": "compat-shims", "entrypoint": "str" },
+        { "unit": "compat-shims", "entrypoint": "urlparse" },
+        { "unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar" },
+        { "unit": "utils", "entrypoint": "parse_dict_header" }
+      ],
+      "effects": [
+        { "kind": "clock", "description": "HTTPDigestAuth.build_digest_header reads the current time (time.ctime) as one input to the client nonce used in the digest response." },
+        { "kind": "random", "description": "HTTPDigestAuth.build_digest_header reads 8 bytes from os.urandom() to build an unpredictable client nonce (cnonce)." }
+      ]
+    },
+    {
+      "name": "utils",
+      "kind": "infra",
+      "description": "A general-purpose grab bag of helper functions used throughout the library: computing a request body's length, reading credentials from a .netrc file, resolving proxy configuration from environment variables and NO_PROXY rules, parsing/quoting HTTP header syntax (list/dict headers, link headers, content-type charset), URI percent-encoding, guessing a response's text encoding or a JSON payload's byte encoding, atomic temp-file writes, and extracting a file from within a zip archive on the filesystem.",
+      "role": "Shared utility functions for proxy resolution, netrc/env lookups, header/URI parsing, and misc I/O helpers.",
+      "files": ["src/requests/utils.py"],
+      "entrypoints": [
+        { "name": "super_len", "kind": "function", "location": "src/requests/utils.py:160", "signature": "super_len(o: Any) -> int", "plain": "Determines the remaining byte length of a body object (string, bytes, or file-like), accounting for its current read position." },
+        { "name": "get_netrc_auth", "kind": "function", "location": "src/requests/utils.py:231", "signature": "get_netrc_auth(url, raise_errors=False) -> tuple[str, str] | None", "plain": "Looks up a login/password for the URL's host from a .netrc file." },
+        { "name": "guess_filename", "kind": "function", "location": "src/requests/utils.py:283", "signature": "guess_filename(obj) -> str | None", "plain": "Tries to infer a filename from a file-like object's .name attribute, for multipart uploads." },
+        { "name": "extract_zipped_paths", "kind": "function", "location": "src/requests/utils.py:290", "signature": "extract_zipped_paths(path: str) -> str", "plain": "If a path points inside a zip archive rather than a real file, extracts that member to a temp file and returns its path." },
+        { "name": "atomic_open", "kind": "function", "location": "src/requests/utils.py:328", "signature": "atomic_open(filename: str) -> ContextManager[BufferedWriter]", "plain": "Context manager that writes to a temp file then atomically renames it over the target, avoiding partial writes." },
+        { "name": "to_key_val_list", "kind": "function", "location": "src/requests/utils.py:376", "signature": "to_key_val_list(value) -> list[tuple] | None", "plain": "Normalizes a dict or iterable of pairs into a list of (key, value) tuples." },
+        { "name": "from_key_val_list", "kind": "function", "location": "src/requests/utils.py:341", "signature": "from_key_val_list(value) -> dict | None", "plain": "Normalizes a mapping or iterable of pairs into an OrderedDict." },
+        { "name": "parse_list_header", "kind": "function", "location": "src/requests/utils.py:408", "signature": "parse_list_header(value: str) -> list[str]", "plain": "Parses an RFC 2068 comma-separated header list, honoring quoted substrings." },
+        { "name": "parse_dict_header", "kind": "function", "location": "src/requests/utils.py:440", "signature": "parse_dict_header(value: str) -> dict[str, str | None]", "plain": "Parses a comma-separated key=value header (e.g. a Digest auth challenge) into a dict." },
+        { "name": "unquote_header_value", "kind": "function", "location": "src/requests/utils.py:475", "signature": "unquote_header_value(value: str, is_filename=False) -> str", "plain": "Strips surrounding quotes and unescapes a quoted header value." },
+        { "name": "dict_from_cookiejar", "kind": "function", "location": "src/requests/utils.py:500", "signature": "dict_from_cookiejar(cj) -> dict", "plain": "Converts a CookieJar into a plain {name: value} dict." },
+        { "name": "get_encoding_from_headers", "kind": "function", "location": "src/requests/utils.py:569", "signature": "get_encoding_from_headers(headers) -> str | None", "plain": "Infers a text encoding from a response's Content-Type header." },
+        { "name": "stream_decode_response_unicode", "kind": "function", "location": "src/requests/utils.py:594", "signature": "stream_decode_response_unicode(iterator, r) -> Generator[str | bytes]", "plain": "Incrementally decodes a byte-chunk iterator into text using the response's encoding, without buffering the whole body." },
+        { "name": "iter_slices", "kind": "function", "location": "src/requests/utils.py:621", "signature": "iter_slices(string, slice_length) -> Generator", "plain": "Yields fixed-size slices of an in-memory string/bytes value, simulating streamed chunks." },
+        { "name": "requote_uri", "kind": "function", "location": "src/requests/utils.py:704", "signature": "requote_uri(uri: str) -> str", "plain": "Normalizes a URI's percent-encoding so it's consistently and only as escaped as necessary." },
+        { "name": "should_bypass_proxies", "kind": "function", "location": "src/requests/utils.py:810", "signature": "should_bypass_proxies(url, no_proxy) -> bool", "plain": "Decides whether a URL's host is covered by NO_PROXY rules and should skip any configured proxy." },
+        { "name": "get_environ_proxies", "kind": "function", "location": "src/requests/utils.py:873", "signature": "get_environ_proxies(url, no_proxy=None) -> dict", "plain": "Returns the OS/environment proxy configuration applicable to a URL, or an empty dict if it should be bypassed." },
+        { "name": "select_proxy", "kind": "function", "location": "src/requests/utils.py:885", "signature": "select_proxy(url, proxies) -> str | None", "plain": "Picks the most specific matching proxy URL for a request from a proxies mapping." },
+        { "name": "resolve_proxies", "kind": "function", "location": "src/requests/utils.py:911", "signature": "resolve_proxies(request, proxies, trust_env=True) -> dict", "plain": "Combines explicit proxy settings with environment-derived ones for a given request." },
+        { "name": "default_user_agent", "kind": "function", "location": "src/requests/utils.py:942", "signature": "default_user_agent(name='python-requests') -> str", "plain": "Builds the default User-Agent header string, e.g. 'python-requests/2.34.2'." },
+        { "name": "default_headers", "kind": "function", "location": "src/requests/utils.py:951", "signature": "default_headers() -> CaseInsensitiveDict", "plain": "Builds the default header set (User-Agent, Accept-Encoding, Accept, Connection) a new Session starts with." },
+        { "name": "parse_header_links", "kind": "function", "location": "src/requests/utils.py:965", "signature": "parse_header_links(value: str) -> list[dict[str, str]]", "plain": "Parses an RFC 5988 Link header into a list of {url, rel, ...} dicts, powering Response.links." },
+        { "name": "guess_json_utf", "kind": "function", "location": "src/requests/utils.py:1008", "signature": "guess_json_utf(data: bytes) -> str | None", "plain": "Detects the UTF encoding (8/16/32, any endianness, with or without BOM) of a raw JSON byte string." },
+        { "name": "prepend_scheme_if_needed", "kind": "function", "location": "src/requests/utils.py:1040", "signature": "prepend_scheme_if_needed(url: str, new_scheme: str) -> str", "plain": "Adds a scheme (e.g. 'http://') to a URL that's missing one, without disturbing an existing scheme." },
+        { "name": "get_auth_from_url", "kind": "function", "location": "src/requests/utils.py:1070", "signature": "get_auth_from_url(url: str) -> tuple[str, str]", "plain": "Extracts a username/password embedded in a URL (e.g. http://user:pass@host/)." },
+        { "name": "check_header_validity", "kind": "function", "location": "src/requests/utils.py:1087", "signature": "check_header_validity(header: tuple) -> None", "plain": "Raises InvalidHeader if a (name, value) header pair contains illegal whitespace/control characters." },
+        { "name": "urldefragauth", "kind": "function", "location": "src/requests/utils.py:1122", "signature": "urldefragauth(url: str) -> str", "plain": "Strips the fragment and any embedded userinfo/auth from a URL." },
+        { "name": "rewind_body", "kind": "function", "location": "src/requests/utils.py:1139", "signature": "rewind_body(prepared_request: PreparedRequest) -> None", "plain": "Seeks a streamed request body back to its recorded starting position so it can be resent after a redirect." },
+        { "name": "DEFAULT_CA_BUNDLE_PATH", "kind": "constant", "location": "src/requests/utils.py:82", "signature": "DEFAULT_CA_BUNDLE_PATH: str", "plain": "The filesystem path to the default CA bundle, computed once at import time." },
+        { "name": "DEFAULT_PORTS", "kind": "constant", "location": "src/requests/utils.py:85", "signature": "DEFAULT_PORTS: dict[str, int]", "plain": "Maps 'http'/'https' to their standard default port numbers." }
+      ],
+      "depends_on": [
+        { "unit": "ca-certs", "entrypoint": "where" },
+        { "unit": "version-metadata", "entrypoint": "__version__" },
+        { "unit": "internal-string-utils", "entrypoint": "HEADER_VALIDATORS" },
+        { "unit": "internal-string-utils", "entrypoint": "to_native_string" },
+        { "unit": "type-definitions", "entrypoint": "SupportsItems" },
+        { "unit": "compat-shims", "entrypoint": "Mapping" },
+        { "unit": "compat-shims", "entrypoint": "urlparse" },
+        { "unit": "compat-shims", "entrypoint": "urlunparse" },
+        { "unit": "compat-shims", "entrypoint": "getproxies" },
+        { "unit": "compat-shims", "entrypoint": "getproxies_environment" },
+        { "unit": "compat-shims", "entrypoint": "proxy_bypass" },
+        { "unit": "compat-shims", "entrypoint": "proxy_bypass_environment" },
+        { "unit": "compat-shims", "entrypoint": "parse_http_list" },
+        { "unit": "compat-shims", "entrypoint": "quote" },
+        { "unit": "compat-shims", "entrypoint": "unquote" },
+        { "unit": "compat-shims", "entrypoint": "integer_types" },
+        { "unit": "compat-shims", "entrypoint": "is_urllib3_1" },
+        { "unit": "cookie-jar", "entrypoint": "cookiejar_from_dict" },
+        { "unit": "exceptions", "entrypoint": "FileModeWarning" },
+        { "unit": "exceptions", "entrypoint": "InvalidHeader" },
+        { "unit": "exceptions", "entrypoint": "InvalidURL" },
+        { "unit": "exceptions", "entrypoint": "UnrewindableBodyError" },
+        { "unit": "data-structures", "entrypoint": "CaseInsensitiveDict" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "get_netrc_auth reads a .netrc/_netrc credentials file from the user's home directory or a NETRC-env-var-specified path." },
+        { "kind": "filesystem", "description": "extract_zipped_paths reads a zip archive and writes an extracted member to a new temp file; atomic_open writes to a temp file and atomically renames it over the destination path." },
+        { "kind": "env", "description": "should_bypass_proxies, get_environ_proxies, get_netrc_auth and set_environ read (and set_environ temporarily writes) OS environment variables such as no_proxy/NO_PROXY, NETRC, and REQUESTS_CA_BUNDLE/CURL_CA_BUNDLE to resolve proxy and auth configuration." }
+      ]
+    },
+    {
+      "name": "transport-adapters",
+      "kind": "infra",
+      "description": "Implements the pluggable transport layer that actually puts bytes on the wire: BaseAdapter defines the interface, and HTTPAdapter is the default implementation wrapping a urllib3 PoolManager (and per-proxy ProxyManagers) to open pooled HTTP/HTTPS connections, verify TLS certificates and client certs, send the prepared request, translate urllib3-level errors into Requests exceptions, and build a Response object from the raw reply.",
+      "role": "Owns the urllib3-backed connection pooling, TLS verification, and request/response translation for a mounted URL scheme.",
+      "files": ["src/requests/adapters.py"],
+      "entrypoints": [
+        { "name": "BaseAdapter", "kind": "class", "location": "src/requests/adapters.py:122", "signature": "class BaseAdapter", "plain": "Abstract interface a transport adapter must implement: send() and close()." },
+        { "name": "HTTPAdapter", "kind": "class", "location": "src/requests/adapters.py:158", "signature": "class HTTPAdapter(BaseAdapter)", "plain": "The default HTTP/HTTPS transport adapter, backed by a urllib3 connection pool manager." },
+        { "name": "HTTPAdapter.send", "kind": "method", "location": "src/requests/adapters.py:634", "signature": "HTTPAdapter.send(request, stream=False, timeout=None, verify=True, cert=None, proxies=None) -> Response", "plain": "Opens/reuses a pooled connection and sends the prepared request over it, returning a Response or raising a translated error." },
+        { "name": "HTTPAdapter.build_response", "kind": "method", "location": "src/requests/adapters.py:365", "signature": "HTTPAdapter.build_response(req, resp) -> Response", "plain": "Converts a raw urllib3 response into a fully-populated Requests Response object." },
+        { "name": "HTTPAdapter.cert_verify", "kind": "method", "location": "src/requests/adapters.py:307", "signature": "HTTPAdapter.cert_verify(conn, url, verify, cert) -> None", "plain": "Configures the connection's TLS verification mode and client certificate/key based on the verify/cert settings." },
+        { "name": "HTTPAdapter.get_connection_with_tls_context", "kind": "method", "location": "src/requests/adapters.py:455", "signature": "HTTPAdapter.get_connection_with_tls_context(request, verify, proxies=None, cert=None) -> HTTPConnectionPool", "plain": "Selects (creating if needed) the pooled connection, direct or via proxy, for the given request and TLS settings." },
+        { "name": "HTTPAdapter.init_poolmanager", "kind": "method", "location": "src/requests/adapters.py:239", "signature": "HTTPAdapter.init_poolmanager(connections, maxsize, block=False, **pool_kwargs) -> None", "plain": "(Re)creates the underlying urllib3 PoolManager with the given pool sizing." },
+        { "name": "HTTPAdapter.proxy_manager_for", "kind": "method", "location": "src/requests/adapters.py:269", "signature": "HTTPAdapter.proxy_manager_for(proxy, **proxy_kwargs) -> Any", "plain": "Returns (creating and caching if needed) the urllib3 ProxyManager for a given proxy URL." },
+        { "name": "DEFAULT_POOLSIZE", "kind": "constant", "location": "src/requests/adapters.py:80", "signature": "DEFAULT_POOLSIZE: int", "plain": "Default number of connections cached per host pool (10)." },
+        { "name": "DEFAULT_RETRIES", "kind": "constant", "location": "src/requests/adapters.py:81", "signature": "DEFAULT_RETRIES: int", "plain": "Default retry count for failed connections (0, i.e. no automatic retry)." }
+      ],
+      "depends_on": [
+        { "unit": "auth-handlers", "entrypoint": "_basic_auth_str" },
+        { "unit": "compat-shims", "entrypoint": "basestring" },
+        { "unit": "compat-shims", "entrypoint": "urlparse" },
+        { "unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar" },
+        { "unit": "exceptions", "entrypoint": "ConnectionError" },
+        { "unit": "exceptions", "entrypoint": "ConnectTimeout" },
+        { "unit": "exceptions", "entrypoint": "InvalidHeader" },
+        { "unit": "exceptions", "entrypoint": "InvalidProxyURL" },
+        { "unit": "exceptions", "entrypoint": "InvalidSchema" },
+        { "unit": "exceptions", "entrypoint": "InvalidURL" },
+        { "unit": "exceptions", "entrypoint": "ProxyError" },
+        { "unit": "exceptions", "entrypoint": "ReadTimeout" },
+        { "unit": "exceptions", "entrypoint": "RetryError" },
+        { "unit": "exceptions", "entrypoint": "SSLError" },
+        { "unit": "http-models", "entrypoint": "Response" },
+        { "unit": "data-structures", "entrypoint": "CaseInsensitiveDict" },
+        { "unit": "utils", "entrypoint": "DEFAULT_CA_BUNDLE_PATH" },
+        { "unit": "utils", "entrypoint": "get_auth_from_url" },
+        { "unit": "utils", "entrypoint": "get_encoding_from_headers" },
+        { "unit": "utils", "entrypoint": "prepend_scheme_if_needed" },
+        { "unit": "utils", "entrypoint": "select_proxy" },
+        { "unit": "utils", "entrypoint": "urldefragauth" },
+        { "unit": "type-definitions", "entrypoint": "is_prepared" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "HTTPAdapter.send opens (or reuses) TCP/TLS connections through urllib3's connection pool and performs the live HTTP request/response exchange (conn.urlopen), optionally through a proxy or SOCKS proxy." },
+        { "kind": "filesystem", "description": "cert_verify checks that the configured CA bundle path and client certificate/key files exist on disk before using them." }
+      ]
+    },
+    {
+      "name": "http-models",
+      "kind": "domain",
+      "description": "Defines the core HTTP message objects users and the rest of the library build and consume: Request (the user-facing, unprepared description of a call), PreparedRequest (the exact bytes/headers/URL that will be sent, built by encoding params/body/files/auth/cookies), and Response (the server's reply, with lazy content/text/json decoding, streaming iteration, redirect metadata, and raise_for_status()).",
+      "role": "Defines the Request/PreparedRequest/Response data model and the encoding logic that turns user input into wire bytes.",
+      "files": ["src/requests/models.py"],
+      "entrypoints": [
+        { "name": "RequestEncodingMixin", "kind": "class", "location": "src/requests/models.py:108", "signature": "class RequestEncodingMixin", "plain": "Shared logic for encoding query parameters and multipart file uploads into request bodies." },
+        { "name": "RequestHooksMixin", "kind": "class", "location": "src/requests/models.py:254", "signature": "class RequestHooksMixin", "plain": "Shared logic for registering/deregistering event hooks on a Request or PreparedRequest." },
+        { "name": "Request", "kind": "class", "location": "src/requests/models.py:284", "signature": "class Request(RequestHooksMixin)", "plain": "The user-facing description of an HTTP call (method, url, headers, data, etc.) before it's turned into wire bytes." },
+        { "name": "PreparedRequest", "kind": "class", "location": "src/requests/models.py:378", "signature": "class PreparedRequest(RequestEncodingMixin, RequestHooksMixin)", "plain": "The fully-resolved request (exact URL, headers, body bytes) that gets handed to a transport adapter to send." },
+        { "name": "PreparedRequest.prepare", "kind": "method", "location": "src/requests/models.py:424", "signature": "PreparedRequest.prepare(method=None, url=None, headers=None, files=None, data=None, params=None, auth=None, cookies=None, hooks=None, json=None) -> None", "plain": "Runs the full pipeline (method, url, headers, cookies, body, auth, hooks) that turns a Request's inputs into a sendable PreparedRequest." },
+        { "name": "PreparedRequest.prepare_url", "kind": "method", "location": "src/requests/models.py:483", "signature": "PreparedRequest.prepare_url(url, params) -> None", "plain": "Parses, IDNA-encodes the host if needed, merges query params into, and re-quotes the target URL." },
+        { "name": "PreparedRequest.prepare_body", "kind": "method", "location": "src/requests/models.py:576", "signature": "PreparedRequest.prepare_body(data, files, json=None) -> None", "plain": "Builds the request body bytes and Content-Type/Content-Length headers from JSON, form data, streamed data, or multipart files." },
+        { "name": "Response", "kind": "class", "location": "src/requests/models.py:732", "signature": "class Response", "plain": "The server's reply: status code, headers, cookies, redirect history, and lazily-decoded content/text/json." },
+        { "name": "Response.iter_content", "kind": "method", "location": "src/requests/models.py:914", "signature": "Response.iter_content(chunk_size=1, decode_unicode=False) -> Iterator[bytes | str]", "plain": "Streams the response body in chunks without buffering it all in memory." },
+        { "name": "Response.content", "kind": "method", "location": "src/requests/models.py:1035", "signature": "Response.content -> bytes (property)", "plain": "Reads and caches the full response body as bytes." },
+        { "name": "Response.text", "kind": "method", "location": "src/requests/models.py:1054", "signature": "Response.text -> str (property)", "plain": "Decodes the response content to text using the declared or detected encoding." },
+        { "name": "Response.json", "kind": "method", "location": "src/requests/models.py:1091", "signature": "Response.json(**kwargs) -> Any", "plain": "Parses the response body as JSON, raising JSONDecodeError on malformed input." },
+        { "name": "Response.raise_for_status", "kind": "method", "location": "src/requests/models.py:1144", "signature": "Response.raise_for_status() -> None", "plain": "Raises HTTPError if the status code indicates a 4xx or 5xx client/server error." },
+        { "name": "Response.close", "kind": "method", "location": "src/requests/models.py:1173", "signature": "Response.close() -> None", "plain": "Releases the underlying connection back to the pool." },
+        { "name": "DEFAULT_REDIRECT_LIMIT", "kind": "constant", "location": "src/requests/models.py:103", "signature": "DEFAULT_REDIRECT_LIMIT: int", "plain": "The default maximum number of redirects to follow (30)." },
+        { "name": "REDIRECT_STATI", "kind": "constant", "location": "src/requests/models.py:95", "signature": "REDIRECT_STATI: tuple[int, ...]", "plain": "The set of HTTP status codes treated as automatically-followable redirects." }
+      ],
+      "depends_on": [
+        { "unit": "type-definitions", "entrypoint": "SupportsRead" },
+        { "unit": "type-definitions", "entrypoint": "has_read" },
+        { "unit": "internal-string-utils", "entrypoint": "to_native_string" },
+        { "unit": "internal-string-utils", "entrypoint": "unicode_is_ascii" },
+        { "unit": "auth-handlers", "entrypoint": "HTTPBasicAuth" },
+        { "unit": "compat-shims", "entrypoint": "JSONDecodeError" },
+        { "unit": "compat-shims", "entrypoint": "basestring" },
+        { "unit": "compat-shims", "entrypoint": "builtin_str" },
+        { "unit": "compat-shims", "entrypoint": "chardet" },
+        { "unit": "compat-shims", "entrypoint": "cookielib" },
+        { "unit": "compat-shims", "entrypoint": "urlencode" },
+        { "unit": "compat-shims", "entrypoint": "urlsplit" },
+        { "unit": "compat-shims", "entrypoint": "urlunparse" },
+        { "unit": "compat-shims", "entrypoint": "json" },
+        { "unit": "cookie-jar", "entrypoint": "_copy_cookie_jar" },
+        { "unit": "cookie-jar", "entrypoint": "cookiejar_from_dict" },
+        { "unit": "cookie-jar", "entrypoint": "get_cookie_header" },
+        { "unit": "exceptions", "entrypoint": "ChunkedEncodingError" },
+        { "unit": "exceptions", "entrypoint": "ConnectionError" },
+        { "unit": "exceptions", "entrypoint": "ContentDecodingError" },
+        { "unit": "exceptions", "entrypoint": "HTTPError" },
+        { "unit": "exceptions", "entrypoint": "InvalidJSONError" },
+        { "unit": "exceptions", "entrypoint": "InvalidURL" },
+        { "unit": "exceptions", "entrypoint": "MissingSchema" },
+        { "unit": "exceptions", "entrypoint": "StreamConsumedError" },
+        { "unit": "exceptions", "entrypoint": "JSONDecodeError" },
+        { "unit": "exceptions", "entrypoint": "SSLError" },
+        { "unit": "hooks", "entrypoint": "default_hooks" },
+        { "unit": "status-codes", "entrypoint": "codes" },
+        { "unit": "data-structures", "entrypoint": "CaseInsensitiveDict" },
+        { "unit": "utils", "entrypoint": "check_header_validity" },
+        { "unit": "utils", "entrypoint": "get_auth_from_url" },
+        { "unit": "utils", "entrypoint": "guess_filename" },
+        { "unit": "utils", "entrypoint": "guess_json_utf" },
+        { "unit": "utils", "entrypoint": "iter_slices" },
+        { "unit": "utils", "entrypoint": "parse_header_links" },
+        { "unit": "utils", "entrypoint": "requote_uri" },
+        { "unit": "utils", "entrypoint": "stream_decode_response_unicode" },
+        { "unit": "utils", "entrypoint": "super_len" },
+        { "unit": "utils", "entrypoint": "to_key_val_list" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Response.iter_content and Response.close read from and release the underlying raw urllib3 socket/connection (self.raw), streaming response bytes as consumed." }
+      ]
+    },
+    {
+      "name": "session",
+      "kind": "domain",
+      "description": "Implements the Session object, the stateful entry point most users interact with: merges per-request settings (headers, params, auth, cookies, hooks, proxies, verify/cert) with session-level defaults, dispatches the request through the mounted transport adapter for its URL scheme, times the request, follows redirect chains (rebuilding method/auth/proxy/cookies at each hop per RFC 7231), and persists cookies back into the session's jar.",
+      "role": "Owns cross-request state (cookies, auth, adapters) and orchestrates preparing, sending, and following redirects for a request.",
+      "files": ["src/requests/sessions.py"],
+      "entrypoints": [
+        { "name": "merge_setting", "kind": "function", "location": "src/requests/sessions.py:76", "signature": "merge_setting(request_setting, session_setting, dict_class=OrderedDict) -> Any", "plain": "Combines a per-request setting with the session-level default, merging dict-like values and letting the request value win otherwise." },
+        { "name": "merge_hooks", "kind": "function", "location": "src/requests/sessions.py:108", "signature": "merge_hooks(request_hooks, session_hooks, dict_class=OrderedDict) -> dict", "plain": "Merges per-request and session-level event hooks without one empty side wiping out the other." },
+        { "name": "SessionRedirectMixin", "kind": "class", "location": "src/requests/sessions.py:127", "signature": "class SessionRedirectMixin", "plain": "Implements the redirect-following state machine (rebuild method/auth/proxy/cookies each hop) shared by Session." },
+        { "name": "SessionRedirectMixin.resolve_redirects", "kind": "method", "location": "src/requests/sessions.py:186", "signature": "resolve_redirects(resp, req, stream=False, timeout=None, verify=True, cert=None, proxies=None, yield_requests=False, **adapter_kwargs) -> Generator[Response]", "plain": "Follows a chain of HTTP redirects, re-sending (or yielding) each subsequent request until a non-redirect response or the redirect limit is hit." },
+        { "name": "Session", "kind": "class", "location": "src/requests/sessions.py:395", "signature": "class Session(SessionRedirectMixin)", "plain": "Holds cookies, default headers/auth/proxies, and mounted transport adapters shared across many requests." },
+        { "name": "Session.request", "kind": "method", "location": "src/requests/sessions.py:557", "signature": "Session.request(method, url, **kwargs) -> Response", "plain": "Builds a Request from the given arguments and session defaults, prepares it, and sends it." },
+        { "name": "Session.get", "kind": "method", "location": "src/requests/sessions.py:655", "signature": "Session.get(url, params=None, **kwargs) -> Response", "plain": "Sends a GET request through this session." },
+        { "name": "Session.post", "kind": "method", "location": "src/requests/sessions.py:695", "signature": "Session.post(url, data=None, json=None, **kwargs) -> Response", "plain": "Sends a POST request through this session." },
+        { "name": "Session.send", "kind": "method", "location": "src/requests/sessions.py:752", "signature": "Session.send(request: PreparedRequest, **kwargs) -> Response", "plain": "Dispatches a PreparedRequest through the appropriate mounted adapter, times it, follows redirects, and persists cookies." },
+        { "name": "Session.merge_environment_settings", "kind": "method", "location": "src/requests/sessions.py:831", "signature": "Session.merge_environment_settings(url, proxies, stream, verify, cert) -> dict", "plain": "Combines explicit proxies/verify settings with environment-derived proxy and CA-bundle configuration." },
+        { "name": "Session.mount", "kind": "method", "location": "src/requests/sessions.py:888", "signature": "Session.mount(prefix: str, adapter: BaseAdapter) -> None", "plain": "Registers a transport adapter to handle URLs starting with the given prefix (e.g. 'https://')." },
+        { "name": "Session.close", "kind": "method", "location": "src/requests/sessions.py:883", "signature": "Session.close() -> None", "plain": "Closes every mounted adapter, releasing pooled connections." },
+        { "name": "session", "kind": "function", "location": "src/requests/sessions.py:908", "signature": "session() -> Session", "plain": "Deprecated convenience constructor equivalent to calling Session()." }
+      ],
+      "depends_on": [
+        { "unit": "internal-string-utils", "entrypoint": "to_native_string" },
+        { "unit": "type-definitions", "entrypoint": "is_prepared" },
+        { "unit": "transport-adapters", "entrypoint": "HTTPAdapter" },
+        { "unit": "auth-handlers", "entrypoint": "_basic_auth_str" },
+        { "unit": "compat-shims", "entrypoint": "cookielib" },
+        { "unit": "compat-shims", "entrypoint": "urljoin" },
+        { "unit": "compat-shims", "entrypoint": "urlparse" },
+        { "unit": "cookie-jar", "entrypoint": "RequestsCookieJar" },
+        { "unit": "cookie-jar", "entrypoint": "cookiejar_from_dict" },
+        { "unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar" },
+        { "unit": "cookie-jar", "entrypoint": "merge_cookies" },
+        { "unit": "exceptions", "entrypoint": "ChunkedEncodingError" },
+        { "unit": "exceptions", "entrypoint": "ContentDecodingError" },
+        { "unit": "exceptions", "entrypoint": "InvalidSchema" },
+        { "unit": "exceptions", "entrypoint": "TooManyRedirects" },
+        { "unit": "hooks", "entrypoint": "default_hooks" },
+        { "unit": "hooks", "entrypoint": "dispatch_hook" },
+        { "unit": "http-models", "entrypoint": "DEFAULT_REDIRECT_LIMIT" },
+        { "unit": "http-models", "entrypoint": "REDIRECT_STATI" },
+        { "unit": "http-models", "entrypoint": "PreparedRequest" },
+        { "unit": "http-models", "entrypoint": "Request" },
+        { "unit": "http-models", "entrypoint": "Response" },
+        { "unit": "status-codes", "entrypoint": "codes" },
+        { "unit": "data-structures", "entrypoint": "CaseInsensitiveDict" },
+        { "unit": "utils", "entrypoint": "DEFAULT_PORTS" },
+        { "unit": "utils", "entrypoint": "default_headers" },
+        { "unit": "utils", "entrypoint": "get_auth_from_url" },
+        { "unit": "utils", "entrypoint": "get_environ_proxies" },
+        { "unit": "utils", "entrypoint": "get_netrc_auth" },
+        { "unit": "utils", "entrypoint": "requote_uri" },
+        { "unit": "utils", "entrypoint": "resolve_proxies" },
+        { "unit": "utils", "entrypoint": "rewind_body" },
+        { "unit": "utils", "entrypoint": "should_bypass_proxies" },
+        { "unit": "utils", "entrypoint": "to_key_val_list" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Session.send dispatches the prepared request through a mounted transport adapter and follows redirect chains, producing one or more live HTTP connections and requests." },
+        { "kind": "clock", "description": "Session.send measures request duration with time.perf_counter or time.time (whichever is more accurate on the platform) to populate Response.elapsed." },
+        { "kind": "env", "description": "Session.merge_environment_settings reads the REQUESTS_CA_BUNDLE and CURL_CA_BUNDLE environment variables directly (via os.environ.get) to pick a default CA bundle when trust_env is enabled." }
+      ]
+    },
+    {
+      "name": "functional-api",
+      "kind": "domain",
+      "description": "The simple, one-off, function-based API (requests.get, requests.post, etc.) that most users reach for first. Each function opens a throwaway Session inside a `with` block, issues exactly one request through it, and returns the Response, so the caller never has to think about session lifecycle for a single call.",
+      "role": "Provides the top-level get/post/put/patch/delete/head/options/request convenience functions built on a disposable Session.",
+      "files": ["src/requests/api.py"],
+      "entrypoints": [
+        { "name": "request", "kind": "function", "location": "src/requests/api.py:24", "signature": "request(method: str, url, **kwargs) -> Response", "plain": "Opens a temporary Session, sends one request with the given method and arguments, and returns the Response." },
+        { "name": "get", "kind": "function", "location": "src/requests/api.py:74", "signature": "get(url, params=None, **kwargs) -> Response", "plain": "Sends a single GET request." },
+        { "name": "options", "kind": "function", "location": "src/requests/api.py:90", "signature": "options(url, **kwargs) -> Response", "plain": "Sends a single OPTIONS request." },
+        { "name": "head", "kind": "function", "location": "src/requests/api.py:102", "signature": "head(url, **kwargs) -> Response", "plain": "Sends a single HEAD request (redirects not followed by default)." },
+        { "name": "post", "kind": "function", "location": "src/requests/api.py:117", "signature": "post(url, data=None, json=None, **kwargs) -> Response", "plain": "Sends a single POST request." },
+        { "name": "put", "kind": "function", "location": "src/requests/api.py:137", "signature": "put(url, data=None, **kwargs) -> Response", "plain": "Sends a single PUT request." },
+        { "name": "patch", "kind": "function", "location": "src/requests/api.py:154", "signature": "patch(url, data=None, **kwargs) -> Response", "plain": "Sends a single PATCH request." },
+        { "name": "delete", "kind": "function", "location": "src/requests/api.py:171", "signature": "delete(url, **kwargs) -> Response", "plain": "Sends a single DELETE request." }
+      ],
+      "depends_on": [
+        { "unit": "session", "entrypoint": "Session" },
+        { "unit": "http-models", "entrypoint": "Response" }
+      ],
+      "effects": [
+        { "kind": "network", "description": "Every function here opens a short-lived Session and issues exactly one live HTTP request/response through it before the session (and its sockets) are closed." }
+      ]
+    },
+    {
+      "name": "legacy-package-shim",
+      "kind": "infra",
+      "description": "A backward-compatibility shim with no functions of its own: at import time it walks sys.modules and registers extra aliases like `requests.packages.urllib3` and `requests.packages.chardet` pointing at the already-imported urllib3/idna/chardet(-or-charset_normalizer) modules, so old code written against `requests.packages.X` keeps working.",
+      "role": "Aliases urllib3/idna/chardet into the requests.packages.* namespace for old code that imports vendored-style paths.",
+      "files": ["src/requests/packages.py"],
+      "entrypoints": [
+        { "name": "requests.packages (module import)", "kind": "constant", "location": "src/requests/packages.py:1", "signature": "import requests.packages", "plain": "Importing this module has the side effect of making urllib3/idna/chardet reachable as requests.packages.urllib3 etc." }
+      ],
+      "depends_on": [
+        { "unit": "compat-shims", "entrypoint": "chardet" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Mutates sys.modules to insert aliases (e.g. 'requests.packages.urllib3', 'requests.packages.chardet') pointing at the already-imported urllib3/idna/chardet modules, for backward compatibility." }
+      ]
+    },
+    {
+      "name": "diagnostics",
+      "kind": "infra",
+      "description": "A standalone bug-report helper (also runnable as `python -m requests.help`) that gathers version and environment information — Python implementation and version, OS platform/release, OpenSSL version, and the installed versions of urllib3/idna/chardet/charset_normalizer/cryptography/pyOpenSSL/requests itself — and prints it as JSON, so users can paste one blob of diagnostic info into a bug report.",
+      "role": "Collects environment/dependency-version information into a JSON blob for bug reports.",
+      "files": ["src/requests/help.py"],
+      "entrypoints": [
+        { "name": "info", "kind": "function", "location": "src/requests/help.py:67", "signature": "info() -> dict[str, Any]", "plain": "Assembles a dictionary describing the platform, Python implementation, OpenSSL, and installed dependency versions." },
+        { "name": "main", "kind": "cli", "location": "src/requests/help.py:126", "signature": "main() -> None", "plain": "Pretty-prints the info() dictionary as JSON to stdout; the entry point when run as `python -m requests.help`." },
+        { "name": "_implementation", "kind": "function", "location": "src/requests/help.py:35", "signature": "_implementation() -> dict[str, str]", "plain": "Reports the running Python implementation's name and version (CPython, PyPy, etc.)." }
+      ],
+      "depends_on": [
+        { "unit": "version-metadata", "entrypoint": "__version__" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Reads system/platform information (platform.system/release, ssl.OPENSSL_VERSION_NUMBER, sys.pypy_version_info) and the versions of several optional installed packages (including urllib3, which triggers a network-related heuristic even though only its __version__ attribute is read), then main() prints the resulting JSON report to stdout." }
+      ]
+    },
+    {
+      "name": "package-bootstrap",
+      "kind": "infra",
+      "description": "The top-level `requests` package __init__: on import, it checks that the installed urllib3/chardet/charset_normalizer/cryptography versions fall within supported ranges (warning if not), patches urllib3 to use pyOpenSSL when the standard library lacks SNI support, silences urllib3's own DependencyWarnings, and re-exports the public API surface (get/post/..., Session, Request/PreparedRequest/Response, the exception hierarchy, codes, packages, utils) as `requests.*`.",
+      "role": "The package entry point: validates dependency versions, wires up SNI/SSL fallback, and re-exports the public requests.* API surface.",
+      "files": ["src/requests/__init__.py"],
+      "entrypoints": [
+        { "name": "check_compatibility", "kind": "function", "location": "src/requests/__init__.py:60", "signature": "check_compatibility(urllib3_version, chardet_version, charset_normalizer_version) -> None", "plain": "Asserts the installed urllib3/chardet/charset_normalizer versions fall within the ranges this release supports." },
+        { "name": "_check_cryptography", "kind": "function", "location": "src/requests/__init__.py:99", "signature": "_check_cryptography(cryptography_version) -> None", "plain": "Warns if an old, slow version of the cryptography package is installed (only relevant on the pyOpenSSL/SNI-fallback path)." },
+        { "name": "__all__", "kind": "constant", "location": "src/requests/__init__.py:188", "signature": "__all__: tuple[str, ...]", "plain": "The list of names exported as the public `requests.*` API surface." }
+      ],
+      "depends_on": [
+        { "unit": "exceptions", "entrypoint": "RequestsDependencyWarning" },
+        { "unit": "exceptions", "entrypoint": "FileModeWarning" },
+        { "unit": "exceptions", "entrypoint": "ConnectionError" },
+        { "unit": "exceptions", "entrypoint": "ConnectTimeout" },
+        { "unit": "exceptions", "entrypoint": "HTTPError" },
+        { "unit": "exceptions", "entrypoint": "JSONDecodeError" },
+        { "unit": "exceptions", "entrypoint": "ReadTimeout" },
+        { "unit": "exceptions", "entrypoint": "RequestException" },
+        { "unit": "exceptions", "entrypoint": "Timeout" },
+        { "unit": "exceptions", "entrypoint": "TooManyRedirects" },
+        { "unit": "exceptions", "entrypoint": "URLRequired" },
+        { "unit": "version-metadata", "entrypoint": "__version__" },
+        { "unit": "functional-api", "entrypoint": "get" },
+        { "unit": "functional-api", "entrypoint": "post" },
+        { "unit": "functional-api", "entrypoint": "request" },
+        { "unit": "functional-api", "entrypoint": "delete" },
+        { "unit": "functional-api", "entrypoint": "head" },
+        { "unit": "functional-api", "entrypoint": "options" },
+        { "unit": "functional-api", "entrypoint": "patch" },
+        { "unit": "functional-api", "entrypoint": "put" },
+        { "unit": "http-models", "entrypoint": "PreparedRequest" },
+        { "unit": "http-models", "entrypoint": "Request" },
+        { "unit": "http-models", "entrypoint": "Response" },
+        { "unit": "session", "entrypoint": "Session" },
+        { "unit": "session", "entrypoint": "session" },
+        { "unit": "status-codes", "entrypoint": "codes" },
+        { "unit": "legacy-package-shim", "entrypoint": "requests.packages (module import)" },
+        { "unit": "utils", "entrypoint": "default_headers" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "At import time, patches urllib3 to use pyOpenSSL's SSL implementation when the standard library ssl module lacks SNI support, silences urllib3's DependencyWarning category, registers a NullHandler on the 'requests' logger, and emits RequestsDependencyWarning/FileModeWarning via warnings.warn when installed dependency versions look unsupported." },
+        { "kind": "network", "description": "Re-exports get/post/put/patch/delete/head/options/request as top-level requests.* names and imports urllib3/urllib3.contrib.pyopenssl directly; this module performs no HTTP calls itself, but it is the module through which every network-performing call in the library becomes reachable, and its urllib3/SNI/SSL references are what a naive scan flags as network-related." }
+      ]
+    }
+  ],
+  "excluded": [
+    { "path": "tests/__init__.py", "reason": "Test suite: package marker for the pytest test tree, not application source." },
+    { "path": "tests/compat.py", "reason": "Test suite: py2/py3 compatibility shim used only by the tests." },
+    { "path": "tests/conftest.py", "reason": "Test suite: pytest fixtures (httpbin, trustme certs, etc.)." },
+    { "path": "tests/test_adapters.py", "reason": "Test suite: unit tests for the transport-adapters unit." },
+    { "path": "tests/test_help.py", "reason": "Test suite: unit tests for the diagnostics unit." },
+    { "path": "tests/test_hooks.py", "reason": "Test suite: unit tests for the hooks unit." },
+    { "path": "tests/test_lowlevel.py", "reason": "Test suite: low-level integration tests against a local test server." },
+    { "path": "tests/test_packages.py", "reason": "Test suite: unit tests for the legacy-package-shim unit." },
+    { "path": "tests/test_requests.py", "reason": "Test suite: the main end-to-end/unit test suite covering models, sessions, auth, cookies, utils, etc." },
+    { "path": "tests/test_structures.py", "reason": "Test suite: unit tests for the data-structures unit." },
+    { "path": "tests/test_testserver.py", "reason": "Test suite: unit tests for the local testserver helper used by other tests." },
+    { "path": "tests/test_utils.py", "reason": "Test suite: unit tests for the utils unit." },
+    { "path": "tests/testserver/__init__.py", "reason": "Test suite: package marker for the local test HTTP server helper." },
+    { "path": "tests/testserver/server.py", "reason": "Test suite: a minimal local socket-server used to drive low-level tests; test infrastructure, not library source." },
+    { "path": "tests/utils.py", "reason": "Test suite: shared test-only helper functions." },
+    { "path": "tests/certs/", "reason": "Test suite: TLS certificate/key fixtures (valid, expired, mTLS) used only by the tests, not application source." },
+    { "path": "docs/conf.py", "reason": "Sphinx documentation build configuration script; configures the docs site, not application logic." },
+    { "path": "docs/_themes/flask_theme_support.py", "reason": "Vendored Sphinx theme support script for the documentation site's look and feel; not application logic." },
+    { "path": "docs/", "reason": "Remaining Sphinx documentation source (RST pages, static/theme assets, Makefile) and ReadTheDocs page content; not executable library code." },
+    { "path": "ext/", "reason": "Project logo/branding image and vector assets (png/svg/ai) plus their license; design assets, not source." },
+    { "path": ".github/", "reason": "GitHub CI workflow definitions, issue/PR templates, CODEOWNERS, and community/security policy docs." },
+    { "path": ".git/", "reason": "Version control metadata, not source." },
+    { "path": "pyproject.toml", "reason": "Build system, packaging, lint/format/typecheck, and pytest configuration; project metadata rather than application logic." },
+    { "path": "setup.py", "reason": "Thin setuptools shim delegating to pyproject.toml; build tooling, not application logic." },
+    { "path": "requirements-dev.txt", "reason": "Development/test dependency pins; not application source." },
+    { "path": "tox.ini", "reason": "Tox test-matrix runner configuration." },
+    { "path": "Makefile", "reason": "Developer convenience targets (test/lint/docs commands); build tooling, not application logic." },
+    { "path": "MANIFEST.in", "reason": "sdist packaging file-inclusion rules; build tooling." },
+    { "path": ".pre-commit-config.yaml", "reason": "Pre-commit hook configuration for linting/formatting; developer tooling." },
+    { "path": ".readthedocs.yaml", "reason": "ReadTheDocs build configuration for the documentation site." },
+    { "path": ".coveragerc", "reason": "Test coverage tool configuration." },
+    { "path": ".gitignore", "reason": "VCS ignore rules." },
+    { "path": ".git-blame-ignore-revs", "reason": "git-blame configuration listing commits to ignore (e.g. mass reformatting); not source." },
+    { "path": "README.md", "reason": "Project overview documentation." },
+    { "path": "HISTORY.md", "reason": "Changelog." },
+    { "path": "AUTHORS.rst", "reason": "Contributor credits list." },
+    { "path": "LICENSE", "reason": "License text." },
+    { "path": "NOTICE", "reason": "Third-party notice/attribution text." },
+    { "path": "lu-manifest.schema.json", "reason": "The manifest schema this output conforms to; a tooling artifact for this partitioning task, not part of the requests library source." }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    {
+      "from_unit": "http-models",
+      "to_unit": "cookie-jar",
+      "location": "src/requests/models.py:53",
+      "note": "models.py imports the underscore-prefixed _copy_cookie_jar helper directly from cookies.py rather than going through a public copy API; cookies.py's own inline comment ('cross-module usage in models.py') acknowledges this is a private symbol leaking across the unit boundary."
+    },
+    {
+      "from_unit": "transport-adapters",
+      "to_unit": "auth-handlers",
+      "location": "src/requests/adapters.py:36",
+      "note": "adapters.py imports the underscore-prefixed _basic_auth_str helper from auth.py to build Proxy-Authorization headers, reaching past auth.py's public AuthBase/HTTPBasicAuth/HTTPProxyAuth surface into its private implementation detail."
+    },
+    {
+      "from_unit": "session",
+      "to_unit": "auth-handlers",
+      "location": "src/requests/sessions.py:22",
+      "note": "sessions.py separately imports the same private _basic_auth_str helper from auth.py (to rebuild Proxy-Authorization headers during redirect handling), duplicating the same boundary violation seen in transport-adapters."
+    },
+    {
+      "from_unit": "utils",
+      "to_unit": "internal-string-utils",
+      "location": "src/requests/utils.py:39",
+      "note": "utils.py imports the underscore-prefixed _HEADER_VALIDATORS_BYTE and _HEADER_VALIDATORS_STR regex tables from _internal_utils.py in addition to the public HEADER_VALIDATORS mapping that already exposes the same data."
+    }
+  ]
+}

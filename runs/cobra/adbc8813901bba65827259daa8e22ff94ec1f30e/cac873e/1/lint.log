@@ -1,0 +1,10 @@
+=== lint round 1788935811 ===
+I4 'flag-groups' file 'flag_groups.go' shows 'filesystem' effect not declared
+I4 'completion-engine' file 'completions.go' shows 'env' effect not declared
+I4 'completion-engine' file 'active_help.go' shows 'env' effect not declared
+I4 'doc-generators' file 'doc/man_docs.go' shows 'env' effect not declared
+4 blocking error(s)
+exit=1
+=== lint round 1788936106 ===
+0 blocking error(s)
+exit=0

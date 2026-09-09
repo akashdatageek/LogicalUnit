@@ -212,6 +212,14 @@ def extract(repo):
     files = sorted(p for p in repo.rglob('*') if p.is_file() and p.suffix in LANG_BY_EXT and not (set(p.parts[len(repo.parts):]) & SKIP_DIRS))
     out = {}
     parsers = {}
+    internal = set()                       # top-level package / module names defined by this repo
+    for p in files:
+        rel = p.relative_to(repo).parts
+        for i, part in enumerate(rel[:-1]):
+            if (repo.joinpath(*rel[:i+1]) / '__init__.py').exists() or part in ('src', 'lib', 'pkg', 'internal', 'crates', 'packages'):
+                if part not in ('src','lib','pkg','internal','crates','packages'): internal.add(part)
+        internal.add(Path(rel[-1]).stem)
+    internal.add(repo.name); internal.add(repo.name.replace('-', '_'))
     for p in files:
         lang = LANG_BY_EXT[p.suffix]; rel = str(p.relative_to(repo))
         if lang not in parsers: parsers[lang] = get_parser(lang)
@@ -255,7 +263,7 @@ def extract(repo):
                     if any(t == x or t.startswith(x + '.') or t.startswith(x + '::') or t.startswith(x + '/') for x in NO_EFFECT[lang]): continue
                     for mod, kind in EFFECT_IMPORTS[lang].items():
                         if kind and (t == mod or t.startswith(mod + '.') or t.startswith(mod + '/') or t.startswith(mod + '::') or t.endswith('/' + mod)):
-                            weak.append((kind, names or [mod.split('/')[-1].split('.')[-1]]))
+                            weak.append((kind, names or [mod.split('/')[-1].split('.')[-1]], t.split('.')[0].split('/')[0].split('::')[0]))
             elif n.type == 'export_statement' and lang in ('javascript','typescript') and Path(rel).stem == 'index':
                 srcn = child_by_field(n, 'source'); tgt = node_text(srcn, src).strip('\'"`') if srcn is not None else None
                 txt = node_text(n, src)
@@ -278,7 +286,8 @@ def extract(repo):
                 idents.add(node_text(n, src))
         # confirm import-derived effects: some call in this file goes through a name the import bound
         callset = set(calls)
-        for kind, names in weak:
+        for kind, names, target in weak:
+            if target in internal: continue      # the repo's own package (e.g. `requests` inside psf/requests) is not an effect
             if '*' in names or any(c == nm or c.startswith(nm + '.') or c.startswith(nm + '::') or c.startswith(nm + '(') for nm in names for c in callset):
                 effects.add(kind)
             elif lang in ('c','cpp'):

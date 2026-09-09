@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 git rev-parse HEAD >/dev/null 2>&1 || { git init -q && git add -A && git commit -qm "lu-bench initial"; }
 mkdir -p notes runs
-claude -p "Read CLAUDE.md, program.md, and LOOP.md. Then execute LOOP.md from Phase 0." \
+claude -p "Read CLAUDE.md, program.md, and LOOP.md. Run ./harness/status.sh and resume LOOP.md at the phase it names. Checkpoint after every phase and iteration. Keep going until status.sh reports DONE, BLOCKED, or WAITING." \
   --max-turns 800 \
   --output-format json \
   > notes/loop-result.json 2> notes/loop-stderr.log

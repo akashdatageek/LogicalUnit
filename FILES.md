@@ -23,8 +23,13 @@
 | `harness/power.py` | agent (Phase-2 gate), human | min dev-set size for the pre-registered MDE, with effect heterogeneity | no |
 | `harness/build_corpus.py` | human | stratified random sample from GitHub, pinned, frame recorded | no |
 | `harness/pilot.sh`, `pilot_check.py` | human | pilot runner and automated go/no-go report | no |
-| `harness/kickoff.sh` | human | starts the loop | no |
-| `harness/corpus.txt` | run_corpus.sh | `repo sha stratum language`, pinned | human adds rows; never edits shas |
+| `harness/status.sh` | agent, supervisor, human | derives current phase + next command from repo state; exit 2 = human needed | no |
+| `harness/checkpoint.sh` | agent, supervisor | commit + push runs/ notes/ results.tsv | no |
+| `harness/pin_corpus.sh` | agent, human | replace PIN_ME with HEAD shas (mechanical) | no |
+| `harness/supervise.sh` | human (local/self-hosted) | re-launch fresh sessions until DONE/BLOCKED/WAITING | no |
+| `harness/kickoff.sh` | human | one-shot launch (use supervise.sh or a cloud session instead) | no |
+| `.claude/hooks/session_setup.sh` | Claude Code (SessionStart) | installs resolver deps if missing; runs outside the agent's pip deny | no |
+| `harness/corpus.txt` | run_corpus.sh | `repo sha stratum language`, pinned | human adds rows; agent may pin PIN_ME via pin_corpus.sh |
 | `harness/holdout.txt` | aggregate, run_corpus | repos the agent may not run | human only, before any edit |
 | `harness/corpus.meta.json` | thesis | citable sampling frame (written by build_corpus.py) | no |
 | **Overlay — copied into every target repo checkout** | | | |
