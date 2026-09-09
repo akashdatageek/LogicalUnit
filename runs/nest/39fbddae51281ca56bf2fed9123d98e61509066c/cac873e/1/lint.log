@@ -1,0 +1,55 @@
+=== lint round 1788951546 ===
+I1 'integration/_support/register-local-packages.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/auto-mock/src/bar.service.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/auto-mock/src/foo.service.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/auto-mock/test/bar.service.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/cors/e2e/express.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/cors/e2e/fastify.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/cors/src/app.controller.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/cors/src/app.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/e2e/discover-by-meta.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/app.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/decorators/non-applied.decorator.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/decorators/webhook.decorators.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/my-webhook/cleanup.webhook.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/my-webhook/flush.webhook.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/my-webhook/my-webhook.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/discovery/src/webhooks.explorer.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graceful-shutdown/e2e/express.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graceful-shutdown/src/app.controller.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graceful-shutdown/src/app.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/e2e/code-first.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/e2e/guards-filters.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/e2e/pipes.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/app.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/common/filters/unauthorized.filter.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/common/guards/auth.guard.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/common/interceptors/data.interceptor.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/common/scalars/date.scalar.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/main.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/dto/new-recipe.input.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/dto/recipes.args.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/models/recipe.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/recipes.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/recipes.resolver.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-code-first/src/recipes/recipes.service.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/e2e/graphql-async-class.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/e2e/graphql-async-existing.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/e2e/graphql-async.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/e2e/graphql-request-scoped.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/e2e/graphql.spec.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/app.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/async-options-class.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/async-options-existing.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/async-options.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/cats-request-scoped.service.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/cats.guard.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/cats.module.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/cats.resolvers.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/cats.service.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/cats/interfaces/cat.interface.ts' in no unit, not excluded, not unpartitioned
+I1 'integration/graphql-schema-first/src/common/scalars/date.scalar.ts' in no unit, not excluded, not unpartitioned
+I1 ...and 1166 more unassigned files
+I4 'mq-transport-support' file 'packages/microservices/external/mqtt-options.interface.ts' shows 'random' effect not declared
+52 blocking error(s)
+exit=1

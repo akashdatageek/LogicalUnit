@@ -1,0 +1,17 @@
+{
+  "repo": "pallets/flask",
+  "sha": "d73fa1cdcbd8b1465c151db8924ba58b1dd14e35",
+  "rep": "0",
+  "skill_label": "cac873e-noskill",
+  "overlay_hash": "ed0ae79809b7",
+  "condition": "noskill",
+  "hide_docs": 0,
+  "has_claude_md": 0,
+  "exit": 1,
+  "max_turns": 60,
+  "model": "claude-sonnet-5",
+  "claude_code": "2.1.266 (Claude Code)",
+  "date": "2026-09-09T13:56:06Z",
+  "session_id": "0952cbec-4a03-5a81-b7e7-96d9d04827c0",
+  "stratum": "famous"
+}

@@ -1,0 +1,42 @@
+=== lint round 1788933596 ===
+I1 'docs/_themes/flask_theme_support.py' in no unit, not excluded, not unpartitioned
+I1 'docs/conf.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/__version__.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/_internal_utils.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/_types.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/adapters.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/api.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/auth.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/certs.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/compat.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/cookies.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/exceptions.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/help.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/hooks.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/models.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/packages.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/sessions.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/status_codes.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/structures.py' in no unit, not excluded, not unpartitioned
+I1 'src/requests/utils.py' in no unit, not excluded, not unpartitioned
+I1 'tests/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'tests/compat.py' in no unit, not excluded, not unpartitioned
+I1 'tests/conftest.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_adapters.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_help.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_hooks.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_lowlevel.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_packages.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_requests.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_structures.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_testserver.py' in no unit, not excluded, not unpartitioned
+I1 'tests/test_utils.py' in no unit, not excluded, not unpartitioned
+I1 'tests/testserver/__init__.py' in no unit, not excluded, not unpartitioned
+I1 'tests/testserver/server.py' in no unit, not excluded, not unpartitioned
+I1 'tests/utils.py' in no unit, not excluded, not unpartitioned
+36 blocking error(s)
+exit=1
+=== lint round 1788933841 ===
+0 blocking error(s)
+exit=0

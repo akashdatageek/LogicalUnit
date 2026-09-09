@@ -1,0 +1,263 @@
+{
+  "repo": "spf13/cobra@adbc8813901bba65827259daa8e22ff94ec1f30e",
+  "units": [
+    {
+      "name": "command-model",
+      "kind": "domain",
+      "role": "Defines the Command tree and drives argument parsing, subcommand dispatch, and help/usage output.",
+      "description": "This is the heart of Cobra: the Command type that a CLI author assembles into a tree of commands and subcommands, plus the machinery that turns process arguments into a decision about which command to run, parses that command's flags, and prints its help, usage, error, and version text. It also contains a small Windows-only guard that detects a CLI launched by double-clicking it in Explorer (instead of from a terminal) and shows an explanatory message instead of a console window that immediately closes.",
+      "files": ["command.go", "command_win.go", "command_notwin.go"],
+      "entrypoints": [
+        { "name": "Command", "kind": "type", "location": "command.go:54", "plain": "The struct a CLI is built from: one node in the command tree, holding its flags, subcommands, Run function, and help/usage settings." },
+        { "name": "Execute", "kind": "method", "location": "command.go:1070", "signature": "func (c *Command) Execute() error", "plain": "The call most Cobra programs make from main(): parses process arguments and runs the resolved (sub)command." },
+        { "name": "ExecuteContext", "kind": "method", "location": "command.go:1062", "signature": "func (c *Command) ExecuteContext(ctx context.Context) error", "plain": "Same as Execute, but lets the caller supply a context.Context that flows through to Run." },
+        { "name": "ExecuteC", "kind": "method", "location": "command.go:1084", "signature": "func (c *Command) ExecuteC() (cmd *Command, err error)", "plain": "Does the actual work behind Execute and also reports back which command was run; almost all execution logic lives here." },
+        { "name": "Find", "kind": "method", "location": "command.go:757", "signature": "func (c *Command) Find(args []string) (*Command, []string, error)", "plain": "Walks the command tree to figure out which (sub)command a given slice of CLI args refers to." },
+        { "name": "AddCommand", "kind": "method", "location": "command.go:1342", "signature": "func (c *Command) AddCommand(cmds ...*Command)", "plain": "Registers one or more subcommands under this command, building the command tree." },
+        { "name": "Commands", "kind": "method", "location": "command.go:1332", "signature": "func (c *Command) Commands() []*Command", "plain": "Returns this command's direct subcommands." },
+        { "name": "Root", "kind": "method", "location": "command.go:892", "signature": "func (c *Command) Root() *Command", "plain": "Walks up to and returns the top-level command of the tree." },
+        { "name": "Name", "kind": "method", "location": "command.go:1541", "signature": "func (c *Command) Name() string", "plain": "Returns the command's own name (the first word of its Use string)." },
+        { "name": "CommandPath", "kind": "method", "location": "command.go:1465", "signature": "func (c *Command) CommandPath() string", "plain": "Returns the full space-separated path from the root command down to this one, e.g. \"git remote add\"." },
+        { "name": "HasSubCommands", "kind": "method", "location": "command.go:1601", "signature": "func (c *Command) HasSubCommands() bool" },
+        { "name": "HasParent", "kind": "method", "location": "command.go:1677", "signature": "func (c *Command) HasParent() bool" },
+        { "name": "IsAvailableCommand", "kind": "method", "location": "command.go:1607", "signature": "func (c *Command) IsAvailableCommand() bool", "plain": "Reports whether this command should be shown in help listings (not hidden, not deprecated, runnable or has visible children)." },
+        { "name": "IsAdditionalHelpTopicCommand", "kind": "method", "location": "command.go:1628", "signature": "func (c *Command) IsAdditionalHelpTopicCommand() bool" },
+        { "name": "Flags", "kind": "method", "location": "command.go:1688", "signature": "func (c *Command) Flags() *flag.FlagSet", "plain": "Returns this command's full set of flags (local plus persistent), creating it on first use." },
+        { "name": "PersistentFlags", "kind": "method", "location": "command.go:1775", "signature": "func (c *Command) PersistentFlags() *flag.FlagSet", "plain": "Returns the flags that are also inherited by every subcommand." },
+        { "name": "ParseFlags", "kind": "method", "location": "command.go:1868", "signature": "func (c *Command) ParseFlags(args []string) error" },
+        { "name": "Help", "kind": "method", "location": "command.go:520", "signature": "func (c *Command) Help() error", "plain": "Prints this command's help text using its (or an inherited) help function." },
+        { "name": "Usage", "kind": "method", "location": "command.go:478", "signature": "func (c *Command) Usage() error" },
+        { "name": "ValidateArgs", "kind": "method", "location": "command.go:1172", "signature": "func (c *Command) ValidateArgs(args []string) error", "plain": "Runs the command's positional-argument validator (its Args field) against the leftover, non-flag arguments." },
+        { "name": "SetArgs", "kind": "method", "location": "command.go:281", "signature": "func (c *Command) SetArgs(a []string)", "plain": "Overrides the argument slice Execute parses; without this it defaults to os.Args[1:]." }
+      ],
+      "depends_on": [
+        { "unit": "positional-args", "entrypoint": "PositionalArgs" },
+        { "unit": "positional-args", "entrypoint": "ArbitraryArgs" },
+        { "unit": "positional-args", "entrypoint": "legacyArgs" },
+        { "unit": "template-runtime", "entrypoint": "tmpl" },
+        { "unit": "template-runtime", "entrypoint": "ld" },
+        { "unit": "template-runtime", "entrypoint": "rpad" },
+        { "unit": "template-runtime", "entrypoint": "CheckErr" },
+        { "unit": "template-runtime", "entrypoint": "OnInitialize" },
+        { "unit": "template-runtime", "entrypoint": "OnFinalize" },
+        { "unit": "flag-groups", "entrypoint": "ValidateFlagGroups" },
+        { "unit": "shell-completions", "entrypoint": "InitDefaultCompletionCmd" }
+      ],
+      "effects": [
+        { "kind": "other", "description": "Reads process arguments from os.Args[1:] when SetArgs has not been called (command.go:1105-1106)." },
+        { "kind": "other", "description": "Writes help/usage/error/version text to stdout or stderr (or a caller-supplied io.Writer), defaulting to os.Stdout/os.Stderr, via OutOrStdout/OutOrStderr/ErrOrStderr and InOrStdin defaulting to os.Stdin (command.go:393-409)." },
+        { "kind": "filesystem", "description": "A generic filesystem-effect scanner flags the substring \"fs.\" in fs.Lookup(...)/fs.ShorthandLookup(...) (command.go:655,667), where `fs` is a local *pflag.FlagSet variable; this is flag lookup, not disk I/O." },
+        { "kind": "other", "description": "The Windows mousetrap guard calls os.Exit(1) to terminate the process before Run executes, when the binary was double-clicked from Explorer (command_win.go:39)." },
+        { "kind": "clock", "description": "The Windows mousetrap guard sleeps for MousetrapDisplayDuration before continuing (command_win.go:33-34)." },
+        { "kind": "other", "description": "The Windows mousetrap guard blocks on fmt.Scanln() to wait for a keypress from stdin when MousetrapDisplayDuration is 0 (command_win.go:37)." }
+      ]
+    },
+    {
+      "name": "positional-args",
+      "kind": "domain",
+      "role": "Ready-made and combinable validators for a command's leftover (non-flag) positional arguments.",
+      "description": "A small library of functions that check the positional arguments left over after flag parsing: exactly N, at least N, at most N, a range, no duplicates, only values from an allow-list, or no arguments at all. They plug into a Command's Args field and can be combined with MatchAll. This file has no side effects of its own; it only inspects the argument slice and the owning Command's configuration.",
+      "files": ["args.go"],
+      "entrypoints": [
+        { "name": "PositionalArgs", "kind": "type", "location": "args.go:22", "signature": "type PositionalArgs func(cmd *Command, args []string) error", "plain": "The function signature every positional-argument validator implements; assigned to Command.Args." },
+        { "name": "legacyArgs", "kind": "function", "location": "args.go:28", "plain": "Cobra's default validator when Args is left unset: root commands with subcommands reject unknown subcommand names, everything else accepts anything." },
+        { "name": "NoArgs", "kind": "function", "location": "args.go:42", "plain": "Rejects the command if it was given any positional arguments." },
+        { "name": "OnlyValidArgs", "kind": "function", "location": "args.go:51", "plain": "Rejects any positional argument not listed in the command's ValidArgs." },
+        { "name": "NoDuplicateArgs", "kind": "function", "location": "args.go:69", "plain": "Rejects the command if the same positional argument value appears twice." },
+        { "name": "ArbitraryArgs", "kind": "function", "location": "args.go:82", "plain": "Accepts any positional arguments; never errors." },
+        { "name": "MinimumNArgs", "kind": "function", "location": "args.go:87", "signature": "func MinimumNArgs(n int) PositionalArgs" },
+        { "name": "MaximumNArgs", "kind": "function", "location": "args.go:97", "signature": "func MaximumNArgs(n int) PositionalArgs" },
+        { "name": "ExactArgs", "kind": "function", "location": "args.go:107", "signature": "func ExactArgs(n int) PositionalArgs" },
+        { "name": "RangeArgs", "kind": "function", "location": "args.go:117", "signature": "func RangeArgs(min int, max int) PositionalArgs" },
+        { "name": "MatchAll", "kind": "function", "location": "args.go:127", "plain": "Combines several PositionalArgs validators so all of them must pass." },
+        { "name": "ExactValidArgs", "kind": "function", "location": "args.go:142", "plain": "Deprecated shortcut for MatchAll(ExactArgs(n), OnlyValidArgs)." }
+      ],
+      "depends_on": [
+        { "unit": "command-model", "entrypoint": "HasSubCommands" },
+        { "unit": "command-model", "entrypoint": "CommandPath" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "template-runtime",
+      "kind": "infra",
+      "role": "Global, package-wide configuration knobs, help/usage template plumbing, and small text/comparison utilities.",
+      "description": "Cross-cutting support code shared by the rest of the library: the registry of custom template functions usable inside help and usage templates, the OnInitialize/OnFinalize hook lists that run around every Execute call, package-level toggles like prefix matching and command sorting, a levenshtein-distance helper used to suggest the closest command name on a typo, and CheckErr, a small helper for printing an error and exiting the process. Nothing here refers to the Command type; other units call into it, not the reverse.",
+      "files": ["cobra.go"],
+      "entrypoints": [
+        { "name": "AddTemplateFunc", "kind": "function", "location": "cobra.go:85", "plain": "Registers one named function that Usage/Help templates can call." },
+        { "name": "AddTemplateFuncs", "kind": "function", "location": "cobra.go:91", "plain": "Registers several template functions at once." },
+        { "name": "OnInitialize", "kind": "function", "location": "cobra.go:99", "plain": "Queues functions to run at the start of every command's Execute." },
+        { "name": "OnFinalize", "kind": "function", "location": "cobra.go:105", "plain": "Queues functions to run at the end of every command's Execute." },
+        { "name": "Gt", "kind": "function", "location": "cobra.go:114", "plain": "Template helper: is the first value greater than the second (lengths for collections, else numeric/string compare)." },
+        { "name": "Eq", "kind": "function", "location": "cobra.go:144", "plain": "Template helper: are two int or string values equal." },
+        { "name": "CheckErr", "kind": "function", "location": "cobra.go:235", "plain": "Prints \"Error: <msg>\" to stderr and exits the process with status 1, if msg is non-nil." },
+        { "name": "WriteStringAndCheck", "kind": "function", "location": "cobra.go:243", "plain": "Writes a string to a writer and calls CheckErr on any error." },
+        { "name": "tmpl", "kind": "function", "location": "cobra.go:179", "plain": "Compiles a help/usage template string, bound to the current template function registry, into a reusable renderer." },
+        { "name": "ld", "kind": "function", "location": "cobra.go:192", "plain": "Levenshtein edit distance between two strings, used to suggest a likely-intended command name after a typo." },
+        { "name": "stringInSlice", "kind": "function", "location": "cobra.go:225" },
+        { "name": "rpad", "kind": "function", "location": "cobra.go:174", "plain": "Right-pads a string with spaces to a given width, for aligning help-listing columns." }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "other", "description": "CheckErr writes \"Error: <msg>\" to os.Stderr and calls os.Exit(1), terminating the process, whenever it is given a non-nil error (cobra.go:235-240)." }
+      ]
+    },
+    {
+      "name": "flag-groups",
+      "kind": "domain",
+      "role": "Declarative constraints across a command's flags: required-together, one-of-required, mutually exclusive.",
+      "description": "Lets a command declare relationships between several of its flags, such as \"if any of these is set, all of them must be\" or \"exactly one of these must be set\", by attaching annotations to the flags via pflag. ValidateFlagGroups checks those annotations against which flags were actually set and is run automatically as part of Execute. It builds directly on the pflag.FlagSet exposed by a Command's Flags()/PersistentFlags().",
+      "files": ["flag_groups.go"],
+      "entrypoints": [
+        { "name": "MarkFlagsRequiredTogether", "kind": "method", "location": "flag_groups.go:33", "signature": "func (c *Command) MarkFlagsRequiredTogether(flagNames ...string)" },
+        { "name": "MarkFlagsOneRequired", "kind": "method", "location": "flag_groups.go:49", "signature": "func (c *Command) MarkFlagsOneRequired(flagNames ...string)" },
+        { "name": "MarkFlagsMutuallyExclusive", "kind": "method", "location": "flag_groups.go:65", "signature": "func (c *Command) MarkFlagsMutuallyExclusive(flagNames ...string)" },
+        { "name": "ValidateFlagGroups", "kind": "method", "location": "flag_groups.go:81", "signature": "func (c *Command) ValidateFlagGroups() error", "plain": "Checks all of a command's declared flag-group constraints against which flags were actually set, returning an error on violation. Called automatically during Execute." }
+      ],
+      "depends_on": [
+        { "unit": "command-model", "entrypoint": "Flags" },
+        { "unit": "command-model", "entrypoint": "PersistentFlags" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "A generic filesystem-effect scanner flags the substring \"fs.\" in fs.Lookup(...) (flag_groups.go:113), where `fs` is a local *pflag.FlagSet variable; this is flag lookup, not disk I/O." }
+      ]
+    },
+    {
+      "name": "shell-completions",
+      "kind": "domain",
+      "role": "Dynamic tab-completion protocol plus static completion-script generation for bash, zsh, fish, and PowerShell.",
+      "description": "Everything related to shell tab-completion: the __complete/__completeNoDesc runtime protocol and its ShellCompDirective/CompletionFunc types, per-flag completion registration, ActiveHelp hint messages, flag annotations that mark a flag as filename/dirname/custom completion, and the generators that emit a static completion script for bash (legacy and dynamic v2), zsh, fish, or PowerShell. These eight files are treated as one unit because they share unexported constants and helper functions across file boundaries rather than exposing a clean internal interface between the completion protocol and each shell's script generator.",
+      "files": ["completions.go", "shell_completions.go", "active_help.go", "bash_completions.go", "bash_completionsV2.go", "zsh_completions.go", "fish_completions.go", "powershell_completions.go"],
+      "entrypoints": [
+        { "name": "ShellCompDirective", "kind": "type", "location": "completions.go:45", "plain": "A bitmask a completion function returns alongside its suggestions, e.g. \"no file completion\" or \"no space after\"." },
+        { "name": "Completion", "kind": "type", "location": "completions.go:136" },
+        { "name": "CompletionFunc", "kind": "type", "location": "completions.go:139", "plain": "The function signature a flag or command registers to supply its own dynamic completions." },
+        { "name": "CompletionWithDesc", "kind": "function", "location": "completions.go:142" },
+        { "name": "NoFileCompletions", "kind": "function", "location": "completions.go:151", "plain": "A CompletionFunc that suggests nothing and disables the shell's default filename completion." },
+        { "name": "FixedCompletions", "kind": "function", "location": "completions.go:160", "plain": "Builds a CompletionFunc that always returns the same fixed list of choices." },
+        { "name": "RegisterFlagCompletionFunc", "kind": "method", "location": "completions.go:170", "signature": "func (c *Command) RegisterFlagCompletionFunc(flagName string, f CompletionFunc) error", "plain": "Attaches a custom dynamic-completion function to one of a command's flags." },
+        { "name": "GetFlagCompletionFunc", "kind": "method", "location": "completions.go:186" },
+        { "name": "InitDefaultCompletionCmd", "kind": "method", "location": "completions.go:748", "plain": "Adds the built-in \"completion\" and hidden \"__complete\"/\"__completeNoDesc\" subcommands that implement the shell-completion protocol." },
+        { "name": "CompDebug", "kind": "function", "location": "completions.go:955", "plain": "Writes a completion-debug message, optionally to stderr and always to the file named by BASH_COMP_DEBUG_FILE if set." },
+        { "name": "CompError", "kind": "function", "location": "completions.go:985" },
+        { "name": "AppendActiveHelp", "kind": "function", "location": "active_help.go:38", "plain": "Appends an ActiveHelp hint string to a list of completions, using the marker convention shells recognize." },
+        { "name": "GetActiveHelpConfig", "kind": "function", "location": "active_help.go:47", "plain": "Reads the per-command and global environment variables that let a user disable or configure ActiveHelp hints." },
+        { "name": "MarkFlagFilename", "kind": "method", "location": "shell_completions.go:44", "plain": "Limits completions for a flag to files with the given extensions." },
+        { "name": "MarkFlagCustom", "kind": "method", "location": "shell_completions.go:54" },
+        { "name": "MarkFlagDirname", "kind": "method", "location": "shell_completions.go:83", "plain": "Limits completions for a flag to directory names." },
+        { "name": "GenBashCompletion", "kind": "method", "location": "bash_completions.go:683", "plain": "Writes a legacy (v1) bash completion script for this command tree to a writer." },
+        { "name": "GenBashCompletionFile", "kind": "method", "location": "bash_completions.go:701" },
+        { "name": "GenBashCompletionV2", "kind": "method", "location": "bash_completionsV2.go:482", "plain": "Writes a dynamic (v2) bash completion script, which calls back into the program itself, to a writer." },
+        { "name": "GenBashCompletionFileV2", "kind": "method", "location": "bash_completionsV2.go:470" },
+        { "name": "GenZshCompletion", "kind": "method", "location": "zsh_completions.go:31" },
+        { "name": "GenZshCompletionFile", "kind": "method", "location": "zsh_completions.go:25" },
+        { "name": "GenFishCompletion", "kind": "method", "location": "fish_completions.go:276" },
+        { "name": "GenFishCompletionFile", "kind": "method", "location": "fish_completions.go:284" },
+        { "name": "GenPowerShellCompletion", "kind": "method", "location": "powershell_completions.go:337" },
+        { "name": "GenPowerShellCompletionFile", "kind": "method", "location": "powershell_completions.go:331" },
+        { "name": "GenPowerShellCompletionWithDesc", "kind": "method", "location": "powershell_completions.go:348" }
+      ],
+      "depends_on": [
+        { "unit": "command-model", "entrypoint": "Command" },
+        { "unit": "command-model", "entrypoint": "Commands" },
+        { "unit": "command-model", "entrypoint": "Root" },
+        { "unit": "command-model", "entrypoint": "CommandPath" },
+        { "unit": "command-model", "entrypoint": "Name" },
+        { "unit": "command-model", "entrypoint": "Flags" },
+        { "unit": "command-model", "entrypoint": "PersistentFlags" },
+        { "unit": "command-model", "entrypoint": "Find" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "The GenXxxCompletionFile methods write a completion script to disk via os.Create (bash_completions.go:702, bash_completionsV2.go:471, zsh_completions.go:71, fish_completions.go:285, powershell_completions.go:321)." },
+        { "kind": "filesystem", "description": "CompDebug opens (and appends to) the file named by the BASH_COMP_DEBUG_FILE environment variable via os.OpenFile, when that variable is set (completions.go:962)." },
+        { "kind": "env", "description": "Reads BASH_COMP_DEBUG_FILE to enable completion debug logging, and per-command/global env vars (via configEnvVar/activeHelpEnvVar) to configure descriptions and ActiveHelp (completions.go:960,1019,1021; active_help.go:48,50)." },
+        { "kind": "other", "description": "CompDebug/CompError write completion debug/error text to stderr in addition to (or instead of) the debug file (completions.go:955-991)." }
+      ]
+    },
+    {
+      "name": "doc-generators",
+      "kind": "infra",
+      "role": "Renders a Cobra command tree into Markdown, man pages, reStructuredText, or YAML documentation files.",
+      "description": "A separate Go package (doc) built on top of the root Cobra package: given a root Command, it walks the whole command tree and writes one documentation file per command, in the caller's choice of Markdown, Unix man page (troff), reStructuredText, or YAML, either to a supplied writer or as a tree of files in a directory. It is purely a consumer of the command-model unit's public API (command names, flags, help text, subcommands) and performs no domain logic of its own beyond formatting.",
+      "files": ["doc/md_docs.go", "doc/man_docs.go", "doc/rest_docs.go", "doc/yaml_docs.go", "doc/util.go"],
+      "entrypoints": [
+        { "name": "GenMarkdown", "kind": "function", "location": "doc/md_docs.go:52", "signature": "func GenMarkdown(cmd *cobra.Command, w io.Writer) error" },
+        { "name": "GenMarkdownCustom", "kind": "function", "location": "doc/md_docs.go:57" },
+        { "name": "GenMarkdownTree", "kind": "function", "location": "doc/md_docs.go:125", "plain": "Writes one Markdown file per command in the tree, into a directory." },
+        { "name": "GenMarkdownTreeCustom", "kind": "function", "location": "doc/md_docs.go:133" },
+        { "name": "GenMan", "kind": "function", "location": "doc/man_docs.go:105", "signature": "func GenMan(cmd *cobra.Command, header *GenManHeader, w io.Writer) error" },
+        { "name": "GenManTree", "kind": "function", "location": "doc/man_docs.go:38", "plain": "Writes one Unix man page per command in the tree, into a directory." },
+        { "name": "GenManTreeFromOpts", "kind": "function", "location": "doc/man_docs.go:48" },
+        { "name": "GenReST", "kind": "function", "location": "doc/rest_docs.go:57", "signature": "func GenReST(cmd *cobra.Command, w io.Writer) error" },
+        { "name": "GenReSTCustom", "kind": "function", "location": "doc/rest_docs.go:62" },
+        { "name": "GenReSTTree", "kind": "function", "location": "doc/rest_docs.go:138", "plain": "Writes one reStructuredText file per command in the tree, into a directory." },
+        { "name": "GenReSTTreeCustom", "kind": "function", "location": "doc/rest_docs.go:145" },
+        { "name": "GenYaml", "kind": "function", "location": "doc/yaml_docs.go:88", "signature": "func GenYaml(cmd *cobra.Command, w io.Writer) error" },
+        { "name": "GenYamlCustom", "kind": "function", "location": "doc/yaml_docs.go:93" },
+        { "name": "GenYamlTree", "kind": "function", "location": "doc/yaml_docs.go:53", "plain": "Writes one YAML file per command in the tree, into a directory." },
+        { "name": "GenYamlTreeCustom", "kind": "function", "location": "doc/yaml_docs.go:60" }
+      ],
+      "depends_on": [
+        { "unit": "command-model", "entrypoint": "Command" },
+        { "unit": "command-model", "entrypoint": "Commands" },
+        { "unit": "command-model", "entrypoint": "Name" },
+        { "unit": "command-model", "entrypoint": "CommandPath" },
+        { "unit": "command-model", "entrypoint": "HasParent" },
+        { "unit": "command-model", "entrypoint": "IsAvailableCommand" },
+        { "unit": "command-model", "entrypoint": "IsAdditionalHelpTopicCommand" },
+        { "unit": "command-model", "entrypoint": "Flags" },
+        { "unit": "command-model", "entrypoint": "PersistentFlags" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "GenMarkdownTree/GenManTree/GenReSTTree/GenYamlTree each create one output file per command via os.Create (doc/md_docs.go:145, doc/man_docs.go:72, doc/rest_docs.go:157, doc/yaml_docs.go:72)." },
+        { "kind": "env", "description": "GenMan reads SOURCE_DATE_EPOCH to produce a reproducible build date on the man page instead of the current date (doc/man_docs.go:127)." },
+        { "kind": "clock", "description": "GenMan/GenMarkdown/GenReST stamp the generated document with time.Now() when no reproducible date override is set (doc/man_docs.go:126, doc/md_docs.go:113, doc/rest_docs.go:126)." }
+      ]
+    }
+  ],
+  "excluded": [
+    { "path": "args_test.go", "reason": "unit tests for positional-args; no production entrypoints of their own" },
+    { "path": "active_help_test.go", "reason": "unit tests for the shell-completions unit's ActiveHelp behavior" },
+    { "path": "command_test.go", "reason": "unit tests for the command-model unit" },
+    { "path": "cobra_test.go", "reason": "unit tests for the template-runtime unit" },
+    { "path": "bash_completionsV2_test.go", "reason": "unit tests for the shell-completions unit (bash v2 generator)" },
+    { "path": "completions_test.go", "reason": "unit tests for the shell-completions unit's completion protocol" },
+    { "path": "bash_completions_test.go", "reason": "unit tests for the shell-completions unit (bash v1 generator)" },
+    { "path": "flag_groups_test.go", "reason": "unit tests for the flag-groups unit" },
+    { "path": "fish_completions_test.go", "reason": "unit tests for the shell-completions unit (fish generator)" },
+    { "path": "powershell_completions_test.go", "reason": "unit tests for the shell-completions unit (PowerShell generator)" },
+    { "path": "zsh_completions_test.go", "reason": "unit tests for the shell-completions unit (zsh generator)" },
+    { "path": "doc/cmd_test.go", "reason": "shared test fixtures/helpers for the doc package's tests" },
+    { "path": "doc/rest_docs_test.go", "reason": "unit tests for the doc-generators unit (reST)" },
+    { "path": "doc/man_docs_test.go", "reason": "unit tests for the doc-generators unit (man pages)" },
+    { "path": "doc/yaml_docs_test.go", "reason": "unit tests for the doc-generators unit (YAML)" },
+    { "path": "doc/md_docs_test.go", "reason": "unit tests for the doc-generators unit (Markdown)" },
+    { "path": "doc/man_examples_test.go", "reason": "runnable Example tests (godoc examples) for the doc-generators unit" },
+    { "path": ".github", "reason": "CI workflows and repo automation config (dependabot, labeler), not library source" },
+    { "path": "site", "reason": "Hugo-based documentation website content, not library source" },
+    { "path": "README.md", "reason": "project documentation" },
+    { "path": "CONTRIBUTING.md", "reason": "project governance documentation" },
+    { "path": "CONDUCT.md", "reason": "project governance documentation" },
+    { "path": "SECURITY.md", "reason": "project governance documentation" },
+    { "path": "MAINTAINERS", "reason": "project governance documentation" },
+    { "path": "LICENSE.txt", "reason": "license text, not source" },
+    { "path": "assets/CobraMain.png", "reason": "logo image asset used by README" },
+    { "path": "Makefile", "reason": "build/lint task runner config, not source" },
+    { "path": ".golangci.yml", "reason": "linter configuration, not source" },
+    { "path": ".gitignore", "reason": "repo configuration, not source" },
+    { "path": ".mailmap", "reason": "git author-mapping configuration, not source" },
+    { "path": "go.mod", "reason": "Go module manifest (declares dependencies), not source" },
+    { "path": "go.sum", "reason": "Go module checksum lockfile, not source" },
+    { "path": ".claude", "reason": "agent tooling configuration for this analysis session, not repository source" }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    {
+      "from_unit": "command-model",
+      "to_unit": "shell-completions",
+      "location": "command.go:1188",
+      "note": "ValidateRequiredFlags reads flag.Annotations[BashCompOneRequiredFlag] directly off the raw pflag.Flag, reaching into an annotation constant and convention that belongs to the shell-completions unit (defined in bash_completions.go) instead of going through a public accessor exposed by that unit."
+    }
+  ]
+}

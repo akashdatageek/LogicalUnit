@@ -1,0 +1,7 @@
+=== lint round 1788942510 ===
+I4 'app-orchestration' file 'crates/core/main.rs' shows 'clock' effect not declared
+1 blocking error(s)
+exit=1
+=== lint round 1788942647 ===
+0 blocking error(s)
+exit=0

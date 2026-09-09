@@ -1,0 +1,27 @@
+=== lint round 1788973917 ===
+I1 'crates/globset/benches/bench.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_skip_bom.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/test_matcher.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/tests.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/util.rs' in no unit, not excluded, not unpartitioned
+I1 'fuzz/fuzz_targets/fuzz_glob.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/binary.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/feature.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/hay.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/index/basic.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/index/disallowed.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/index/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/json.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/macros.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/misc.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/multiline.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/regression.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/tests.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/util.rs' in no unit, not excluded, not unpartitioned
+I4 'index' file 'crates/index/src/index.rs' shows 'env' effect not declared
+21 blocking error(s)
+exit=1
+=== lint round 1788974194 ===
+0 blocking error(s)
+exit=0

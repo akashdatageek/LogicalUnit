@@ -1,0 +1,8 @@
+=== lint round 1788936658 ===
+I4 'command-core' file 'command.go' shows 'filesystem' effect not declared
+I4 'flag-groups' file 'flag_groups.go' shows 'filesystem' effect not declared
+2 blocking error(s)
+exit=1
+=== lint round 1788936783 ===
+0 blocking error(s)
+exit=0

@@ -1,0 +1,63 @@
+=== lint round 1788974959 ===
+I1 'c/example/calibrate.c' in no unit, not excluded, not unpartitioned
+I1 'c/example/camera-client.c' in no unit, not excluded, not unpartitioned
+I1 'c/example/camera-server.c' in no unit, not excluded, not unpartitioned
+I1 'c/example/mission.c' in no unit, not excluded, not unpartitioned
+I1 'c/example/params.c' in no unit, not excluded, not unpartitioned
+I1 'c/example/takeoff-and-land.c' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/autopilot.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/component_type.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/connection_result.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/log.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/log.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/mavsdk.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/mavsdk.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/mavsdk_export.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/action/action.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/action/action.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/action_server/action_server.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/action_server/action_server.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/arm_authorizer_server/arm_authorizer_server.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/arm_authorizer_server/arm_authorizer_server.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/calibration/calibration.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/calibration/calibration.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/camera/camera.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/camera/camera.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/camera_server/camera_server.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/camera_server/camera_server.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/component_metadata/component_metadata.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/component_metadata/component_metadata.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/component_metadata_server/component_metadata_server.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/component_metadata_server/component_metadata_server.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/events/events.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/events/events.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/failure/failure.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/failure/failure.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/follow_me/follow_me.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/follow_me/follow_me.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/ftp/ftp.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/ftp/ftp.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/ftp_server/ftp_server.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/ftp_server/ftp_server.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/geofence/geofence.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/geofence/geofence.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/gimbal/gimbal.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/gimbal/gimbal.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/gripper/gripper.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/gripper/gripper.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/info/info.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/info/info.h' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/log_files/log_files.cpp' in no unit, not excluded, not unpartitioned
+I1 'c/src/cmavsdk/plugins/log_files/log_files.h' in no unit, not excluded, not unpartitioned
+I1 ...and 946 more unassigned files
+51 blocking error(s)
+exit=1
+=== lint round 1788975642 ===
+I1 'cpp/src/mavsdk/core/log_race_test.cpp' in no unit, not excluded, not unpartitioned
+I4 'python-ctypes-sdk' file 'py/mavsdk/setup.py' shows 'subprocess' effect not declared
+I4 'python-async-sdk' file 'py/aiomavsdk/setup.py' shows 'filesystem' effect not declared
+3 blocking error(s)
+exit=1
+=== lint round 1788975938 ===
+0 blocking error(s)
+exit=0

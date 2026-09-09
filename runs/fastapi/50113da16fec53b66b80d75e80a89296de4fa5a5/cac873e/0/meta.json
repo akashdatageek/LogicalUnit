@@ -1,0 +1,17 @@
+{
+  "repo": "tiangolo/fastapi",
+  "sha": "50113da16fec53b66b80d75e80a89296de4fa5a5",
+  "rep": "0",
+  "skill_label": "cac873e",
+  "overlay_hash": "ed0ae79809b7",
+  "condition": "skill",
+  "hide_docs": 0,
+  "has_claude_md": 0,
+  "exit": 1,
+  "max_turns": 60,
+  "model": "claude-sonnet-5",
+  "claude_code": "2.1.266 (Claude Code)",
+  "date": "2026-09-09T07:41:56Z",
+  "session_id": "0952cbec-4a03-5a81-b7e7-96d9d04827c0",
+  "stratum": "famous"
+}
