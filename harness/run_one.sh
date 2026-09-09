@@ -10,13 +10,17 @@ while [ $# -gt 0 ]; do case "$1" in
   --hide-docs) HIDE_DOCS=1; shift;; --model) MODEL="$2"; shift 2;; --stratum) STRATUM="$2"; shift 2;; *) shift;; esac; done
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-NAME="${REPO#*/}"; WORK="/work/$NAME"
+NAME="${REPO#*/}"
+# Per-run checkout and output dir so repos can run concurrently. LU_WORK/LU_OUT let a
+# caller pin them; the defaults keep every run isolated.
+WORK="${LU_WORK:-/work/$NAME-${SHA:0:7}-$REP}"
+OUT="${LU_OUT:-/out/$NAME-${SHA:0:7}-$REP}"
 SKILL_LABEL="$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo nogit)"
 [ "$CONDITION" = skill ] || SKILL_LABEL="${SKILL_LABEL}-${CONDITION}"
 [ "$HIDE_DOCS" = 1 ] && SKILL_LABEL="${SKILL_LABEL}-nodocs"
 RUN="$HERE/runs/$NAME/$SHA/$SKILL_LABEL/$REP"
 if [ -f "$RUN/score.json" ]; then echo "have $RUN"; exit 0; fi
-mkdir -p "$RUN" /out; rm -f /out/manifest.json /out/lint.log
+mkdir -p "$RUN" "$OUT"; rm -f "$OUT/manifest.json" "$OUT/lint.log"
 
 # 1. checkout (full clone: co-change scoring needs history)
 [ -d "$WORK/.git" ] || git clone --quiet "https://github.com/$REPO" "$WORK"
@@ -33,17 +37,20 @@ fi
 # 3. overlay (skill condition) or bare schema (noskill condition)
 if [ "$CONDITION" = skill ]; then
   cp -r "$HERE/overlay/." "$WORK/"; cp "$HERE/harness/resolver.py" "$WORK/.claude/hooks/"
+  # Point the per-run copy of the skill at this run's output dir. The file in git is never
+  # touched, so the instrument under study and overlay_hash are unchanged.
+  [ "$OUT" = /out ] || sed -i "s#/out/#$OUT/#g" "$WORK/.claude/skills/lu-decompose/SKILL.md"
   PROMPT="/lu-decompose"
 else
   mkdir -p "$WORK/.claude"; cp "$HERE/overlay/.claude/settings.json" "$WORK/.claude/"; cp -r "$HERE/overlay/.claude/hooks" "$WORK/.claude/"; cp "$HERE/harness/resolver.py" "$WORK/.claude/hooks/"
   cp "$HERE/overlay/lu-manifest.schema.json" "$WORK/"
-  PROMPT="Partition this repository's source files into named units, each with entrypoints, dependencies on other units' entrypoints, and external effects. Write the result to /out/manifest.json conforming to lu-manifest.schema.json. Do not edit source. Do not ask questions."
+  PROMPT="Partition this repository's source files into named units, each with entrypoints, dependencies on other units' entrypoints, and external effects. Write the result to $OUT/manifest.json conforming to lu-manifest.schema.json. Do not edit source. Do not ask questions."
 fi
 OVERLAY_HASH=$(find "$HERE/overlay" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum | cut -c1-12)
 
 # 4. run
 cd "$WORK"
-export CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 CLAUDE_PROJECT_DIR="$WORK"
+export CLAUDE_AGENT_SDK_DISABLE_BUILTIN_AGENTS=1 CLAUDE_PROJECT_DIR="$WORK" LU_OUT="$OUT"
 MODEL_FLAG=(); [ -n "$MODEL" ] && MODEL_FLAG=(--model "$MODEL")
 set +e
 claude -p "$PROMPT" "${MODEL_FLAG[@]}" \
@@ -54,8 +61,8 @@ EXIT=$?
 set -e
 
 # 5. collect + provenance
-cp /out/manifest.json "$RUN/manifest.json" 2>/dev/null || echo '{}' > "$RUN/manifest.json"
-cp /out/lint.log "$RUN/lint.log" 2>/dev/null || true
+cp "$OUT/manifest.json" "$RUN/manifest.json" 2>/dev/null || echo '{}' > "$RUN/manifest.json"
+cp "$OUT/lint.log" "$RUN/lint.log" 2>/dev/null || true
 jq -n --arg repo "$REPO" --arg sha "$SHA" --arg rep "$REP" --arg skill "$SKILL_LABEL" --arg overlay "$OVERLAY_HASH" \
       --arg cond "$CONDITION" --argjson hide_docs "$HIDE_DOCS" --argjson has_claude_md "$HAS_CLAUDE_MD" --arg stratum "$STRATUM" \
       --argjson exit "$EXIT" --argjson max_turns "$MAX_TURNS" --arg model "${MODEL:-default}" \
