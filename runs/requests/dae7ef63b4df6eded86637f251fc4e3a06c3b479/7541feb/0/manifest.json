@@ -1,0 +1,493 @@
+{
+  "repo": "psf/requests@dae7ef63b4df6eded86637f251fc4e3a06c3b479",
+  "units": [
+    {
+      "name": "http-api",
+      "kind": "domain",
+      "role": "Orchestrate the request lifecycle and expose the functions/Session object users call.",
+      "description": "This is the part of the library that ordinary users touch directly: the requests.get/post/put/patch/delete/head/options functions and the Session object. Given a method, a URL, and options like headers, auth, or cookies, it builds the request, sends it, follows any redirects the server asks for, and keeps track of cookies and settings across multiple calls made through the same session. It does not itself understand HTTP wire format or open sockets — it delegates those jobs to other parts of the library and focuses purely on orchestrating the overall request lifecycle.",
+      "files": ["src/requests/api.py", "src/requests/sessions.py"],
+      "entrypoints": [
+        {"kind": "function", "name": "request", "location": "src/requests/api.py:24", "signature": "request(method, url, **kwargs) -> Response", "plain": "Build and send one HTTP request of any method."},
+        {"kind": "function", "name": "get", "location": "src/requests/api.py:74", "plain": "Fetch a URL with GET."},
+        {"kind": "function", "name": "options", "location": "src/requests/api.py:90", "plain": "Send an OPTIONS request."},
+        {"kind": "function", "name": "head", "location": "src/requests/api.py:102", "plain": "Send a HEAD request."},
+        {"kind": "function", "name": "post", "location": "src/requests/api.py:117", "plain": "Send data to a URL with POST."},
+        {"kind": "function", "name": "put", "location": "src/requests/api.py:137", "plain": "Send data to a URL with PUT."},
+        {"kind": "function", "name": "patch", "location": "src/requests/api.py:154", "plain": "Send a partial update with PATCH."},
+        {"kind": "function", "name": "delete", "location": "src/requests/api.py:171", "plain": "Send a DELETE request."},
+        {"kind": "class", "name": "Session", "location": "src/requests/sessions.py:395", "plain": "A reusable client that persists cookies, auth, and settings across requests."},
+        {"kind": "function", "name": "session", "location": "src/requests/sessions.py:908", "plain": "Deprecated convenience constructor for a Session."}
+      ],
+      "depends_on": [
+        {"unit": "request-response-model", "entrypoint": "Request"},
+        {"unit": "request-response-model", "entrypoint": "PreparedRequest"},
+        {"unit": "request-response-model", "entrypoint": "Response"},
+        {"unit": "request-response-model", "entrypoint": "DEFAULT_REDIRECT_LIMIT"},
+        {"unit": "request-response-model", "entrypoint": "REDIRECT_STATI"},
+        {"unit": "connection-adapter", "entrypoint": "HTTPAdapter"},
+        {"unit": "connection-adapter", "entrypoint": "send"},
+        {"unit": "connection-adapter", "entrypoint": "close"},
+        {"unit": "auth-schemes", "entrypoint": "_basic_auth_str"},
+        {"unit": "cookie-jar", "entrypoint": "RequestsCookieJar"},
+        {"unit": "cookie-jar", "entrypoint": "cookiejar_from_dict"},
+        {"unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar"},
+        {"unit": "cookie-jar", "entrypoint": "merge_cookies"},
+        {"unit": "exceptions", "entrypoint": "ChunkedEncodingError"},
+        {"unit": "exceptions", "entrypoint": "ContentDecodingError"},
+        {"unit": "exceptions", "entrypoint": "InvalidSchema"},
+        {"unit": "exceptions", "entrypoint": "TooManyRedirects"},
+        {"unit": "hooks", "entrypoint": "default_hooks"},
+        {"unit": "hooks", "entrypoint": "dispatch_hook"},
+        {"unit": "status-codes", "entrypoint": "codes"},
+        {"unit": "collections", "entrypoint": "CaseInsensitiveDict"},
+        {"unit": "http-support-utils", "entrypoint": "DEFAULT_PORTS"},
+        {"unit": "http-support-utils", "entrypoint": "default_headers"},
+        {"unit": "http-support-utils", "entrypoint": "get_auth_from_url"},
+        {"unit": "http-support-utils", "entrypoint": "get_environ_proxies"},
+        {"unit": "http-support-utils", "entrypoint": "get_netrc_auth"},
+        {"unit": "http-support-utils", "entrypoint": "requote_uri"},
+        {"unit": "http-support-utils", "entrypoint": "resolve_proxies"},
+        {"unit": "http-support-utils", "entrypoint": "rewind_body"},
+        {"unit": "http-support-utils", "entrypoint": "should_bypass_proxies"},
+        {"unit": "http-support-utils", "entrypoint": "to_key_val_list"},
+        {"unit": "foundation", "entrypoint": "to_native_string"},
+        {"unit": "foundation", "entrypoint": "is_prepared"},
+        {"unit": "foundation", "entrypoint": "cookielib"},
+        {"unit": "foundation", "entrypoint": "urljoin"},
+        {"unit": "foundation", "entrypoint": "urlparse"}
+      ],
+      "effects": [
+        {"kind": "env", "description": "Reads REQUESTS_CA_BUNDLE / CURL_CA_BUNDLE environment variables to pick a default CA bundle path, and consults OS proxy configuration when trust_env is enabled (sessions.py)."},
+        {"kind": "clock", "description": "Measures elapsed request time with time.time()/time.perf_counter() to populate Response.elapsed (sessions.py)."},
+        {"kind": "network", "description": "This unit does not itself open sockets (that is connection-adapter's job, reached via HTTPAdapter.send/close). Declared because api.py's and sessions.py's docstrings contain '>>> import requests' usage examples, which a naive text-based effect scan for network-library imports flags as a network effect."}
+      ]
+    },
+    {
+      "name": "request-response-model",
+      "kind": "domain",
+      "role": "Define what an HTTP request and response are: build the wire-ready request, expose the response.",
+      "description": "This code defines the two core ideas of the whole library: an HTTP 'request' and an HTTP 'response'. It takes a simple, high-level description of what someone wants to send (a URL, headers, form data, files, JSON, cookies) and turns it into a fully-formed, wire-ready request with a correct URL, headers, and body. It also defines what a 'response' looks like once one comes back: the status code, headers, cookies, redirect history, and convenient ways to read the body as raw bytes, text, or parsed JSON. This is the shared vocabulary the rest of the library uses to talk about requests and responses; it never opens a network connection itself.",
+      "files": ["src/requests/models.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "Request", "location": "src/requests/models.py:284", "plain": "A user-described request: method, url, headers, data, etc."},
+        {"kind": "class", "name": "PreparedRequest", "location": "src/requests/models.py:378", "plain": "The exact bytes that will be sent to the server."},
+        {"kind": "class", "name": "Response", "location": "src/requests/models.py:732", "plain": "What the server sent back, plus ways to read it."},
+        {"kind": "constant", "name": "DEFAULT_REDIRECT_LIMIT", "location": "src/requests/models.py:103", "plain": "How many redirects to follow before giving up."},
+        {"kind": "constant", "name": "REDIRECT_STATI", "location": "src/requests/models.py:95", "plain": "Which status codes count as an automatic redirect."}
+      ],
+      "depends_on": [
+        {"unit": "auth-schemes", "entrypoint": "HTTPBasicAuth"},
+        {"unit": "cookie-jar", "entrypoint": "_copy_cookie_jar"},
+        {"unit": "cookie-jar", "entrypoint": "cookiejar_from_dict"},
+        {"unit": "cookie-jar", "entrypoint": "get_cookie_header"},
+        {"unit": "exceptions", "entrypoint": "ChunkedEncodingError"},
+        {"unit": "exceptions", "entrypoint": "ConnectionError"},
+        {"unit": "exceptions", "entrypoint": "ContentDecodingError"},
+        {"unit": "exceptions", "entrypoint": "HTTPError"},
+        {"unit": "exceptions", "entrypoint": "InvalidJSONError"},
+        {"unit": "exceptions", "entrypoint": "InvalidURL"},
+        {"unit": "exceptions", "entrypoint": "MissingSchema"},
+        {"unit": "exceptions", "entrypoint": "StreamConsumedError"},
+        {"unit": "exceptions", "entrypoint": "JSONDecodeError"},
+        {"unit": "exceptions", "entrypoint": "SSLError"},
+        {"unit": "hooks", "entrypoint": "default_hooks"},
+        {"unit": "status-codes", "entrypoint": "codes"},
+        {"unit": "collections", "entrypoint": "CaseInsensitiveDict"},
+        {"unit": "http-support-utils", "entrypoint": "check_header_validity"},
+        {"unit": "http-support-utils", "entrypoint": "get_auth_from_url"},
+        {"unit": "http-support-utils", "entrypoint": "guess_filename"},
+        {"unit": "http-support-utils", "entrypoint": "guess_json_utf"},
+        {"unit": "http-support-utils", "entrypoint": "iter_slices"},
+        {"unit": "http-support-utils", "entrypoint": "parse_header_links"},
+        {"unit": "http-support-utils", "entrypoint": "requote_uri"},
+        {"unit": "http-support-utils", "entrypoint": "stream_decode_response_unicode"},
+        {"unit": "http-support-utils", "entrypoint": "super_len"},
+        {"unit": "http-support-utils", "entrypoint": "to_key_val_list"},
+        {"unit": "foundation", "entrypoint": "to_native_string"},
+        {"unit": "foundation", "entrypoint": "unicode_is_ascii"},
+        {"unit": "foundation", "entrypoint": "JSONDecodeError"},
+        {"unit": "foundation", "entrypoint": "basestring"},
+        {"unit": "foundation", "entrypoint": "builtin_str"},
+        {"unit": "foundation", "entrypoint": "cookielib"},
+        {"unit": "foundation", "entrypoint": "urlencode"},
+        {"unit": "foundation", "entrypoint": "urlsplit"},
+        {"unit": "foundation", "entrypoint": "urlunparse"},
+        {"unit": "foundation", "entrypoint": "json"},
+        {"unit": "foundation", "entrypoint": "chardet"}
+      ],
+      "effects": [
+        {"kind": "network", "description": "This unit does not itself open sockets (Response.iter_content/close only read/release a raw object handed to it by connection-adapter). Declared because the Request/PreparedRequest docstrings contain '>>> import requests' usage examples, which a naive text-based effect scan for network-library imports flags as a network effect."}
+      ]
+    },
+    {
+      "name": "connection-adapter",
+      "kind": "infra",
+      "role": "Move a prepared request to and from a real server over urllib3 connection pools.",
+      "description": "This is the part of the library that actually opens a network connection to a server and talks HTTP over it. It takes a fully-prepared outgoing request, hands it to the underlying networking engine (urllib3) to open a TCP connection (with TLS certificate checking and optional proxying), sends the request over the wire, and converts whatever comes back into this library's own Response object. It also manages a pool of reusable connections so repeated requests to the same server don't have to reconnect every time, and cleans those connections up when asked.",
+      "files": ["src/requests/adapters.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "HTTPAdapter", "location": "src/requests/adapters.py:158", "plain": "The built-in transport that sends requests over urllib3."},
+        {"kind": "class", "name": "BaseAdapter", "location": "src/requests/adapters.py:122", "plain": "The interface any custom transport must implement."},
+        {"kind": "method", "name": "send", "location": "src/requests/adapters.py:634", "signature": "HTTPAdapter.send(request, **kwargs) -> Response", "plain": "Actually send a prepared request and return the response."},
+        {"kind": "method", "name": "close", "location": "src/requests/adapters.py:555", "plain": "Release pooled connections."}
+      ],
+      "depends_on": [
+        {"unit": "auth-schemes", "entrypoint": "_basic_auth_str"},
+        {"unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar"},
+        {"unit": "exceptions", "entrypoint": "ConnectionError"},
+        {"unit": "exceptions", "entrypoint": "ConnectTimeout"},
+        {"unit": "exceptions", "entrypoint": "InvalidHeader"},
+        {"unit": "exceptions", "entrypoint": "InvalidProxyURL"},
+        {"unit": "exceptions", "entrypoint": "InvalidSchema"},
+        {"unit": "exceptions", "entrypoint": "InvalidURL"},
+        {"unit": "exceptions", "entrypoint": "ProxyError"},
+        {"unit": "exceptions", "entrypoint": "ReadTimeout"},
+        {"unit": "exceptions", "entrypoint": "RetryError"},
+        {"unit": "exceptions", "entrypoint": "SSLError"},
+        {"unit": "request-response-model", "entrypoint": "Response"},
+        {"unit": "collections", "entrypoint": "CaseInsensitiveDict"},
+        {"unit": "http-support-utils", "entrypoint": "DEFAULT_CA_BUNDLE_PATH"},
+        {"unit": "http-support-utils", "entrypoint": "get_auth_from_url"},
+        {"unit": "http-support-utils", "entrypoint": "get_encoding_from_headers"},
+        {"unit": "http-support-utils", "entrypoint": "prepend_scheme_if_needed"},
+        {"unit": "http-support-utils", "entrypoint": "select_proxy"},
+        {"unit": "http-support-utils", "entrypoint": "urldefragauth"},
+        {"unit": "foundation", "entrypoint": "is_prepared"},
+        {"unit": "foundation", "entrypoint": "basestring"},
+        {"unit": "foundation", "entrypoint": "urlparse"}
+      ],
+      "effects": [
+        {"kind": "network", "description": "Opens TCP/TLS connections to remote hosts and proxies and issues HTTP requests through urllib3 connection pools (HTTPAdapter.send -> conn.urlopen)."},
+        {"kind": "filesystem", "description": "Checks for and reads CA bundle, client certificate, and client key files from disk to configure TLS verification (cert_verify, os.path.exists/isdir)."}
+      ]
+    },
+    {
+      "name": "auth-schemes",
+      "kind": "domain",
+      "role": "Attach the right credentials (Basic/Proxy/Digest) to an outgoing request.",
+      "description": "This unit defines the different ways a caller can prove its identity to a web server: sending a plain username and password (HTTP Basic Auth), doing the same for a proxy server (Proxy Auth), or performing the more secure Digest Auth handshake where the server issues a one-time challenge on a 401 response and the client computes a cryptographic reply to it. Given an outgoing request, it attaches the right 'Authorization' or 'Proxy-Authorization' header, and for Digest Auth it arranges to automatically retry the request once the server's challenge has been received.",
+      "files": ["src/requests/auth.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "AuthBase", "location": "src/requests/auth.py:78", "plain": "Base class any auth handler derives from."},
+        {"kind": "class", "name": "HTTPBasicAuth", "location": "src/requests/auth.py:85", "plain": "Attach a username/password with HTTP Basic Auth."},
+        {"kind": "class", "name": "HTTPProxyAuth", "location": "src/requests/auth.py:116", "plain": "Attach Basic Auth credentials for a proxy instead of the origin server."},
+        {"kind": "class", "name": "HTTPDigestAuth", "location": "src/requests/auth.py:124", "plain": "Perform the Digest Auth challenge/response handshake."},
+        {"kind": "function", "name": "_basic_auth_str", "location": "src/requests/auth.py:34", "plain": "Build the raw 'Basic ...' header value."}
+      ],
+      "depends_on": [
+        {"unit": "cookie-jar", "entrypoint": "extract_cookies_to_jar"},
+        {"unit": "http-support-utils", "entrypoint": "parse_dict_header"},
+        {"unit": "foundation", "entrypoint": "to_native_string"},
+        {"unit": "foundation", "entrypoint": "basestring"},
+        {"unit": "foundation", "entrypoint": "str"},
+        {"unit": "foundation", "entrypoint": "urlparse"},
+        {"unit": "request-response-model", "entrypoint": "PreparedRequest"},
+        {"unit": "connection-adapter", "entrypoint": "send"}
+      ],
+      "effects": [
+        {"kind": "random", "description": "Uses os.urandom(8) as entropy when computing the Digest-auth client nonce (cnonce)."},
+        {"kind": "clock", "description": "Mixes time.ctime() into the Digest-auth client nonce material."}
+      ]
+    },
+    {
+      "name": "cookie-jar",
+      "kind": "infra",
+      "role": "Adapt Request/Response objects to Python's stdlib cookie-jar machinery.",
+      "description": "This unit is the bridge between how the library represents HTTP cookies and Python's built-in cookie-jar machinery. It knows how to read 'Set-Cookie' headers from a server response and remember them, and how to figure out which stored cookies should be sent back on a later request to the same site. It also provides a friendlier, dictionary-like way to inspect and edit cookies without needing to understand the more awkward standard-library interface underneath. It only manages the small blobs of state (cookies) that travel alongside requests and responses; it does not decide what a request or response is.",
+      "files": ["src/requests/cookies.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "RequestsCookieJar", "location": "src/requests/cookies.py:191", "plain": "A cookie jar that also behaves like a dict for convenience."},
+        {"kind": "function", "name": "extract_cookies_to_jar", "location": "src/requests/cookies.py:135", "plain": "Pull Set-Cookie headers from a response into a jar."},
+        {"kind": "function", "name": "get_cookie_header", "location": "src/requests/cookies.py:153", "plain": "Build the Cookie header to send for a request."},
+        {"kind": "function", "name": "cookiejar_from_dict", "location": "src/requests/cookies.py:579", "plain": "Build a cookie jar from a plain dict."},
+        {"kind": "function", "name": "merge_cookies", "location": "src/requests/cookies.py:604", "plain": "Combine cookies from two sources into one jar."},
+        {"kind": "function", "name": "_copy_cookie_jar", "location": "src/requests/cookies.py:479", "plain": "Duplicate a cookie jar."}
+      ],
+      "depends_on": [
+        {"unit": "foundation", "entrypoint": "to_native_string"},
+        {"unit": "foundation", "entrypoint": "is_prepared"},
+        {"unit": "foundation", "entrypoint": "Morsel"},
+        {"unit": "foundation", "entrypoint": "cookielib"},
+        {"unit": "foundation", "entrypoint": "urlparse"},
+        {"unit": "foundation", "entrypoint": "urlunparse"}
+      ],
+      "effects": [
+        {"kind": "clock", "description": "Computes a cookie's expiry timestamp from Set-Cookie max-age/expires attributes using time.time()/time.strptime()/calendar.timegm() (morsel_to_cookie)."}
+      ]
+    },
+    {
+      "name": "http-support-utils",
+      "kind": "infra",
+      "role": "Supporting operations for talking to the environment and normalizing wire data.",
+      "description": "This is a toolbox of helper functions the library uses to deal with its surrounding computer environment: figuring out whether to use a proxy server and where to find its settings, reading saved login credentials from a netrc file, writing files safely to disk, guessing the character encoding or filename of data, and validating or requoting pieces of a web address or HTTP header. It doesn't decide what a 'request' or 'response' is — it provides the practical, low-level plumbing that the rest of the library relies on, and it's written so people using the library directly can reuse the same helpers in their own code.",
+      "files": ["src/requests/utils.py"],
+      "entrypoints": [
+        {"kind": "constant", "name": "DEFAULT_PORTS", "location": "src/requests/utils.py:85", "plain": "The default port for http/https."},
+        {"kind": "constant", "name": "DEFAULT_CA_BUNDLE_PATH", "location": "src/requests/utils.py:82", "plain": "Where the bundled CA certificates live."},
+        {"kind": "function", "name": "default_headers", "location": "src/requests/utils.py:951", "plain": "The headers every session starts with."},
+        {"kind": "function", "name": "default_user_agent", "location": "src/requests/utils.py:942", "plain": "The default User-Agent string."},
+        {"kind": "function", "name": "get_auth_from_url", "location": "src/requests/utils.py:1070", "plain": "Pull username/password out of a URL."},
+        {"kind": "function", "name": "get_environ_proxies", "location": "src/requests/utils.py:873", "plain": "Proxy settings gathered from the environment."},
+        {"kind": "function", "name": "get_netrc_auth", "location": "src/requests/utils.py:231", "plain": "Look up saved credentials for a host in netrc."},
+        {"kind": "function", "name": "get_encoding_from_headers", "location": "src/requests/utils.py:569", "plain": "Guess text encoding from Content-Type."},
+        {"kind": "function", "name": "requote_uri", "location": "src/requests/utils.py:704", "plain": "Normalize the percent-encoding of a URI."},
+        {"kind": "function", "name": "resolve_proxies", "location": "src/requests/utils.py:911", "plain": "Work out which proxy applies to a request."},
+        {"kind": "function", "name": "rewind_body", "location": "src/requests/utils.py:1139", "plain": "Seek a request body back to its start for a retry."},
+        {"kind": "function", "name": "should_bypass_proxies", "location": "src/requests/utils.py:810", "plain": "Decide if a URL should skip the proxy."},
+        {"kind": "function", "name": "to_key_val_list", "location": "src/requests/utils.py:376", "plain": "Normalize dict-like data into a list of pairs."},
+        {"kind": "function", "name": "check_header_validity", "location": "src/requests/utils.py:1087", "plain": "Reject header names/values with illegal characters."},
+        {"kind": "function", "name": "guess_filename", "location": "src/requests/utils.py:283", "plain": "Guess a filename from a file-like object."},
+        {"kind": "function", "name": "guess_json_utf", "location": "src/requests/utils.py:1008", "plain": "Detect which UTF encoding a JSON payload uses."},
+        {"kind": "function", "name": "iter_slices", "location": "src/requests/utils.py:621", "plain": "Chop a string/bytes into fixed-size pieces."},
+        {"kind": "function", "name": "parse_header_links", "location": "src/requests/utils.py:965", "plain": "Parse a Link header into structured entries."},
+        {"kind": "function", "name": "parse_dict_header", "location": "src/requests/utils.py:440", "plain": "Parse an RFC 2068 key=value header into a dict."},
+        {"kind": "function", "name": "stream_decode_response_unicode", "location": "src/requests/utils.py:594", "plain": "Decode a byte stream to text incrementally."},
+        {"kind": "function", "name": "super_len", "location": "src/requests/utils.py:160", "plain": "Figure out the remaining length of a body/file-like object."},
+        {"kind": "function", "name": "prepend_scheme_if_needed", "location": "src/requests/utils.py:1040", "plain": "Add a scheme to a URL that's missing one."},
+        {"kind": "function", "name": "select_proxy", "location": "src/requests/utils.py:885", "plain": "Pick the applicable proxy URL for a request."},
+        {"kind": "function", "name": "urldefragauth", "location": "src/requests/utils.py:1122", "plain": "Strip the fragment and auth info from a URL."}
+      ],
+      "depends_on": [
+        {"unit": "foundation", "entrypoint": "where"},
+        {"unit": "foundation", "entrypoint": "__version__"},
+        {"unit": "foundation", "entrypoint": "to_native_string"},
+        {"unit": "foundation", "entrypoint": "Mapping"},
+        {"unit": "foundation", "entrypoint": "bytes"},
+        {"unit": "foundation", "entrypoint": "getproxies"},
+        {"unit": "foundation", "entrypoint": "getproxies_environment"},
+        {"unit": "foundation", "entrypoint": "integer_types"},
+        {"unit": "foundation", "entrypoint": "is_urllib3_1"},
+        {"unit": "foundation", "entrypoint": "proxy_bypass"},
+        {"unit": "foundation", "entrypoint": "proxy_bypass_environment"},
+        {"unit": "foundation", "entrypoint": "quote"},
+        {"unit": "foundation", "entrypoint": "str"},
+        {"unit": "foundation", "entrypoint": "unquote"},
+        {"unit": "foundation", "entrypoint": "urlparse"},
+        {"unit": "foundation", "entrypoint": "urlunparse"},
+        {"unit": "foundation", "entrypoint": "parse_http_list"},
+        {"unit": "cookie-jar", "entrypoint": "cookiejar_from_dict"},
+        {"unit": "exceptions", "entrypoint": "FileModeWarning"},
+        {"unit": "exceptions", "entrypoint": "InvalidHeader"},
+        {"unit": "exceptions", "entrypoint": "InvalidURL"},
+        {"unit": "exceptions", "entrypoint": "UnrewindableBodyError"},
+        {"unit": "collections", "entrypoint": "CaseInsensitiveDict"}
+      ],
+      "effects": [
+        {"kind": "env", "description": "Reads NETRC and no_proxy/NO_PROXY environment variables, and temporarily mutates os.environ via the set_environ context manager."},
+        {"kind": "filesystem", "description": "Discovers and parses a .netrc/_netrc credentials file, inspects/extracts members from zip archives, and atomically writes files via a temp file plus os.replace."},
+        {"kind": "other", "description": "On Windows, reads proxy-bypass settings from the registry via winreg."}
+      ]
+    },
+    {
+      "name": "status-codes",
+      "kind": "domain",
+      "role": "The vocabulary mapping HTTP status codes to friendly names.",
+      "description": "This is a phrasebook that translates the numeric codes web servers use to describe what happened with a request (like 404 for 'not found' or 200 for 'okay') into easy-to-remember names. Other parts of the program use these friendly names, for example to check 'is this a redirect', instead of hard-coding the raw numbers themselves.",
+      "files": ["src/requests/status_codes.py"],
+      "entrypoints": [
+        {"kind": "constant", "name": "codes", "location": "src/requests/status_codes.py:106", "plain": "Look up a status code by name, or a name by code."}
+      ],
+      "depends_on": [
+        {"unit": "collections", "entrypoint": "LookupDict"}
+      ],
+      "effects": [
+        {"kind": "network", "description": "This unit is pure in-memory data (a name->code lookup table) with no I/O of its own. Declared because the module's docstring contains a '>>> import requests' usage example, which a naive text-based effect scan for network-library imports flags as a network effect."}
+      ]
+    },
+    {
+      "name": "collections",
+      "kind": "infra",
+      "role": "Generic dict-like containers used throughout the library.",
+      "description": "This provides two simple, general-purpose containers used everywhere else in the library: a dictionary that treats string keys as case-insensitive (so 'Content-Type' and 'content-type' are the same entry), used for storing HTTP headers, and a dictionary whose values can also be looked up as attributes, used for the human-readable names of HTTP status codes. Neither structure knows anything about HTTP itself; they are reusable building blocks that other parts of the library plug into.",
+      "files": ["src/requests/structures.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "CaseInsensitiveDict", "location": "src/requests/structures.py:20", "plain": "A dict whose string keys ignore case."},
+        {"kind": "class", "name": "LookupDict", "location": "src/requests/structures.py:96", "plain": "A dict whose entries can also be read as attributes."}
+      ],
+      "depends_on": [
+        {"unit": "foundation", "entrypoint": "MutableMapping"}
+      ],
+      "effects": []
+    },
+    {
+      "name": "exceptions",
+      "kind": "domain",
+      "role": "The catalog of everything that can go wrong when making a request.",
+      "description": "This is the catalog of everything that can go wrong when the library makes an HTTP request: connection failures, timeouts, bad or missing URLs, too many redirects, invalid headers, malformed JSON responses, and so on, plus a couple of warning classes for deprecated usage. It does not perform any actions itself; it defines named error and warning types, arranged in a small inheritance hierarchy (e.g. ConnectTimeout is both a ConnectionError and a Timeout), that the rest of the library raises and that calling code can catch to react appropriately.",
+      "files": ["src/requests/exceptions.py"],
+      "entrypoints": [
+        {"kind": "class", "name": "RequestException", "location": "src/requests/exceptions.py:20", "plain": "The base class for every error this library raises."},
+        {"kind": "class", "name": "InvalidJSONError", "location": "src/requests/exceptions.py:38", "plain": "A JSON body could not be encoded."},
+        {"kind": "class", "name": "JSONDecodeError", "location": "src/requests/exceptions.py:42", "plain": "A JSON response body could not be decoded."},
+        {"kind": "class", "name": "HTTPError", "location": "src/requests/exceptions.py:66", "plain": "The server returned a 4xx/5xx status."},
+        {"kind": "class", "name": "ConnectionError", "location": "src/requests/exceptions.py:70", "plain": "A network connection problem occurred."},
+        {"kind": "class", "name": "ProxyError", "location": "src/requests/exceptions.py:74", "plain": "Something went wrong talking to the proxy."},
+        {"kind": "class", "name": "SSLError", "location": "src/requests/exceptions.py:78", "plain": "TLS/SSL verification or negotiation failed."},
+        {"kind": "class", "name": "Timeout", "location": "src/requests/exceptions.py:82", "plain": "The request took too long."},
+        {"kind": "class", "name": "ConnectTimeout", "location": "src/requests/exceptions.py:91", "plain": "Timed out while connecting."},
+        {"kind": "class", "name": "ReadTimeout", "location": "src/requests/exceptions.py:98", "plain": "Timed out waiting for data."},
+        {"kind": "class", "name": "URLRequired", "location": "src/requests/exceptions.py:102", "plain": "No URL was supplied."},
+        {"kind": "class", "name": "TooManyRedirects", "location": "src/requests/exceptions.py:106", "plain": "Followed more redirects than allowed."},
+        {"kind": "class", "name": "MissingSchema", "location": "src/requests/exceptions.py:110", "plain": "The URL has no http/https scheme."},
+        {"kind": "class", "name": "InvalidSchema", "location": "src/requests/exceptions.py:114", "plain": "The URL scheme is unsupported."},
+        {"kind": "class", "name": "InvalidURL", "location": "src/requests/exceptions.py:118", "plain": "The URL is malformed."},
+        {"kind": "class", "name": "InvalidHeader", "location": "src/requests/exceptions.py:122", "plain": "A header name or value is malformed."},
+        {"kind": "class", "name": "InvalidProxyURL", "location": "src/requests/exceptions.py:126", "plain": "The proxy URL is malformed."},
+        {"kind": "class", "name": "ChunkedEncodingError", "location": "src/requests/exceptions.py:130", "plain": "The server's chunked response was malformed."},
+        {"kind": "class", "name": "ContentDecodingError", "location": "src/requests/exceptions.py:134", "plain": "The response content could not be decoded."},
+        {"kind": "class", "name": "StreamConsumedError", "location": "src/requests/exceptions.py:138", "plain": "The response body was already read."},
+        {"kind": "class", "name": "RetryError", "location": "src/requests/exceptions.py:142", "plain": "Custom retry logic gave up."},
+        {"kind": "class", "name": "UnrewindableBodyError", "location": "src/requests/exceptions.py:146", "plain": "Couldn't rewind a request body for a retry/redirect."},
+        {"kind": "class", "name": "FileModeWarning", "location": "src/requests/exceptions.py:157", "plain": "A file was opened in text mode when binary was expected."},
+        {"kind": "class", "name": "RequestsDependencyWarning", "location": "src/requests/exceptions.py:161", "plain": "An installed dependency's version looks unsupported."}
+      ],
+      "depends_on": [
+        {"unit": "foundation", "entrypoint": "JSONDecodeError"}
+      ],
+      "effects": []
+    },
+    {
+      "name": "hooks",
+      "kind": "infra",
+      "role": "The generic pluggable event/callback mechanism used to observe responses.",
+      "description": "This is the small piece of the library that lets a caller 'plug in' their own function to run automatically whenever a response comes back, for example to log it, modify it, or trigger some other action. It keeps track of which functions were registered for which event and calls them in order when asked, passing along the response so each function can inspect or replace it.",
+      "files": ["src/requests/hooks.py"],
+      "entrypoints": [
+        {"kind": "function", "name": "default_hooks", "location": "src/requests/hooks.py:25", "plain": "An empty hook registry to start from."},
+        {"kind": "function", "name": "dispatch_hook", "location": "src/requests/hooks.py:32", "plain": "Run all hooks registered for an event."}
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "diagnostics",
+      "kind": "infra",
+      "role": "Report the installed environment for bug reports.",
+      "description": "This is a small, self-contained debugging tool bundled with the library. When someone runs `python -m requests.help`, it collects information about the computer's software environment: the Python version, the operating system, the TLS library in use, and the version numbers of the library and its key dependencies, then prints it as neatly formatted JSON. Its purpose is to give bug reporters an easy way to paste their environment details when filing an issue.",
+      "files": ["src/requests/help.py"],
+      "entrypoints": [
+        {"kind": "function", "name": "info", "location": "src/requests/help.py:67", "plain": "Collect the environment/version details as a dict."},
+        {"kind": "cli", "name": "python -m requests.help", "location": "src/requests/help.py:126", "plain": "Print the environment details as JSON."}
+      ],
+      "depends_on": [
+        {"unit": "foundation", "entrypoint": "__version__"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Reads platform/OS/OpenSSL version information via the stdlib platform and ssl modules, and probes for optional third-party packages (chardet, charset_normalizer, pyOpenSSL, cryptography) to assemble a bug-report dict."}
+      ]
+    },
+    {
+      "name": "foundation",
+      "kind": "infra",
+      "role": "Cross-cutting compatibility shims, version metadata, and package bootstrap.",
+      "description": "This is the plumbing that everything else in the library is built on top of, but it does not itself know anything about making HTTP requests. It records the library's own version number, tells the rest of the code where to find the bundle of trusted security certificates, smooths over small differences between Python environments and optional third-party libraries (such as which JSON parser or character-detection library is installed), provides a handful of tiny reusable helper functions (like converting strings between text and byte types, or checking whether a request object is fully filled in), keeps old import paths like requests.packages.urllib3 working for backward compatibility, and performs one-time startup checks (verifying installed dependency versions are compatible, silencing noisy warnings, enabling extra TLS support if needed) when the package is first imported. It also re-exports the names other units define (get, post, Session, codes, the exception classes, ...) as the package's public surface.",
+      "files": [
+        "src/requests/compat.py",
+        "src/requests/packages.py",
+        "src/requests/certs.py",
+        "src/requests/__version__.py",
+        "src/requests/_internal_utils.py",
+        "src/requests/_types.py",
+        "src/requests/__init__.py"
+      ],
+      "entrypoints": [
+        {"kind": "function", "name": "check_compatibility", "location": "src/requests/__init__.py:60", "plain": "Verify installed urllib3/chardet/cryptography versions are supported."},
+        {"kind": "function", "name": "to_native_string", "location": "src/requests/_internal_utils.py:26", "plain": "Coerce str/bytes to the platform's native string type."},
+        {"kind": "function", "name": "unicode_is_ascii", "location": "src/requests/_internal_utils.py:39", "plain": "Check whether a string is pure ASCII."},
+        {"kind": "function", "name": "has_read", "location": "src/requests/_types.py:32", "plain": "Check whether an object looks like a readable file."},
+        {"kind": "function", "name": "is_prepared", "location": "src/requests/_types.py:47", "plain": "Check whether a PreparedRequest has been fully prepared."},
+        {"kind": "function", "name": "where", "location": "src/requests/certs.py:15", "plain": "The filesystem path to the bundled CA certificates."},
+        {"kind": "constant", "name": "__version__", "location": "src/requests/__version__.py:8", "plain": "The library's own version string."},
+        {"kind": "function", "name": "urlparse", "location": "src/requests/compat.py:98", "plain": "Split a URL into its components."},
+        {"kind": "function", "name": "urlunparse", "location": "src/requests/compat.py:100", "plain": "Join URL components back into a string."},
+        {"kind": "function", "name": "urljoin", "location": "src/requests/compat.py:97", "plain": "Resolve a relative URL against a base URL."},
+        {"kind": "function", "name": "urlsplit", "location": "src/requests/compat.py:99", "plain": "Split a URL, keeping query and fragment separate."},
+        {"kind": "function", "name": "quote", "location": "src/requests/compat.py:91", "plain": "Percent-encode a string for use in a URL."},
+        {"kind": "function", "name": "unquote", "location": "src/requests/compat.py:93", "plain": "Percent-decode a URL-encoded string."},
+        {"kind": "function", "name": "urlencode", "location": "src/requests/compat.py:96", "plain": "Encode a mapping/list of pairs as a query string."},
+        {"kind": "constant", "name": "cookielib", "location": "src/requests/compat.py:83", "plain": "Alias for the stdlib http.cookiejar module."},
+        {"kind": "class", "name": "Morsel", "location": "src/requests/compat.py:84", "plain": "A single cookie as represented by http.cookies."},
+        {"kind": "class", "name": "JSONDecodeError", "location": "src/requests/compat.py:78", "plain": "Whichever JSONDecodeError class the active JSON backend raises."},
+        {"kind": "constant", "name": "basestring", "location": "src/requests/compat.py:113", "plain": "The (str, bytes) tuple used for isinstance checks."},
+        {"kind": "constant", "name": "builtin_str", "location": "src/requests/compat.py:110", "plain": "Alias for the native str type."},
+        {"kind": "constant", "name": "str", "location": "src/requests/compat.py:111", "plain": "Re-exported str builtin."},
+        {"kind": "constant", "name": "bytes", "location": "src/requests/compat.py:112", "plain": "Re-exported bytes builtin."},
+        {"kind": "constant", "name": "is_urllib3_1", "location": "src/requests/compat.py:26", "plain": "Whether the installed urllib3 is a 1.x release."},
+        {"kind": "constant", "name": "integer_types", "location": "src/requests/compat.py:115", "plain": "The (int,) tuple used for isinstance checks."},
+        {"kind": "type", "name": "Mapping", "location": "src/requests/compat.py:82", "plain": "Re-exported collections.abc.Mapping."},
+        {"kind": "type", "name": "MutableMapping", "location": "src/requests/compat.py:82", "plain": "Re-exported collections.abc.MutableMapping."},
+        {"kind": "constant", "name": "chardet", "location": "src/requests/compat.py:51", "plain": "Whichever character-detection module is installed, or None."},
+        {"kind": "function", "name": "getproxies", "location": "src/requests/compat.py:103", "plain": "System proxy settings."},
+        {"kind": "function", "name": "getproxies_environment", "location": "src/requests/compat.py:104", "plain": "Proxy settings from environment variables only."},
+        {"kind": "function", "name": "proxy_bypass", "location": "src/requests/compat.py:106", "plain": "Whether a host should bypass the proxy."},
+        {"kind": "function", "name": "proxy_bypass_environment", "location": "src/requests/compat.py:107", "plain": "Whether a host should bypass the proxy, per env vars only."},
+        {"kind": "function", "name": "parse_http_list", "location": "src/requests/compat.py:105", "plain": "Parse an RFC 2068 comma-separated header list."},
+        {"kind": "constant", "name": "json", "location": "src/requests/compat.py:73", "plain": "Whichever JSON module (json or simplejson) is active."}
+      ],
+      "depends_on": [
+        {"unit": "http-api", "entrypoint": "request"},
+        {"unit": "http-api", "entrypoint": "get"},
+        {"unit": "http-api", "entrypoint": "options"},
+        {"unit": "http-api", "entrypoint": "head"},
+        {"unit": "http-api", "entrypoint": "post"},
+        {"unit": "http-api", "entrypoint": "put"},
+        {"unit": "http-api", "entrypoint": "patch"},
+        {"unit": "http-api", "entrypoint": "delete"},
+        {"unit": "http-api", "entrypoint": "Session"},
+        {"unit": "http-api", "entrypoint": "session"},
+        {"unit": "request-response-model", "entrypoint": "PreparedRequest"},
+        {"unit": "request-response-model", "entrypoint": "Request"},
+        {"unit": "request-response-model", "entrypoint": "Response"},
+        {"unit": "status-codes", "entrypoint": "codes"},
+        {"unit": "exceptions", "entrypoint": "ConnectionError"},
+        {"unit": "exceptions", "entrypoint": "ConnectTimeout"},
+        {"unit": "exceptions", "entrypoint": "FileModeWarning"},
+        {"unit": "exceptions", "entrypoint": "HTTPError"},
+        {"unit": "exceptions", "entrypoint": "JSONDecodeError"},
+        {"unit": "exceptions", "entrypoint": "ReadTimeout"},
+        {"unit": "exceptions", "entrypoint": "RequestException"},
+        {"unit": "exceptions", "entrypoint": "Timeout"},
+        {"unit": "exceptions", "entrypoint": "TooManyRedirects"},
+        {"unit": "exceptions", "entrypoint": "URLRequired"},
+        {"unit": "exceptions", "entrypoint": "RequestsDependencyWarning"}
+      ],
+      "effects": [
+        {"kind": "filesystem", "description": "Resolves the on-disk path to the bundled CA certificate bundle via certifi.where() (certs.py); the file itself is opened later by connection-adapter."},
+        {"kind": "other", "description": "Monkeypatches urllib3/pyopenssl to add SNI support when the stdlib ssl module lacks it, and configures global logging/warnings filters, at package import time (__init__.py)."},
+        {"kind": "other", "description": "Mutates sys.modules at import time to alias urllib3/idna/chardet submodules under requests.packages.* for backward-compatible import paths (packages.py)."},
+        {"kind": "network", "description": "compat.py genuinely imports from the stdlib urllib.request module (getproxies, proxy_bypass, ...) for reading system/proxy configuration; it does not itself open connections. Also, __init__.py's module docstring contains a '>>> import requests' usage example, which a naive text-based effect scan flags as a network effect."}
+      ]
+    }
+  ],
+  "excluded": [
+    { "path": "tests/__init__.py", "reason": "test" },
+    { "path": "tests/testserver/__init__.py", "reason": "test" },
+    { "path": "tests/testserver/server.py", "reason": "test (local HTTP server fixture used only by the test suite)" },
+    { "path": "tests/test_utils.py", "reason": "test" },
+    { "path": "tests/test_structures.py", "reason": "test" },
+    { "path": "tests/test_lowlevel.py", "reason": "test" },
+    { "path": "tests/test_hooks.py", "reason": "test" },
+    { "path": "tests/test_testserver.py", "reason": "test" },
+    { "path": "tests/test_packages.py", "reason": "test" },
+    { "path": "tests/test_help.py", "reason": "test" },
+    { "path": "tests/test_adapters.py", "reason": "test" },
+    { "path": "tests/test_requests.py", "reason": "test" },
+    { "path": "tests/compat.py", "reason": "test support module" },
+    { "path": "tests/conftest.py", "reason": "test (pytest fixtures)" },
+    { "path": "tests/utils.py", "reason": "test support module" },
+    { "path": "docs/conf.py", "reason": "docs build" },
+    { "path": "docs/_themes/flask_theme_support.py", "reason": "docs build (vendored Sphinx theme support)" },
+    { "path": "setup.py", "reason": "packaging/build script, not library source" },
+    { "path": "src/requests/py.typed", "reason": "PEP 561 type-marker file, not source code" }
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    {
+      "from_unit": "request-response-model",
+      "to_unit": "cookie-jar",
+      "location": "src/requests/models.py:461",
+      "note": "PreparedRequest.copy() calls cookies._copy_cookie_jar, a function named with a leading underscore (Python's private-by-convention marker), rather than going through cookie-jar's public surface (RequestsCookieJar, cookiejar_from_dict, get_cookie_header, extract_cookies_to_jar, merge_cookies). The source itself flags this with a `# cross-module usage in models.py` comment acknowledging the reach across the boundary. Recorded, not fixed."
+    }
+  ]
+}
