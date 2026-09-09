@@ -77,6 +77,14 @@ are read-only and cannot see each other's output.
   (note it under `violations_observed`; this is a finding, not a failure).
 - Check kind assignments: a unit with effects but no domain logic is infra.
   A unit with no effects and no entrypoints is probably not a unit — merge it.
+- Apply the merge test to every candidate before you write. Keep two units apart
+  only if you can name, for each of them, at least one entrypoint that the other
+  unit's files actually call, or that the outside world enters directly. If one
+  unit's only caller is a single other unit, reaching it through one entrypoint,
+  it is an implementation detail of that unit — merge them. A split is earned by
+  an interface something crosses, never by a file boundary or by a topic being
+  nameable. When a merge and a split are equally defensible, merge: a unit you
+  can describe in one paragraph without saying "and" is the right size.
 
 ### Step 4 — Write and lint
 - Write `/out/manifest.json` conforming to `lu-manifest.schema.json`.
