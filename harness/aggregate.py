@@ -68,27 +68,26 @@ def corpus(rows):
         mean_jaccard=mean(r['jaccard'] for r in rows if r['jaccard'] is not None) if any(r['jaccard'] is not None for r in rows) else None,
         mean_cost=mean(r['cost'] for r in rows))
 
-def decide(before, after, alpha=0.10, boot=5000):
+def _decide_core(before, after, alpha=0.10, boot=5000):
+    """Return {verdict, line, n_repos}. No printing. Shared by --decide and --decide-transfer."""
     A, B = load(before), load(after)
     common = sorted(set(A) & set(B))
-    if len(common) < 3: print(f"REVERT  (only {len(common)} repos in common; need >=3)"); return
+    if len(common) < 3:
+        return dict(verdict='REVERT', n_repos=len(common),
+                    line=f"REVERT  (only {len(common)} repos in common; need >=3)")
     ra = {r['repo']: r for r in summarise({k: A[k] for k in common})}
     rb = {r['repo']: r for r in summarise({k: B[k] for k in common})}
-    # gate 1: validity rate must not drop by more than one run's worth
     va, vb = mean(ra[k]['valid'] for k in common), mean(rb[k]['valid'] for k in common)
     if vb < va - 1e-9 and (va - vb) * len(common) > 1.0/3:
-        print(f"REVERT  validity gate: {va:.2f} -> {vb:.2f}"); return
-    # gate 2: stability must not collapse
+        return dict(verdict='REVERT', n_repos=len(common), line=f"REVERT  validity gate: {va:.2f} -> {vb:.2f}")
     ja = [ra[k]['jaccard'] for k in common if ra[k]['jaccard'] is not None]
     jb = [rb[k]['jaccard'] for k in common if rb[k]['jaccard'] is not None]
     if ja and jb and mean(jb) < mean(ja) - 0.15:
-        print(f"REVERT  stability gate: jaccard {mean(ja):.2f} -> {mean(jb):.2f}"); return
-    # gate 3: contract recall (invariants 2+4) must not drop
+        return dict(verdict='REVERT', n_repos=len(common), line=f"REVERT  stability gate: jaccard {mean(ja):.2f} -> {mean(jb):.2f}")
     ca = [ra[k]['contract'] for k in common if ra[k]['contract'] is not None]
     cb = [rb[k]['contract'] for k in common if rb[k]['contract'] is not None]
     if ca and cb and mean(cb) < mean(ca) - 0.05:
-        print(f"REVERT  contract gate: recall {mean(ca):.2f} -> {mean(cb):.2f}"); return
-    # paired bootstrap on per-repo delta of the quality primary
+        return dict(verdict='REVERT', n_repos=len(common), line=f"REVERT  contract gate: recall {mean(ca):.2f} -> {mean(cb):.2f}")
     deltas = [rb[k]['gain'] - ra[k]['gain'] for k in common]
     rng = random.Random(0); means = []
     for _ in range(boot):
@@ -96,7 +95,32 @@ def decide(before, after, alpha=0.10, boot=5000):
     means.sort(); lo, hi = means[int(alpha/2*boot)], means[int((1-alpha/2)*boot)-1]
     obs = mean(deltas)
     verdict = 'KEEP' if lo > 0 else 'REVERT'
-    print(f"{verdict}  delta_gain={obs:+.4f}  {int((1-alpha)*100)}%CI=[{lo:+.4f},{hi:+.4f}]  validity {va:.2f}->{vb:.2f}  n_repos={len(common)}")
+    return dict(verdict=verdict, n_repos=len(common),
+                line=f"{verdict}  delta_gain={obs:+.4f}  {int((1-alpha)*100)}%CI=[{lo:+.4f},{hi:+.4f}]  validity {va:.2f}->{vb:.2f}  n_repos={len(common)}")
+
+def decide(before, after, alpha=0.10, boot=5000):
+    print(_decide_core(before, after, alpha, boot)['line'])
+
+def decide_transfer(before, after, models, alpha=0.10, boot=5000):
+    """KEEP only if the edit holds on EVERY model (notes/architecture.md change 4).
+
+    Model is a run-label suffix (run_one.sh): <sha>-opus5, <sha>-sonnet5, or a bare <sha> for
+    legacy runs. `models` is that list of suffixes; the token 'base' means the bare label.
+    An edit that is KEEP on one model and REVERT on another is REVERT overall: that is the
+    difference between 'this wording helps model X' and 'this is a better instruction'.
+    """
+    results = []
+    for m in models:
+        lb = before if m in ('base', '') else f"{before}-{m}"
+        la = after  if m in ('base', '') else f"{after}-{m}"
+        r = _decide_core(lb, la, alpha, boot)
+        results.append((m, lb, la, r))
+        print(f"  [{m:8}] {lb} -> {la}\n            {r['line']}")
+    keeps = [r['verdict'] == 'KEEP' for _, _, _, r in results]
+    overall = 'KEEP' if keeps and all(keeps) else 'REVERT'
+    n_keep = sum(keeps)
+    print(f"\nTRANSFER {overall}  ({n_keep}/{len(results)} models KEEP)  "
+          f"-- KEEP requires all {len(results)} models")
 
 def n_dev():
     """Number of pinned, non-holdout repos in corpus.txt (for the Phase-2 gate)."""
@@ -118,6 +142,12 @@ def main():
         alpha = float(a[a.index('--alpha')+1]) if '--alpha' in a else 0.10
         boot = int(a[a.index('--boot')+1]) if '--boot' in a else 5000
         return decide(a[1], a[2], alpha, boot)
+    if a and a[0] == '--decide-transfer':
+        alpha = float(a[a.index('--alpha')+1]) if '--alpha' in a else 0.10
+        boot = int(a[a.index('--boot')+1]) if '--boot' in a else 5000
+        models = (a[a.index('--models')+1].split(',') if '--models' in a
+                  else ['base', 'opus5'])
+        return decide_transfer(a[1], a[2], models, alpha, boot)
     label = a[a.index('--label')+1] if '--label' in a else None
     reps = set(a[a.index('--rep')+1].split(',')) if '--rep' in a else None
     per = load(label, reps, include_holdout='--holdout' in a)
