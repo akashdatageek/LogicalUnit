@@ -69,6 +69,16 @@ EXIT=$?
 set -e
 
 # 5. collect + provenance
+# A zero-byte result.json means the CLI never returned: killed, or the container died. That is
+# operator/infra action, never model behaviour, so it must not enter the record as a data point.
+# Scoring it anyway consumes the (repo,label,rep) slot forever AND lands with run_error=false
+# and no subtype, i.e. indistinguishable from a model that genuinely produced zero units.
+# A run that really failed still writes JSON (error_max_turns, terminal_reason=api_error).
+if [ ! -s "$RUN/result.json" ]; then
+  echo "ABORTED $RUN — CLI produced no result (killed, or the container died)." >&2
+  echo "  Leaving the slot free: no score.json written." >&2
+  exit 3
+fi
 cp "$OUT/manifest.json" "$RUN/manifest.json" 2>/dev/null || echo '{}' > "$RUN/manifest.json"
 cp "$OUT/lint.log" "$RUN/lint.log" 2>/dev/null || true
 jq -n --arg repo "$REPO" --arg sha "$SHA" --arg rep "$REP" --arg skill "$SKILL_LABEL" --arg overlay "$OVERLAY_HASH" \
