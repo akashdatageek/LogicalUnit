@@ -16,20 +16,30 @@ and ends with
 
 ## Before you trust a number
     python3 harness/test_score.py                         8 scorer fixtures; must be 8/8 (2 s)
+    python3 harness/calibrate.py                          instrument sensitivity/specificity on synthetic gold; 8/8 (3 s, no model call)
     python3 harness/headroom.py --corpus                  which repos can show a gain at all (48 s, no model call)
 A repo whose q_dir is ~0 cannot produce a positive q_gain_dir however good the decomposition
 is. Four of the seven current dev repos are in that state; treat them as controls.
 
 ## Commands
     ./harness/pin_corpus.sh                               replace PIN_ME with HEAD shas (mechanical; allowed)
-    ./harness/run_one.sh <owner/name> <sha> <rep> [--condition noskill] [--hide-docs]
-    ./harness/run_corpus.sh [--reps 0,1,2] [--only a,b] [--condition ..] [--hide-docs]
+    ./harness/run_one.sh <owner/name> <sha> <rep> [--condition noskill] [--hide-docs] [--ablate SECTION]
+    ./harness/run_corpus.sh [--reps 0,1,2] [--only a,b] [--condition ..] [--hide-docs] [--ablate SECTION]
+    ./harness/sweep.sh [--reps ..] [--only ..] [--parallel N] [--retries K] [..]   resumable, limit-aware driver; writes notes/sweep-ledger.tsv
+    ./harness/ablation_sweep.sh [reps] [repos]            full skill vs each single-section ablation vs bare prompt
     python3 harness/aggregate.py [--label <sha>]          per-repo table, corpus primaries
     python3 harness/aggregate.py --decide <before> <after> KEEP/REVERT — final, not advisory
+    python3 harness/aggregate.py --decide-transfer <before> <after> --models m1,m2   KEEP only if it holds on every model
+    python3 harness/units.py [--label <sha>] | --decide <before> <after>   unit-level analysis (~200 units, not ~16 runs)
     python3 harness/aggregate.py --tsv >> results.tsv     one row per kept skill version
-    python3 harness/rescore.py [--apply]                  re-score runs in place after a scorer change
+    python3 harness/rescore.py [--apply]                  re-score runs in place after a scorer change (backfills per-unit records)
 
-Second model for the transfer check (RQ5): set LU_MODEL to it. Ask the human to fill this in:
+--ablate SECTION strips ONE top-level SKILL.md section from the per-run copy only (the tracked
+instrument is never touched). SECTION in: definition invariants procedure antipatterns example budget.
+
+Transfer is now part of the KEEP gate, not a final phase (program.md, notes/architecture.md change 4):
+an edit must hold on two models. Set the primary model with LU_MODEL and the second with the id below,
+then confirm an edit with `aggregate.py --decide-transfer`. Ask the human to fill this in:
     LU_MODEL_SECONDARY=<model-id>
 
 ## Conventions

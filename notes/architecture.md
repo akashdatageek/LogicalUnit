@@ -8,6 +8,28 @@ Ordered by how much they change what the program can conclude.
 
 ---
 
+## Implementation status (2026-09-10)
+
+Five of these landed as harness changes in this session, applied deliberately by the operator
+(the outer-loop guard forbids the research agent from touching fixed files; these were a human
+action). Each was validated before commit.
+
+| change | status | landed as | validation |
+|---|---|---|---|
+| 1 unit of analysis | DONE | `score.py` persists per-unit ground truth under `units`; `harness/units.py` does a cluster-robust paired bootstrap over repos; `rescore.py` backfills | 635 unit observations recovered from the existing runs (was ~16 run-level) |
+| 2 calibration | DONE | `harness/calibrate.py` builds a synthetic repo with a known decomposition, degrades it, and asserts sensitivity + specificity | 8/8 checks pass; gold +0.5886, over/under-split flagged trivial, a pure contract error leaves gain unchanged but drops recall 1.00->0.88 |
+| 3 ablate before adding | DONE (tooling) | `run_one.sh --ablate SECTION` strips one section from the per-run copy; `harness/ablation_sweep.sh` runs full/ablations/bare | stripping validated on all sections; the sweep itself is model-cost work, not yet run |
+| 4 transfer in KEEP | DONE | `aggregate.py --decide-transfer`; pre-registered in `program.md` | requires the CI to exclude zero on every model; smoke-tested on the two-model ripgrep labels |
+| 5 operational fragility | DONE | `run_one.sh` exit-4 classifies a usage/rate-limit death; `harness/sweep.sh` is resumable, bounded-parallel, retries killed/limited slots, and writes `notes/sweep-ledger.tsv` so lost runs are visible | orchestration tested with a stub runner; ledger records done / FAILED-killed / FAILED-limit |
+
+Still open and deliberately NOT done here: change 6 (cost in the decision record) and change 7's
+human-anchor point — there is still no gold decomposition judged by a person, so every outcome
+remains a proxy. Patch 05 (the account API key) is environment-only and cannot be set from the
+harness; `sweep.sh` makes the limit survivable rather than removing it. Changing the PRIMARY metric
+itself is still a pre-registration decision reserved for the human and is untouched here.
+
+---
+
 ## 1. The unit of analysis is wrong, and it is costing an order of magnitude of power
 
 Every outcome is currently computed per *run*: one `q_gain_dir`, one `valid_nontrivial`, one
