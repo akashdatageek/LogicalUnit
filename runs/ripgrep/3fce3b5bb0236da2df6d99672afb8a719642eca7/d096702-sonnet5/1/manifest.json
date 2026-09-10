@@ -1,0 +1,749 @@
+{
+  "repo": "BurntSushi/ripgrep@3fce3b5",
+  "units": [
+    {
+      "name": "cli-flags",
+      "kind": "domain",
+      "role": "Defines every ripgrep command-line flag and parses argv plus the config file into a low-level, mostly-unvalidated LowArgs record.",
+      "description": "This is the rulebook for ripgrep's command line. It lists every flag ripgrep understands (its short and long names, aliases, what kind of value it takes, and its help text), and it reads the words the user typed, plus any extra options saved in a config file, and turns them into a simple internal record of what the user asked for. It deliberately does the bare minimum of validation and never acts on what it reads: it will check that a number looks like a number, but it will not open unrelated files, run programs, or decide how a search should actually be carried out. It must never perform a search itself or resolve a fully-configured search plan; that is the job of a separate downstream unit.",
+      "files": [
+        "crates/core/flags/mod.rs",
+        "crates/core/flags/defs.rs",
+        "crates/core/flags/parse.rs",
+        "crates/core/flags/lowargs.rs",
+        "crates/core/flags/config.rs"
+      ],
+      "entrypoints": [
+        {"name": "parse", "kind": "function", "location": "crates/core/flags/parse.rs:49", "signature": "pub(crate) fn parse() -> ParseResult<HiArgs>", "plain": "Reads argv and the config file and returns the fully parsed, resolved arguments ready to run a search."},
+        {"name": "ParseResult", "kind": "type", "location": "crates/core/flags/parse.rs:27", "plain": "The outcome of parsing: a resolved search, a special mode like --help/--version, or an error."},
+        {"name": "LowArgs", "kind": "type", "location": "crates/core/flags/lowargs.rs:33", "plain": "The raw, mostly-unvalidated record of what the user typed on the command line."},
+        {"name": "Mode", "kind": "type", "location": "crates/core/flags/lowargs.rs:156", "plain": "What ripgrep should do overall: search, index, list files, list types, or generate output."},
+        {"name": "SearchMode", "kind": "type", "location": "crates/core/flags/lowargs.rs:206", "plain": "Which search strategy to use: normal or the experimental index-backed path."},
+        {"name": "GenerateMode", "kind": "type", "location": "crates/core/flags/lowargs.rs:230", "plain": "Which kind of generated text to print: help, man page, completions, or version."},
+        {"name": "SpecialMode", "kind": "type", "location": "crates/core/flags/lowargs.rs:125", "plain": "Short-circuit mode used for -h/--help or -V/--version."},
+        {"name": "Flag", "kind": "type", "location": "crates/core/flags/mod.rs:74", "plain": "The trait every individual command-line flag implements: its names, its docs, and the kind of value it accepts."},
+        {"name": "FLAGS", "kind": "constant", "location": "crates/core/flags/defs.rs:44", "plain": "The master list of every flag ripgrep supports, in documented order."},
+        {"name": "parse::lookup", "kind": "function", "location": "crates/core/flags/parse.rs:148", "plain": "Finds a flag definition by name; used to resolve cross-references inside help text."},
+        {"name": "Category", "kind": "type", "location": "crates/core/flags/mod.rs:192", "plain": "Which help-text section a flag belongs to."},
+        {"name": "CompletionType", "kind": "type", "location": "crates/core/flags/mod.rs:244", "plain": "What kind of value a flag takes, used to drive shell tab-completion."},
+        {"name": "INDEXING_NOT_SUPPORTED", "kind": "constant", "location": "crates/core/flags/mod.rs:50", "plain": "The message shown when an indexing-only flag is used in a build without experimental indexing support."}
+      ],
+      "depends_on": [
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::from_low_args"},
+        {"unit": "logger", "entrypoint": "Logger::init"},
+        {"unit": "diagnostic-messages", "entrypoint": "set_messages"},
+        {"unit": "diagnostic-messages", "entrypoint": "set_ignore_messages"},
+        {"unit": "diagnostic-messages", "entrypoint": "message!"},
+        {"unit": "match-printer", "entrypoint": "hyperlink_aliases"},
+        {"unit": "line-searcher", "entrypoint": "Encoding"},
+        {"unit": "cli-utilities", "entrypoint": "parse_human_readable_size"}
+      ],
+      "effects": [
+        {"kind": "env", "description": "Reads argv via std::env::args_os() and the RIPGREP_CONFIG_PATH environment variable."},
+        {"kind": "filesystem", "description": "Opens and reads the config file named by RIPGREP_CONFIG_PATH."},
+        {"kind": "other", "description": "Initializes the global logger and sets the max log level from --trace/--debug, and sets process-global message/ignore-message suppression flags used elsewhere in the program."}
+      ]
+    },
+    {
+      "name": "arg-resolution",
+      "kind": "domain",
+      "role": "Converts LowArgs into a fully resolved HiArgs plan: which regex engine to use, how many threads, which files to visit, and how to print results.",
+      "description": "This is the decision-maker that sits between reading the user's command-line flags and actually running a search. It takes the raw record of what the user typed and turns it into a single, fully-resolved plan of action: which regex engine to use and how to configure it, how many threads to run, which directories or files to search, whether to memory-map files, how matches should be printed, and how colors and hyperlinks should look. Once this resolution is done, the rest of the program just calls simple methods on the result to get a ready-to-use matcher, directory walker, or printer, without needing to know any command-line details itself. It must never print search results itself; it only builds the plan.",
+      "files": ["crates/core/flags/hiargs.rs"],
+      "entrypoints": [
+        {"name": "HiArgs", "kind": "class", "location": "crates/core/flags/hiargs.rs:114", "plain": "The fully-resolved search plan built from the user's flags."},
+        {"name": "HiArgs::from_low_args", "kind": "function", "location": "crates/core/flags/hiargs.rs:114", "plain": "Builds the resolved plan from the raw parsed flags."},
+        {"name": "HiArgs::mode", "kind": "method", "location": "crates/core/flags/hiargs.rs:547"},
+        {"name": "HiArgs::matches_possible", "kind": "method", "location": "crates/core/flags/hiargs.rs:532"},
+        {"name": "HiArgs::index", "kind": "method", "location": "crates/core/flags/hiargs.rs:931"},
+        {"name": "HiArgs::threads", "kind": "method", "location": "crates/core/flags/hiargs.rs:864"},
+        {"name": "HiArgs::quiet", "kind": "method", "location": "crates/core/flags/hiargs.rs:685"},
+        {"name": "HiArgs::haystack_builder", "kind": "method", "location": "crates/core/flags/hiargs.rs:368"},
+        {"name": "HiArgs::walk_builder", "kind": "method", "location": "crates/core/flags/hiargs.rs:885"},
+        {"name": "HiArgs::sort", "kind": "method", "location": "crates/core/flags/hiargs.rs:773"},
+        {"name": "HiArgs::stats", "kind": "method", "location": "crates/core/flags/hiargs.rs:833"},
+        {"name": "HiArgs::search_worker", "kind": "method", "location": "crates/core/flags/hiargs.rs:705"},
+        {"name": "HiArgs::matcher", "kind": "method", "location": "crates/core/flags/hiargs.rs:379"},
+        {"name": "HiArgs::searcher", "kind": "method", "location": "crates/core/flags/hiargs.rs:722"},
+        {"name": "HiArgs::printer", "kind": "method", "location": "crates/core/flags/hiargs.rs:572"},
+        {"name": "HiArgs::stdout", "kind": "method", "location": "crates/core/flags/hiargs.rs:842"},
+        {"name": "HiArgs::has_implicit_path", "kind": "method", "location": "crates/core/flags/hiargs.rs:360"},
+        {"name": "HiArgs::quit_after_match", "kind": "method", "location": "crates/core/flags/hiargs.rs:697"},
+        {"name": "HiArgs::buffer_writer", "kind": "method", "location": "crates/core/flags/hiargs.rs:342"},
+        {"name": "HiArgs::path_printer_builder", "kind": "method", "location": "crates/core/flags/hiargs.rs:556"},
+        {"name": "HiArgs::types", "kind": "method", "location": "crates/core/flags/hiargs.rs:872"},
+        {"name": "HiArgs::index_write", "kind": "method", "location": "crates/core/flags/hiargs.rs:936"},
+        {"name": "HiArgs::index_read", "kind": "method", "location": "crates/core/flags/hiargs.rs:949"}
+      ],
+      "depends_on": [
+        {"unit": "cli-flags", "entrypoint": "LowArgs"},
+        {"unit": "search-orchestration", "entrypoint": "HaystackBuilder"},
+        {"unit": "search-orchestration", "entrypoint": "SearchWorkerBuilder"},
+        {"unit": "search-orchestration", "entrypoint": "PatternMatcher"},
+        {"unit": "search-orchestration", "entrypoint": "Printer"},
+        {"unit": "match-printer", "entrypoint": "StandardBuilder"},
+        {"unit": "match-printer", "entrypoint": "SummaryBuilder"},
+        {"unit": "match-printer", "entrypoint": "JSONBuilder"},
+        {"unit": "match-printer", "entrypoint": "PathPrinterBuilder"},
+        {"unit": "match-printer", "entrypoint": "Stats"},
+        {"unit": "match-printer", "entrypoint": "ColorSpecs"},
+        {"unit": "match-printer", "entrypoint": "HyperlinkConfig"},
+        {"unit": "line-searcher", "entrypoint": "SearcherBuilder"},
+        {"unit": "line-searcher", "entrypoint": "MmapChoice"},
+        {"unit": "line-searcher", "entrypoint": "BinaryDetection"},
+        {"unit": "matcher-trait", "entrypoint": "LineTerminator"},
+        {"unit": "regex-engine", "entrypoint": "RegexMatcherBuilder"},
+        {"unit": "pcre2-engine", "entrypoint": "RegexMatcherBuilder"},
+        {"unit": "cli-utilities", "entrypoint": "patterns_from_stdin"},
+        {"unit": "cli-utilities", "entrypoint": "patterns_from_path"},
+        {"unit": "cli-utilities", "entrypoint": "is_readable_stdin"},
+        {"unit": "cli-utilities", "entrypoint": "resolve_binary"},
+        {"unit": "cli-utilities", "entrypoint": "CommandReaderBuilder"},
+        {"unit": "cli-utilities", "entrypoint": "hostname"},
+        {"unit": "cli-utilities", "entrypoint": "stdout_buffered_line"},
+        {"unit": "cli-utilities", "entrypoint": "stdout_buffered_block"},
+        {"unit": "cli-utilities", "entrypoint": "StandardStream"},
+        {"unit": "file-walking", "entrypoint": "WalkBuilder::new"},
+        {"unit": "file-walking", "entrypoint": "TypesBuilder"},
+        {"unit": "file-walking", "entrypoint": "OverrideBuilder"},
+        {"unit": "diagnostic-messages", "entrypoint": "ignore_message!"},
+        {"unit": "index-engine", "entrypoint": "IndexDiscovery::new"},
+        {"unit": "index-engine", "entrypoint": "IndexDiscovery::create"},
+        {"unit": "index-engine", "entrypoint": "IndexDiscovery::discover"},
+        {"unit": "index-engine", "entrypoint": "Index"}
+      ],
+      "effects": [
+        {"kind": "env", "description": "Reads the current working directory (with PWD fallback) and the WSL_DISTRO_NAME environment variable."},
+        {"kind": "subprocess", "description": "Spawns a user-configurable external command to determine the hostname used for hyperlinks."},
+        {"kind": "filesystem", "description": "Stats files/directories to decide mmap eligibility and single-file search status, and reads file metadata timestamps for --sort by time."},
+        {"kind": "filesystem", "description": "Reads pattern files and stdin (via the cli-utilities unit) to gather search patterns."},
+        {"kind": "hardware", "description": "Queries available CPU parallelism to pick a default thread count."},
+        {"kind": "other", "description": "Checks whether stdout is a terminal, and emits debug-level diagnostic log messages throughout."}
+      ]
+    },
+    {
+      "name": "cli-docs-and-completions",
+      "kind": "infra",
+      "role": "Renders ripgrep's flag definitions into human-facing text: --help output, the man page, version banners, and shell tab-completion scripts.",
+      "description": "This part of ripgrep does not search anything. Instead, it takes the master list of command-line options defined elsewhere and turns it into the various things a user sees when they type rg --help or rg --version, or press Tab in their shell to auto-complete an rg command. It also produces the Unix man page. It works by filling in fixed text templates with information pulled from the flag list, and returns the finished text as a string for another unit to print. It must never decide search behavior itself, only describe it.",
+      "files": [
+        "crates/core/flags/doc/mod.rs",
+        "crates/core/flags/doc/help.rs",
+        "crates/core/flags/doc/version.rs",
+        "crates/core/flags/doc/man.rs",
+        "crates/core/flags/doc/template.long.help",
+        "crates/core/flags/doc/template.rg.1",
+        "crates/core/flags/doc/template.short.help",
+        "crates/core/flags/complete/mod.rs",
+        "crates/core/flags/complete/bash.rs",
+        "crates/core/flags/complete/zsh.rs",
+        "crates/core/flags/complete/fish.rs",
+        "crates/core/flags/complete/powershell.rs",
+        "crates/core/flags/complete/prelude.fish",
+        "crates/core/flags/complete/rg.zsh",
+        "crates/core/flags/complete/encodings.sh"
+      ],
+      "entrypoints": [
+        {"name": "generate_help_short", "kind": "function", "location": "crates/core/flags/doc/help.rs:24"},
+        {"name": "generate_help_long", "kind": "function", "location": "crates/core/flags/doc/help.rs:120"},
+        {"name": "generate_man_page", "kind": "function", "location": "crates/core/flags/doc/man.rs:27"},
+        {"name": "generate_version_short", "kind": "function", "location": "crates/core/flags/doc/version.rs:22"},
+        {"name": "generate_version_long", "kind": "function", "location": "crates/core/flags/doc/version.rs:31"},
+        {"name": "generate_version_pcre2", "kind": "function", "location": "crates/core/flags/doc/version.rs:53"},
+        {"name": "generate_complete_bash", "kind": "function", "location": "crates/core/flags/complete/bash.rs:63"},
+        {"name": "generate_complete_zsh", "kind": "function", "location": "crates/core/flags/complete/zsh.rs:21"},
+        {"name": "generate_complete_fish", "kind": "function", "location": "crates/core/flags/complete/fish.rs:13"},
+        {"name": "generate_complete_powershell", "kind": "function", "location": "crates/core/flags/complete/powershell.rs:43"}
+      ],
+      "depends_on": [
+        {"unit": "cli-flags", "entrypoint": "FLAGS"},
+        {"unit": "cli-flags", "entrypoint": "Flag"},
+        {"unit": "cli-flags", "entrypoint": "parse::lookup"},
+        {"unit": "cli-flags", "entrypoint": "Category"},
+        {"unit": "cli-flags", "entrypoint": "CompletionType"},
+        {"unit": "cli-flags", "entrypoint": "INDEXING_NOT_SUPPORTED"},
+        {"unit": "match-printer", "entrypoint": "hyperlink_aliases"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Detects CPU SIMD features at runtime (SSE2/SSSE3/AVX2) to report support in the long version banner; all text templates are embedded at compile time via include_str!, so there is no runtime filesystem access."}
+      ]
+    },
+    {
+      "name": "search-orchestration",
+      "kind": "domain",
+      "role": "Top-level control flow of the rg binary: walks the file list, dispatches single- or multi-threaded search, and wires the matcher, searcher, and printer together per file.",
+      "description": "This is the conductor of the ripgrep program. When you run the rg command, this is what actually runs from start to finish: it decides what to search, whether to search things one at a time or in parallel across CPU cores, and it hands each file to the matching and printing machinery and collects the results. It also decides, at the end, what exit code the program reports to your shell, and prints final summary statistics if asked. It must never itself decide what a flag means; it only executes the plan handed to it.",
+      "files": [
+        "crates/core/main.rs",
+        "crates/core/haystack.rs",
+        "crates/core/search.rs"
+      ],
+      "entrypoints": [
+        {"name": "main", "kind": "cli", "location": "crates/core/main.rs:44", "plain": "The rg process entry point."},
+        {"name": "search", "kind": "function", "location": "crates/core/main.rs:113"},
+        {"name": "search_parallel", "kind": "function", "location": "crates/core/main.rs:166"},
+        {"name": "Haystack", "kind": "class", "location": "crates/core/haystack.rs:98", "plain": "One discovered file or stdin stream to search."},
+        {"name": "HaystackBuilder", "kind": "class", "location": "crates/core/haystack.rs:16"},
+        {"name": "SearchWorkerBuilder", "kind": "class", "location": "crates/core/search.rs:41"},
+        {"name": "PatternMatcher", "kind": "type", "location": "crates/core/search.rs:193"},
+        {"name": "Printer", "kind": "class", "location": "crates/core/search.rs:203"},
+        {"name": "SearchWorker", "kind": "class", "location": "crates/core/search.rs:230"}
+      ],
+      "depends_on": [
+        {"unit": "cli-flags", "entrypoint": "parse"},
+        {"unit": "cli-flags", "entrypoint": "Mode"},
+        {"unit": "cli-flags", "entrypoint": "SearchMode"},
+        {"unit": "cli-flags", "entrypoint": "GenerateMode"},
+        {"unit": "cli-flags", "entrypoint": "SpecialMode"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::mode"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::index"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::threads"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::matches_possible"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::quiet"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::haystack_builder"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::walk_builder"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::sort"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::stats"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::search_worker"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::matcher"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::searcher"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::printer"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::stdout"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::buffer_writer"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::path_printer_builder"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::quit_after_match"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::has_implicit_path"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::types"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_man_page"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_complete_bash"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_complete_zsh"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_complete_fish"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_complete_powershell"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_help_short"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_help_long"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_version_short"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_version_long"},
+        {"unit": "cli-docs-and-completions", "entrypoint": "generate_version_pcre2"},
+        {"unit": "experimental-indexing-toggle", "entrypoint": "index::read"},
+        {"unit": "experimental-indexing-toggle", "entrypoint": "index::write"},
+        {"unit": "diagnostic-messages", "entrypoint": "err_message!"},
+        {"unit": "diagnostic-messages", "entrypoint": "eprintln_locked!"},
+        {"unit": "diagnostic-messages", "entrypoint": "ignore_message!"},
+        {"unit": "diagnostic-messages", "entrypoint": "errored"},
+        {"unit": "file-walking", "entrypoint": "WalkState"},
+        {"unit": "file-walking", "entrypoint": "DirEntry"},
+        {"unit": "file-walking", "entrypoint": "Error"},
+        {"unit": "line-searcher", "entrypoint": "Searcher"},
+        {"unit": "line-searcher", "entrypoint": "BinaryDetection"},
+        {"unit": "match-printer", "entrypoint": "Standard"},
+        {"unit": "match-printer", "entrypoint": "Summary"},
+        {"unit": "match-printer", "entrypoint": "JSON"},
+        {"unit": "match-printer", "entrypoint": "Stats"},
+        {"unit": "matcher-trait", "entrypoint": "Matcher"},
+        {"unit": "cli-utilities", "entrypoint": "CommandReaderBuilder"},
+        {"unit": "cli-utilities", "entrypoint": "DecompressionReaderBuilder"},
+        {"unit": "cli-utilities", "entrypoint": "resolve_binary"},
+        {"unit": "regex-engine", "entrypoint": "RegexMatcher"},
+        {"unit": "pcre2-engine", "entrypoint": "RegexMatcher"}
+      ],
+      "effects": [
+        {"kind": "filesystem", "description": "Reads file contents to search (buffered or memory-mapped) and opens files directly for preprocessor stdin; reads directory entries' file type, metadata, and symlink status to decide if they're searchable."},
+        {"kind": "subprocess", "description": "Runs an external preprocessor command when --pre is configured, and transparently decompresses recognized compressed files when --search-zip is enabled."},
+        {"kind": "other", "description": "Reads from stdin and writes search results, path listings, and generated help/man/completions to stdout; writes diagnostics to stderr."},
+        {"kind": "other", "description": "Spawns a dedicated printer thread and drives multi-threaded search via a parallel directory walk."},
+        {"kind": "clock", "description": "Times searches with Instant::now() for the --stats summary output."},
+        {"kind": "other", "description": "Computes and returns the process's exit code: success, no-match, or error."}
+      ]
+    },
+    {
+      "name": "experimental-indexing-toggle",
+      "kind": "infra",
+      "role": "A cfg-gated shim that selects between a stub and the real experimental index-backed search/write path.",
+      "description": "This is a small on/off switch inside ripgrep for an experimental feature that lets ripgrep build and use a persistent search index instead of scanning files fresh every time. Because this indexing feature is still experimental and not compiled into normal builds of ripgrep, the program needs a safe placeholder that politely reports 'indexing not enabled in this build' whenever someone tries to use it in a standard build. When ripgrep is specially compiled with the experimental flag on, this switch instead hands the request to the real indexing machinery, so the rest of the program never has to know which version is active. It must never itself decide the index format.",
+      "files": [
+        "crates/core/index/mod.rs",
+        "crates/core/index/disabled.rs",
+        "crates/core/index/enabled.rs"
+      ],
+      "entrypoints": [
+        {"name": "index::read", "kind": "function", "location": "crates/core/index/mod.rs:1", "plain": "Runs a search using the experimental index (or returns an error stub in a build without indexing support)."},
+        {"name": "index::write", "kind": "function", "location": "crates/core/index/mod.rs:1", "plain": "Builds/updates the experimental on-disk index (or returns an error stub without indexing support)."}
+      ],
+      "depends_on": [
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::index_write"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::index_read"},
+        {"unit": "arg-resolution", "entrypoint": "HiArgs::threads"},
+        {"unit": "search-orchestration", "entrypoint": "search"},
+        {"unit": "search-orchestration", "entrypoint": "search_parallel"}
+      ],
+      "effects": []
+    },
+    {
+      "name": "logger",
+      "kind": "infra",
+      "role": "A minimal custom log::Log implementation that prints ripgrep's internal diagnostic/trace messages to stderr.",
+      "description": "This is ripgrep's built-in debug messenger. When you run ripgrep with verbose or debug flags, the program can produce internal notes about what it's doing, for example why a file was skipped. This small piece of code takes those notes and prints them to the terminal's error stream in a simple, consistent format, without pulling in a heavyweight logging library. It must never write anything other than these diagnostic lines, and never to stdout.",
+      "files": ["crates/core/logger.rs"],
+      "entrypoints": [
+        {"name": "Logger::init", "kind": "function", "location": "crates/core/logger.rs:25", "plain": "Installs this logger as the program's global diagnostic logger."}
+      ],
+      "depends_on": [
+        {"unit": "diagnostic-messages", "entrypoint": "eprintln_locked!"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Writes formatted diagnostic log lines to stderr for every log record received, locking stdout first to avoid interleaving with concurrently-written search output."}
+      ]
+    },
+    {
+      "name": "diagnostic-messages",
+      "kind": "infra",
+      "role": "Process-wide flags and macros controlling whether ripgrep prints non-fatal diagnostic/error messages, and tracking whether an error occurred.",
+      "description": "This is a small utility that decides, throughout the program, whether ripgrep should tell the user about minor problems it ran into while searching, like a file it couldn't read or a broken .gitignore rule, instead of silently skipping them. It remembers this on/off setting, set once when the command line is parsed, and also remembers whether any problem happened at all, which later affects whether ripgrep reports success or failure when it finishes. It must never decide search behavior, only whether and how to report problems.",
+      "files": ["crates/core/messages.rs"],
+      "entrypoints": [
+        {"name": "set_messages", "kind": "function", "location": "crates/core/messages.rs:108"},
+        {"name": "set_ignore_messages", "kind": "function", "location": "crates/core/messages.rs:124"},
+        {"name": "errored", "kind": "function", "location": "crates/core/messages.rs:129"},
+        {"name": "message!", "kind": "function", "location": "crates/core/messages.rs:71"},
+        {"name": "err_message!", "kind": "function", "location": "crates/core/messages.rs:82"},
+        {"name": "ignore_message!", "kind": "function", "location": "crates/core/messages.rs:92"},
+        {"name": "eprintln_locked!", "kind": "function", "location": "crates/core/messages.rs:33"}
+      ],
+      "depends_on": [],
+      "effects": [
+        {"kind": "other", "description": "Writes 'rg: ...' diagnostic lines to stderr, and maintains three process-wide flags: whether to print messages, whether to print ignore-messages, and whether an error has occurred."},
+        {"kind": "subprocess", "description": "On a broken pipe while writing a message, terminates the current process directly via std::process::exit (not launching a child process, but any std::process:: call is classified under this effect kind)."}
+      ]
+    },
+    {
+      "name": "glob-matching",
+      "kind": "domain",
+      "role": "Compiles gitignore-style glob patterns into matchers and lets callers test paths against one or many globs at once.",
+      "description": "This unit understands the shorthand patterns people use to describe files, like *.rs or **/target/, the same style used in .gitignore files. It turns a pattern, or a whole list of patterns, into a fast internal matcher, and can then answer, for any file path, whether it matches one pattern, all of them, or which ones out of a large set matched. It does no file reading or network activity itself; it purely does pattern-matching logic, and other units feed it paths and patterns and use its answers.",
+      "files": [
+        "crates/globset/src/lib.rs",
+        "crates/globset/src/glob.rs",
+        "crates/globset/src/fnv.rs",
+        "crates/globset/src/pathutil.rs",
+        "crates/globset/src/serde_impl.rs"
+      ],
+      "entrypoints": [
+        {"name": "Glob", "kind": "class", "location": "crates/globset/src/glob.rs:133"},
+        {"name": "Glob::new", "kind": "function", "location": "crates/globset/src/glob.rs:283"},
+        {"name": "Glob::compile_matcher", "kind": "method", "location": "crates/globset/src/glob.rs:288"},
+        {"name": "GlobBuilder", "kind": "class", "location": "crates/globset/src/glob.rs:211"},
+        {"name": "GlobBuilder::new", "kind": "function", "location": "crates/globset/src/glob.rs:574"},
+        {"name": "GlobBuilder::build", "kind": "method", "location": "crates/globset/src/glob.rs:579"},
+        {"name": "GlobMatcher", "kind": "class", "location": "crates/globset/src/glob.rs:133"},
+        {"name": "GlobMatcher::is_match", "kind": "method", "location": "crates/globset/src/glob.rs:142"},
+        {"name": "GlobSet", "kind": "class", "location": "crates/globset/src/lib.rs:309"},
+        {"name": "GlobSet::is_match", "kind": "method", "location": "crates/globset/src/lib.rs:342"},
+        {"name": "GlobSetBuilder", "kind": "class", "location": "crates/globset/src/lib.rs:566"},
+        {"name": "GlobSetBuilder::new", "kind": "function", "location": "crates/globset/src/lib.rs:574"},
+        {"name": "GlobSetBuilder::add", "kind": "method", "location": "crates/globset/src/lib.rs:586"},
+        {"name": "GlobSetBuilder::build", "kind": "method", "location": "crates/globset/src/lib.rs:581"},
+        {"name": "Candidate", "kind": "class", "location": "crates/globset/src/lib.rs:599"},
+        {"name": "Candidate::new", "kind": "function", "location": "crates/globset/src/lib.rs:617"}
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "file-walking",
+      "kind": "domain",
+      "role": "Recursively walks directory trees and decides which files/dirs are visible to search, honoring gitignore-style rules, overrides, and file-type filters.",
+      "description": "This is the part of ripgrep that decides which files it should even look at. Given one or more starting folders, it walks through every subfolder and file, and along the way checks a stack of rules: hidden-file conventions, .gitignore/.ignore/.rgignore files found in the tree, global git settings, explicit include/exclude patterns from the command line, and file-type filters like 'only .rs files'. Whatever survives all of these checks is handed off, one entry at a time or in parallel across threads, to the rest of ripgrep to actually search inside. It must never open or read the contents of the files it walks for searching purposes; that is another unit's job.",
+      "files": [
+        "crates/ignore/src/lib.rs",
+        "crates/ignore/src/dir.rs",
+        "crates/ignore/src/walk.rs",
+        "crates/ignore/src/gitignore.rs",
+        "crates/ignore/src/overrides.rs",
+        "crates/ignore/src/types.rs",
+        "crates/ignore/src/default_types.rs",
+        "crates/ignore/src/pathutil.rs",
+        "crates/ignore/src/incremental.rs"
+      ],
+      "entrypoints": [
+        {"name": "WalkBuilder", "kind": "class", "location": "crates/ignore/src/walk.rs:552"},
+        {"name": "WalkBuilder::new", "kind": "function", "location": "crates/ignore/src/walk.rs:552"},
+        {"name": "WalkBuilder::build", "kind": "method", "location": "crates/ignore/src/walk.rs:593"},
+        {"name": "Walk", "kind": "class", "location": "crates/ignore/src/walk.rs:1117"},
+        {"name": "WalkBuilder::build_parallel", "kind": "method", "location": "crates/ignore/src/walk.rs:701"},
+        {"name": "WalkParallel::run", "kind": "method", "location": "crates/ignore/src/walk.rs:1452"},
+        {"name": "WalkState", "kind": "type", "location": "crates/ignore/src/walk.rs:1325"},
+        {"name": "ParallelVisitor", "kind": "type", "location": "crates/ignore/src/walk.rs:1371"},
+        {"name": "ParallelVisitorBuilder", "kind": "type", "location": "crates/ignore/src/walk.rs:1353"},
+        {"name": "DirEntry", "kind": "class", "location": "crates/ignore/src/walk.rs:31"},
+        {"name": "Error", "kind": "type", "location": "crates/ignore/src/lib.rs:68"},
+        {"name": "OverrideBuilder", "kind": "class", "location": "crates/ignore/src/overrides.rs:47"},
+        {"name": "Override", "kind": "class", "location": "crates/ignore/src/overrides.rs:115"},
+        {"name": "TypesBuilder", "kind": "class", "location": "crates/ignore/src/types.rs:165"},
+        {"name": "Types", "kind": "class", "location": "crates/ignore/src/types.rs:307"},
+        {"name": "Gitignore", "kind": "class", "location": "crates/ignore/src/gitignore.rs:81"},
+        {"name": "GitignoreBuilder", "kind": "class", "location": "crates/ignore/src/gitignore.rs:320"},
+        {"name": "WalkBuilder::build_matchers", "kind": "method", "location": "crates/ignore/src/walk.rs:675"}
+      ],
+      "depends_on": [
+        {"unit": "glob-matching", "entrypoint": "GlobBuilder"},
+        {"unit": "glob-matching", "entrypoint": "GlobSet"},
+        {"unit": "glob-matching", "entrypoint": "GlobSetBuilder"},
+        {"unit": "glob-matching", "entrypoint": "Candidate"}
+      ],
+      "effects": [
+        {"kind": "filesystem", "description": "Recursively reads directory entries, opens and reads .gitignore/.ignore/.rgignore/.git/info/exclude and /etc/gitconfig files, and reads file metadata for type/size/hidden-attribute checks."},
+        {"kind": "env", "description": "Reads GIT_CONFIG_GLOBAL, GIT_CONFIG_SYSTEM, XDG_CONFIG_HOME, HOME, and the current working directory to locate the global gitignore/core.excludesFile."},
+        {"kind": "other", "description": "Follows/detects symlinks and loops, compares device numbers for same-filesystem checks, and compares path identity against stdout via file handles."},
+        {"kind": "other", "description": "Spawns OS threads and uses work-stealing queues to walk directories in parallel."}
+      ]
+    },
+    {
+      "name": "matcher-trait",
+      "kind": "domain",
+      "role": "Defines the abstract Matcher/Captures interface and match-replacement interpolation that every concrete regex engine implements.",
+      "description": "This is the universal plug and socket that lets ripgrep's search engine work with different kinds of pattern-matching technology. Instead of the rest of ripgrep needing to know the details of any one regex library, this code defines a standard shape: given some text, find a match, and if the pattern captured sub-parts, let the caller read them out or substitute them into a replacement string. Any regex implementation can be built to fit this same socket, and the line-searcher and printer only ever plug into the socket, never into a specific engine. It must never itself implement a regex engine.",
+      "files": [
+        "crates/matcher/src/lib.rs",
+        "crates/matcher/src/interpolate.rs"
+      ],
+      "entrypoints": [
+        {"name": "Matcher", "kind": "type", "location": "crates/matcher/src/lib.rs:546", "plain": "The trait every regex engine implements to plug into ripgrep's search machinery."},
+        {"name": "Captures", "kind": "type", "location": "crates/matcher/src/lib.rs:379"},
+        {"name": "Captures::interpolate", "kind": "method", "location": "crates/matcher/src/lib.rs:441"},
+        {"name": "Match", "kind": "type", "location": "crates/matcher/src/lib.rs:69"},
+        {"name": "LineTerminator", "kind": "type", "location": "crates/matcher/src/lib.rs:195"},
+        {"name": "ByteSet", "kind": "type", "location": "crates/matcher/src/lib.rs:288"},
+        {"name": "NoCaptures", "kind": "type", "location": "crates/matcher/src/lib.rs:468"},
+        {"name": "NoError", "kind": "type", "location": "crates/matcher/src/lib.rs:497"},
+        {"name": "LineMatchKind", "kind": "type", "location": "crates/matcher/src/lib.rs:519"}
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "regex-engine",
+      "kind": "domain",
+      "role": "Implements the Matcher trait using Rust's native regex/regex-automata engine, translating ripgrep's regex options into a compiled matcher.",
+      "description": "This is the component that understands regular-expression patterns the way ripgrep's search options describe them. It takes a text pattern plus a bundle of settings, such as case sensitivity, whether a dot matches newlines, word-boundary matching, and Unicode support, and turns them into a compiled, ready-to-run matcher. It also pulls fast literal strings out of a pattern so that searching can skip most lines quickly before invoking the full regex engine. It must never read files or otherwise touch the outside world; it is pure pattern-compilation logic.",
+      "files": [
+        "crates/regex/src/lib.rs",
+        "crates/regex/src/ast.rs",
+        "crates/regex/src/matcher.rs",
+        "crates/regex/src/strip.rs",
+        "crates/regex/src/non_matching.rs",
+        "crates/regex/src/ban.rs",
+        "crates/regex/src/error.rs",
+        "crates/regex/src/config.rs",
+        "crates/regex/src/literal.rs"
+      ],
+      "entrypoints": [
+        {"name": "RegexMatcherBuilder", "kind": "class", "location": "crates/regex/src/matcher.rs:24"},
+        {"name": "RegexMatcherBuilder::new", "kind": "function", "location": "crates/regex/src/matcher.rs:36"},
+        {"name": "RegexMatcherBuilder::build", "kind": "method", "location": "crates/regex/src/matcher.rs:45"},
+        {"name": "RegexMatcher", "kind": "class", "location": "crates/regex/src/matcher.rs:367"},
+        {"name": "RegexMatcher::new", "kind": "function", "location": "crates/regex/src/matcher.rs:385"},
+        {"name": "RegexCaptures", "kind": "class", "location": "crates/regex/src/matcher.rs:524"},
+        {"name": "Error", "kind": "type", "location": "crates/regex/src/error.rs:7"}
+      ],
+      "depends_on": [
+        {"unit": "matcher-trait", "entrypoint": "Matcher"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Emits trace/debug diagnostic log messages describing compiled regex and literal-extraction decisions; otherwise pure in-memory pattern compilation with no filesystem, network, subprocess, env, clock, or random access."}
+      ]
+    },
+    {
+      "name": "pcre2-engine",
+      "kind": "domain",
+      "role": "Implements the Matcher trait using the PCRE2 backtracking regex library, giving ripgrep access to lookaround and backreferences.",
+      "description": "This is a small adapter that lets ripgrep's search machinery use an alternative, more powerful pattern-matching engine called PCRE2 instead of its normal built-in one. It translates ripgrep's usual options into PCRE2's settings, compiles the user's search pattern, and reports matches back in the shape the rest of ripgrep expects. It powers the --pcre2 flag, used when someone needs advanced pattern tricks the default engine can't do. It must never be used unless the caller explicitly asked for PCRE2.",
+      "files": [
+        "crates/pcre2/src/lib.rs",
+        "crates/pcre2/src/matcher.rs",
+        "crates/pcre2/src/error.rs"
+      ],
+      "entrypoints": [
+        {"name": "RegexMatcherBuilder", "kind": "class", "location": "crates/pcre2/src/matcher.rs:22"},
+        {"name": "RegexMatcher", "kind": "class", "location": "crates/pcre2/src/matcher.rs:302"},
+        {"name": "RegexCaptures", "kind": "class", "location": "crates/pcre2/src/matcher.rs:391"},
+        {"name": "Error", "kind": "type", "location": "crates/pcre2/src/error.rs:7"},
+        {"name": "is_jit_available", "kind": "function", "location": "crates/pcre2/src/lib.rs:8"},
+        {"name": "version", "kind": "function", "location": "crates/pcre2/src/lib.rs:8"}
+      ],
+      "depends_on": [
+        {"unit": "matcher-trait", "entrypoint": "Matcher"},
+        {"unit": "matcher-trait", "entrypoint": "Captures"},
+        {"unit": "matcher-trait", "entrypoint": "Match"},
+        {"unit": "matcher-trait", "entrypoint": "LineMatchKind"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Emits a trace-level log line of the final compiled PCRE2 pattern; all interaction with the underlying C PCRE2 library happens inside the external pcre2 crate dependency, not in these files."}
+      ]
+    },
+    {
+      "name": "line-searcher",
+      "kind": "domain",
+      "role": "Reads a haystack and drives a Matcher over it line-by-line, handling binary detection, context lines, encoding, and memory-mapping, pushing results to a Sink.",
+      "description": "This is the engine at the heart of ripgrep that actually scans through a file or stream of text looking for matches. It does not know how to write a regular expression or how to print pretty output; it takes a pattern-matching engine and a destination for results as ingredients, and handles the bookkeeping in between: breaking input into lines, deciding whether to memory-map a file or read it in chunks, converting text encodings, detecting binary data, tracking line numbers, and gathering context lines around a match. It must never decide how results are formatted; it only finds them and reports them.",
+      "files": [
+        "crates/searcher/src/lib.rs",
+        "crates/searcher/src/sink.rs",
+        "crates/searcher/src/line_buffer.rs",
+        "crates/searcher/src/lines.rs",
+        "crates/searcher/src/searcher/mmap.rs",
+        "crates/searcher/src/searcher/glue.rs",
+        "crates/searcher/src/searcher/mod.rs",
+        "crates/searcher/src/searcher/core.rs"
+      ],
+      "entrypoints": [
+        {"name": "Searcher", "kind": "class", "location": "crates/searcher/src/searcher/mod.rs:597"},
+        {"name": "SearcherBuilder", "kind": "class", "location": "crates/searcher/src/searcher/mod.rs:298"},
+        {"name": "Sink", "kind": "type", "location": "crates/searcher/src/sink.rs:102", "plain": "The trait a result-consumer (like the printer) implements to receive matches from a search."},
+        {"name": "SinkMatch", "kind": "type", "location": "crates/searcher/src/sink.rs:366"},
+        {"name": "SinkContext", "kind": "type", "location": "crates/searcher/src/sink.rs:442"},
+        {"name": "SinkFinish", "kind": "type", "location": "crates/searcher/src/sink.rs:340"},
+        {"name": "SinkError", "kind": "type", "location": "crates/searcher/src/sink.rs:18"},
+        {"name": "sinks", "kind": "type", "location": "crates/searcher/src/sink.rs:517"},
+        {"name": "BinaryDetection", "kind": "class", "location": "crates/searcher/src/searcher/mod.rs:55"},
+        {"name": "Encoding", "kind": "class", "location": "crates/searcher/src/searcher/mod.rs:127"},
+        {"name": "MmapChoice", "kind": "class", "location": "crates/searcher/src/searcher/mmap.rs:13"},
+        {"name": "ConfigError", "kind": "type", "location": "crates/searcher/src/searcher/mod.rs:244"},
+        {"name": "LineIter", "kind": "class", "location": "crates/searcher/src/lines.rs:17"},
+        {"name": "LineStep", "kind": "class", "location": "crates/searcher/src/lines.rs:49"}
+      ],
+      "depends_on": [
+        {"unit": "matcher-trait", "entrypoint": "Matcher"},
+        {"unit": "matcher-trait", "entrypoint": "LineTerminator"},
+        {"unit": "matcher-trait", "entrypoint": "Match"}
+      ],
+      "effects": [
+        {"kind": "filesystem", "description": "Opens files by path, reads their metadata and contents, and reads generic byte streams such as stdin through a buffered line reader."},
+        {"kind": "filesystem", "description": "Memory-maps files as an alternative, faster read strategy."},
+        {"kind": "other", "description": "Emits trace/debug log messages describing which search/mmap strategy was chosen."}
+      ]
+    },
+    {
+      "name": "match-printer",
+      "kind": "domain",
+      "role": "Formats matches produced by the line-searcher into human-readable (standard/summary) or machine-readable (JSON) output, including colors, hyperlinks, and stats.",
+      "description": "When ripgrep finds text matching a search, something has to decide how to show it: the familiar colored filename:line: matched-text format, a compact summary that just counts matches per file, or a stream of JSON records for other programs to consume. This unit is that formatting layer. It takes the raw stream of matches the search engine finds and turns them into readable output, optionally coloring matched text, adding clickable links, and tracking statistics. It does not search and does not decide where output ultimately goes; it produces text and hands it to whatever writer it was given.",
+      "files": [
+        "crates/printer/src/lib.rs",
+        "crates/printer/src/stats.rs",
+        "crates/printer/src/standard.rs",
+        "crates/printer/src/color.rs",
+        "crates/printer/src/macros.rs",
+        "crates/printer/src/util.rs",
+        "crates/printer/src/path.rs",
+        "crates/printer/src/jsont.rs",
+        "crates/printer/src/counter.rs",
+        "crates/printer/src/summary.rs",
+        "crates/printer/src/json.rs",
+        "crates/printer/src/hyperlink/aliases.rs",
+        "crates/printer/src/hyperlink/mod.rs"
+      ],
+      "entrypoints": [
+        {"name": "StandardBuilder", "kind": "class", "location": "crates/printer/src/standard.rs:99"},
+        {"name": "Standard", "kind": "class", "location": "crates/printer/src/standard.rs:480"},
+        {"name": "SummaryBuilder", "kind": "class", "location": "crates/printer/src/summary.rs:147"},
+        {"name": "Summary", "kind": "class", "location": "crates/printer/src/summary.rs:349"},
+        {"name": "JSONBuilder", "kind": "class", "location": "crates/printer/src/json.rs:54"},
+        {"name": "JSON", "kind": "class", "location": "crates/printer/src/json.rs:487"},
+        {"name": "PathPrinterBuilder", "kind": "class", "location": "crates/printer/src/path.rs:142"},
+        {"name": "PathPrinter", "kind": "class", "location": "crates/printer/src/path.rs:33"},
+        {"name": "Stats", "kind": "class", "location": "crates/printer/src/stats.rs:13"},
+        {"name": "ColorSpecs", "kind": "type", "location": "crates/printer/src/color.rs:88"},
+        {"name": "default_color_specs", "kind": "function", "location": "crates/printer/src/color.rs:88"},
+        {"name": "HyperlinkConfig", "kind": "type", "location": "crates/printer/src/hyperlink/mod.rs:1"},
+        {"name": "hyperlink_aliases", "kind": "function", "location": "crates/printer/src/hyperlink/aliases.rs:1"}
+      ],
+      "depends_on": [
+        {"unit": "line-searcher", "entrypoint": "Sink"},
+        {"unit": "matcher-trait", "entrypoint": "Matcher"}
+      ],
+      "effects": [
+        {"kind": "other", "description": "Writes formatted text to any caller-supplied writer; it does not choose the destination itself (decided by the search-orchestration unit)."},
+        {"kind": "clock", "description": "Reads wall-clock time via Instant::now() to compute elapsed search duration for stats output."}
+      ]
+    },
+    {
+      "name": "cli-utilities",
+      "kind": "infra",
+      "role": "Leaf OS-facing utility grab-bag: decompression, escaping, hostname lookup, human-size/duration parsing, pattern reading, and buffered stdout writing.",
+      "description": "This is a small toolbox of operating-system helpers that the ripgrep command-line program leans on to talk to the outside world. It knows how to transparently unpack compressed files by launching the right external decompression program, how to turn a raw command-line pattern or a file of patterns into text ripgrep can search with, how to look up the computer's hostname, how to turn human-friendly sizes like '2M' into byte counts, how to make arbitrary bytes safe to print to a terminal, and how to write colored output to standard output efficiently. It must never know anything about ripgrep's search logic or file-walking rules.",
+      "files": [
+        "crates/cli/src/lib.rs",
+        "crates/cli/src/pattern.rs",
+        "crates/cli/src/hostname.rs",
+        "crates/cli/src/process.rs",
+        "crates/cli/src/human.rs",
+        "crates/cli/src/decompress.rs",
+        "crates/cli/src/wtr.rs",
+        "crates/cli/src/escape.rs"
+      ],
+      "entrypoints": [
+        {"name": "DecompressionReaderBuilder", "kind": "class", "location": "crates/cli/src/decompress.rs:198"},
+        {"name": "hostname", "kind": "function", "location": "crates/cli/src/hostname.rs:16"},
+        {"name": "resolve_binary", "kind": "function", "location": "crates/cli/src/decompress.rs:420"},
+        {"name": "CommandReaderBuilder", "kind": "class", "location": "crates/cli/src/process.rs:84"},
+        {"name": "CommandReader", "kind": "class", "location": "crates/cli/src/process.rs:171"},
+        {"name": "parse_human_readable_size", "kind": "function", "location": "crates/cli/src/human.rs:79"},
+        {"name": "patterns_from_stdin", "kind": "function", "location": "crates/cli/src/pattern.rs:104"},
+        {"name": "patterns_from_path", "kind": "function", "location": "crates/cli/src/pattern.rs:82"},
+        {"name": "is_readable_stdin", "kind": "function", "location": "crates/cli/src/lib.rs:170"},
+        {"name": "stdout_buffered_line", "kind": "function", "location": "crates/cli/src/wtr.rs:39"},
+        {"name": "stdout_buffered_block", "kind": "function", "location": "crates/cli/src/wtr.rs:54"},
+        {"name": "StandardStream", "kind": "class", "location": "crates/cli/src/wtr.rs:7"},
+        {"name": "pattern_from_os", "kind": "function", "location": "crates/cli/src/pattern.rs:51"}
+      ],
+      "depends_on": [
+        {"unit": "glob-matching", "entrypoint": "GlobSet"},
+        {"unit": "glob-matching", "entrypoint": "GlobSetBuilder"},
+        {"unit": "glob-matching", "entrypoint": "Glob"}
+      ],
+      "effects": [
+        {"kind": "subprocess", "description": "Spawns external decompressor binaries (gzip, bzip2, xz, lz4, brotli, zstd, uncompress) to transparently decompress files, and spawns arbitrary caller-supplied commands, reading their stdout/stderr."},
+        {"kind": "filesystem", "description": "Probes PATH entries and file metadata to resolve executables, opens files directly for pass-through reading, and reads pattern files from disk."},
+        {"kind": "env", "description": "Reads the PATH environment variable to locate decompressor and other executables."},
+        {"kind": "hardware", "description": "Looks up the local machine's hostname via the operating system's hostname API."},
+        {"kind": "other", "description": "Constructs buffered/colored writers to stdout, detects whether stdout is a terminal, and reads patterns from stdin."}
+      ]
+    },
+    {
+      "name": "index-engine",
+      "kind": "domain",
+      "role": "Experimental on-disk trigram index plus a literal/ngram query-analysis engine for pre-filtering files, gated behind the unstable-index feature.",
+      "description": "This is an experimental, not-yet-finished part of ripgrep that explores building a small on-disk index of a project's files, so that ripgrep could one day quickly narrow down which files are worth scanning before doing a full text search. It contains code that opens or creates an index database file, and separate code that studies a search pattern to figure out which short chunks of text would have to appear in a file for that pattern to possibly match. It is explicitly unstable and only activates when ripgrep is compiled and run with the experimental indexing flag turned on. It must never run unless that flag is explicitly set.",
+      "files": [
+        "crates/index/src/lib.rs",
+        "crates/index/src/index.rs",
+        "crates/index/src/literal.rs"
+      ],
+      "entrypoints": [
+        {"name": "IndexDiscovery", "kind": "class", "location": "crates/index/src/index.rs:112"},
+        {"name": "IndexDiscovery::new", "kind": "function", "location": "crates/index/src/index.rs:112"},
+        {"name": "IndexDiscovery::create", "kind": "method", "location": "crates/index/src/index.rs:169"},
+        {"name": "IndexDiscovery::discover", "kind": "method", "location": "crates/index/src/index.rs:121"},
+        {"name": "Index", "kind": "class", "location": "crates/index/src/index.rs:12"}
+      ],
+      "depends_on": [],
+      "effects": [
+        {"kind": "filesystem", "description": "Creates/opens an on-disk redb index database file, and walks directory ancestors looking for an existing index."},
+        {"kind": "env", "description": "Reads the current working directory and the RIPGREP_INDEX_PATH environment variable to locate the index."}
+      ]
+    },
+    {
+      "name": "grep-facade",
+      "kind": "infra",
+      "role": "Re-exports the grep-cli, grep-matcher, grep-pcre2, grep-printer, grep-regex, and grep-searcher crates under a single grep:: namespace for library embedders.",
+      "description": "This is the front door of ripgrep's search engine when someone wants to use it as a library inside their own Rust program, rather than running the rg command-line tool. Instead of making a library user add six separate dependencies, this one small file bundles all of them together under one grep:: namespace. It contains no search logic itself; it is purely a labeled doorway into the real machinery, which lives in the other units. It must never contain any actual behavior of its own.",
+      "files": ["crates/grep/src/lib.rs"],
+      "entrypoints": [
+        {"name": "cli", "kind": "type", "location": "crates/grep/src/lib.rs:15", "plain": "Namespace alias for the cli-utilities unit."},
+        {"name": "matcher", "kind": "type", "location": "crates/grep/src/lib.rs:16", "plain": "Namespace alias for the matcher-trait unit."},
+        {"name": "pcre2", "kind": "type", "location": "crates/grep/src/lib.rs:18", "plain": "Namespace alias for the pcre2-engine unit."},
+        {"name": "printer", "kind": "type", "location": "crates/grep/src/lib.rs:19", "plain": "Namespace alias for the match-printer unit."},
+        {"name": "regex", "kind": "type", "location": "crates/grep/src/lib.rs:20", "plain": "Namespace alias for the regex-engine unit."},
+        {"name": "searcher", "kind": "type", "location": "crates/grep/src/lib.rs:21", "plain": "Namespace alias for the line-searcher unit."}
+      ],
+      "depends_on": [],
+      "effects": []
+    }
+  ],
+  "excluded": [
+    {"path": "tests/", "reason": "top-level integration test suite for the rg binary"},
+    {"path": "crates/ignore/tests/", "reason": "crate-level tests and fixtures"},
+    {"path": "crates/ignore/examples/", "reason": "example program, not shipped"},
+    {"path": "crates/matcher/tests/", "reason": "crate-level tests"},
+    {"path": "crates/searcher/examples/", "reason": "example program, not shipped"},
+    {"path": "crates/searcher/src/testutil.rs", "reason": "cfg(test)-only test helper module, not compiled into the shipped library"},
+    {"path": "crates/searcher/src/macros.rs", "reason": "cfg(test)-only assertion macro used solely by the crate's own test suite"},
+    {"path": "crates/globset/benches/", "reason": "benchmark harness, not shipped code"},
+    {"path": "crates/grep/examples/", "reason": "example program, not shipped"},
+    {"path": "fuzz/", "reason": "fuzz targets, not shipped"},
+    {"path": "benchsuite/", "reason": "external benchmarking harness and historical run data"},
+    {"path": "ci/", "reason": "CI scripts"},
+    {"path": "pkg/", "reason": "packaging metadata (Homebrew formula, Windows manifest)"},
+    {"path": "scripts/", "reason": "developer utility scripts"},
+    {"path": ".claude/", "reason": "tooling for this decomposition task itself"},
+    {"path": ".cargo/", "reason": "cargo configuration"},
+    {"path": "examples/", "reason": "example manifest for this decomposition skill, not project source"},
+    {"path": "lu-manifest.schema.json", "reason": "schema for this manifest, not project source"},
+    {"path": "build.rs", "reason": "build-time script (embeds git hash / Windows manifest); not part of the compiled runtime program logic"},
+    {"path": "Cargo.toml", "reason": "build manifest"},
+    {"path": "Cargo.lock", "reason": "build manifest"},
+    {"path": "crates/globset/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/grep/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/cli/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/index/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/matcher/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/pcre2/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/printer/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/regex/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/searcher/Cargo.toml", "reason": "build manifest"},
+    {"path": "crates/ignore/Cargo.toml", "reason": "build manifest"},
+    {"path": "rustfmt.toml", "reason": "formatter configuration"},
+    {"path": ".ignore", "reason": "repo tooling config"},
+    {"path": ".nvim.lua", "reason": "editor configuration"},
+    {"path": "HomebrewFormula", "reason": "packaging metadata"},
+    {"path": "README.md", "reason": "docs"},
+    {"path": "CHANGELOG.md", "reason": "docs"},
+    {"path": "CONTRIBUTING.md", "reason": "docs"},
+    {"path": "FAQ.md", "reason": "docs"},
+    {"path": "GUIDE.md", "reason": "docs"},
+    {"path": "RELEASE-CHECKLIST.md", "reason": "docs"},
+    {"path": "AI_POLICY.md", "reason": "docs"},
+    {"path": "COPYING", "reason": "license text"},
+    {"path": "LICENSE-MIT", "reason": "license text"},
+    {"path": "UNLICENSE", "reason": "license text"},
+    {"path": "crates/globset/README.md", "reason": "docs"},
+    {"path": "crates/globset/COPYING", "reason": "license text"},
+    {"path": "crates/globset/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/globset/UNLICENSE", "reason": "license text"},
+    {"path": "crates/grep/README.md", "reason": "docs"},
+    {"path": "crates/grep/COPYING", "reason": "license text"},
+    {"path": "crates/grep/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/grep/UNLICENSE", "reason": "license text"},
+    {"path": "crates/cli/README.md", "reason": "docs"},
+    {"path": "crates/cli/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/cli/UNLICENSE", "reason": "license text"},
+    {"path": "crates/index/README.md", "reason": "docs"},
+    {"path": "crates/index/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/index/UNLICENSE", "reason": "license text"},
+    {"path": "crates/matcher/README.md", "reason": "docs"},
+    {"path": "crates/matcher/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/matcher/UNLICENSE", "reason": "license text"},
+    {"path": "crates/pcre2/README.md", "reason": "docs"},
+    {"path": "crates/pcre2/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/pcre2/UNLICENSE", "reason": "license text"},
+    {"path": "crates/printer/README.md", "reason": "docs"},
+    {"path": "crates/printer/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/printer/UNLICENSE", "reason": "license text"},
+    {"path": "crates/regex/README.md", "reason": "docs"},
+    {"path": "crates/regex/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/regex/UNLICENSE", "reason": "license text"},
+    {"path": "crates/searcher/README.md", "reason": "docs"},
+    {"path": "crates/searcher/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/searcher/UNLICENSE", "reason": "license text"},
+    {"path": "crates/ignore/README.md", "reason": "docs"},
+    {"path": "crates/ignore/COPYING", "reason": "license text"},
+    {"path": "crates/ignore/LICENSE-MIT", "reason": "license text"},
+    {"path": "crates/ignore/UNLICENSE", "reason": "license text"},
+    {"path": "crates/core/README.md", "reason": "docs"}
+  ],
+  "unpartitioned": [],
+  "violations_observed": [
+    {
+      "from_unit": "arg-resolution",
+      "to_unit": "search-orchestration",
+      "location": "crates/core/flags/hiargs.rs (haystack_builder, search_worker, printer methods)",
+      "note": "HiArgs directly constructs and returns concrete types owned by search-orchestration (HaystackBuilder, Haystack, SearchWorkerBuilder, PatternMatcher, Printer<W>, SearchWorker<W>) rather than being handed only a narrow, opaque interface. Combined with search-orchestration calling roughly 19 HiArgs methods, the two units share an unusually wide, bidirectional interface instead of one calling the other through a small facade. Recorded as an architecture finding, not fixed."
+    },
+    {
+      "from_unit": "cli-docs-and-completions",
+      "to_unit": "cli-flags",
+      "location": "crates/core/flags/doc/help.rs, crates/core/flags/doc/man.rs, crates/core/flags/complete/{bash,zsh,fish,powershell}.rs",
+      "note": "These files iterate cli-flags' FLAGS list and use its Flag trait, Category, CompletionType, and parse::lookup directly, rather than through a small summarized rendering API. This is intentional (help/completions must enumerate every flag) but means cli-flags' real contract for this consumer is its internal flag registry, not just parse()/LowArgs. Documented as entrypoints rather than treated as a bug, but flagged here since it is a much wider seam than a typical dependency edge."
+    }
+  ]
+}

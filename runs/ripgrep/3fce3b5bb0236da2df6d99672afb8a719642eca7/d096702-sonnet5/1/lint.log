@@ -1,0 +1,7 @@
+=== lint round 1789012442 ===
+I4 'diagnostic-messages' file 'crates/core/messages.rs' shows 'subprocess' effect not declared
+1 blocking error(s)
+exit=1
+=== lint round 1789012609 ===
+0 blocking error(s)
+exit=0

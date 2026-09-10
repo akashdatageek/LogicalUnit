@@ -1,0 +1,678 @@
+{
+  "repo": "BurntSushi/ripgrep@3fce3b5bb0236da2df6d99672afb8a719642eca7",
+  "units": [
+    {
+      "name": "core",
+      "kind": "domain",
+      "role": "The `rg` command-line program: parses flags, wires the other units together, walks/searches files, and prints results.",
+      "description": "This is the ripgrep application itself, the code that turns typed command-line flags into an actual search. It reads and validates every flag and config file the user supplies, decides whether to search sequentially or across many threads at once, asks the file-walking unit for a list of files, asks the matching-and-searching units to find matches in each file, and asks the printing unit to show the results (or the indexing unit, when the experimental index feature is used). It is the glue that makes a runnable program out of all the reusable library pieces.",
+      "files": [
+        "crates/core/main.rs",
+        "crates/core/messages.rs",
+        "crates/core/haystack.rs",
+        "crates/core/logger.rs",
+        "crates/core/search.rs",
+        "crates/core/flags/mod.rs",
+        "crates/core/flags/defs.rs",
+        "crates/core/flags/config.rs",
+        "crates/core/flags/hiargs.rs",
+        "crates/core/flags/lowargs.rs",
+        "crates/core/flags/parse.rs",
+        "crates/core/flags/complete/mod.rs",
+        "crates/core/flags/complete/bash.rs",
+        "crates/core/flags/complete/zsh.rs",
+        "crates/core/flags/complete/fish.rs",
+        "crates/core/flags/complete/powershell.rs",
+        "crates/core/flags/doc/mod.rs",
+        "crates/core/flags/doc/help.rs",
+        "crates/core/flags/doc/man.rs",
+        "crates/core/flags/doc/version.rs",
+        "crates/core/index/mod.rs",
+        "crates/core/index/enabled.rs",
+        "crates/core/index/disabled.rs",
+        "build.rs",
+        "Cargo.toml",
+        "Cargo.lock"
+      ],
+      "entrypoints": [
+        {
+          "name": "main",
+          "kind": "cli",
+          "location": "crates/core/main.rs:44",
+          "signature": "fn main() -> ExitCode",
+          "plain": "The program's starting point: run `rg` from a terminal and this is what runs first."
+        },
+        {
+          "name": "parse",
+          "kind": "function",
+          "location": "crates/core/flags/parse.rs:49",
+          "signature": "pub(crate) fn parse() -> ParseResult<HiArgs>",
+          "plain": "Reads the command-line arguments and any config file, and turns them into a validated set of search options."
+        },
+        {
+          "name": "HiArgs",
+          "kind": "type",
+          "location": "crates/core/flags/hiargs.rs:36",
+          "plain": "The fully resolved set of options for one run of ripgrep (what to search for, where, and how to display it), built from the raw flags."
+        },
+        {
+          "name": "SearchWorkerBuilder",
+          "kind": "type",
+          "location": "crates/core/search.rs:41",
+          "plain": "Configures and creates the object that actually searches one file and reports whether it matched."
+        },
+        {
+          "name": "HaystackBuilder",
+          "kind": "type",
+          "location": "crates/core/haystack.rs:16",
+          "plain": "Turns a raw directory-walk result into a concrete file that ripgrep is allowed to search."
+        }
+      ],
+      "depends_on": [
+        { "unit": "grep", "entrypoint": "cli" },
+        { "unit": "grep", "entrypoint": "matcher" },
+        { "unit": "grep", "entrypoint": "regex" },
+        { "unit": "grep", "entrypoint": "pcre2" },
+        { "unit": "grep", "entrypoint": "searcher" },
+        { "unit": "grep", "entrypoint": "printer" },
+        { "unit": "ignore", "entrypoint": "WalkBuilder" },
+        { "unit": "ignore", "entrypoint": "Types" },
+        { "unit": "index", "entrypoint": "IndexBuilder" },
+        { "unit": "index", "entrypoint": "IndexDiscovery" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "Opens the files it searches, reads pattern/config files (-f, RIPGREP_CONFIG_PATH), and writes search results and statistics to stdout." },
+        { "kind": "subprocess", "description": "Spawns an external preprocessor command (--pre) to transform a file's contents before searching it, and shells out to `git rev-parse` at build time to embed a commit hash." },
+        { "kind": "env", "description": "Reads environment variables such as RIPGREP_CONFIG_PATH, NO_COLOR, PATH (to locate the preprocessor binary) and terminal-related variables that affect defaults." },
+        { "kind": "clock", "description": "Times how long a search takes (Instant::now) to report in --stats output." }
+      ]
+    },
+    {
+      "name": "cli",
+      "kind": "infra",
+      "role": "Reusable helpers for building search-oriented command-line tools: stdin detection, colored/buffered stdout, byte-safe escaping, pattern-file reading, decompression, and running child processes.",
+      "description": "This unit is a small toolbox of utilities that any command-line search tool would need, not specific to grepping itself. It can tell whether the program's input or output is connected to a real terminal, it manages how colored output is buffered, it safely converts between raw bytes and printable escape sequences, it reads search patterns from files or stdin with good error messages, and it knows how to run another program (like `gzip` or `xz`) and stream its output back so ripgrep can search inside compressed files.",
+      "files": [
+        "crates/cli/src/lib.rs",
+        "crates/cli/src/decompress.rs",
+        "crates/cli/src/pattern.rs",
+        "crates/cli/src/hostname.rs",
+        "crates/cli/src/process.rs",
+        "crates/cli/src/human.rs",
+        "crates/cli/src/wtr.rs",
+        "crates/cli/src/escape.rs",
+        "crates/cli/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "is_readable_stdin",
+          "kind": "function",
+          "location": "crates/cli/src/lib.rs:170",
+          "signature": "pub fn is_readable_stdin() -> bool",
+          "plain": "Tells the caller whether there is real piped-in data on stdin worth searching."
+        },
+        {
+          "name": "StandardStream",
+          "kind": "type",
+          "location": "crates/cli/src/wtr.rs:7",
+          "plain": "A handle for writing colored output to the terminal that buffers efficiently whether or not it's connected to a real terminal."
+        },
+        {
+          "name": "stdout",
+          "kind": "function",
+          "location": "crates/cli/src/wtr.rs:23",
+          "signature": "pub fn stdout(color_choice: termcolor::ColorChoice) -> StandardStream",
+          "plain": "Gets a ready-to-use handle for writing colored results to standard output."
+        },
+        {
+          "name": "DecompressionReaderBuilder",
+          "kind": "type",
+          "location": "crates/cli/src/decompress.rs:198",
+          "plain": "Configures a reader that transparently decompresses a file (gzip, xz, bzip2, ...) by running the matching external decompression program."
+        },
+        {
+          "name": "DecompressionReader",
+          "kind": "type",
+          "location": "crates/cli/src/decompress.rs:332",
+          "plain": "A stream of decompressed bytes read from a compressed file, produced by running an external decompressor."
+        },
+        {
+          "name": "CommandReaderBuilder",
+          "kind": "type",
+          "location": "crates/cli/src/process.rs:84",
+          "plain": "Configures a reader that runs an external command and streams its stdout, converting a failing exit code into a helpful error."
+        },
+        {
+          "name": "patterns_from_path",
+          "kind": "function",
+          "location": "crates/cli/src/pattern.rs:82",
+          "signature": "pub fn patterns_from_path<P: AsRef<Path>>(path: P) -> io::Result<Vec<String>>",
+          "plain": "Reads a file of search patterns, one per line, for use with ripgrep's -f/--file flag."
+        },
+        {
+          "name": "pattern_from_os",
+          "kind": "function",
+          "location": "crates/cli/src/pattern.rs:51",
+          "signature": "pub fn pattern_from_os(pattern: &OsStr) -> Result<&str, InvalidPatternError>",
+          "plain": "Validates that a pattern given on the command line is valid UTF-8, with a precise error if it isn't."
+        },
+        {
+          "name": "parse_human_readable_size",
+          "kind": "function",
+          "location": "crates/cli/src/human.rs:79",
+          "signature": "pub fn parse_human_readable_size(size: &str) -> Result<u64, ParseSizeError>",
+          "plain": "Converts a size like \"2M\" typed on the command line into a plain byte count."
+        },
+        {
+          "name": "escape",
+          "kind": "function",
+          "location": "crates/cli/src/escape.rs:26",
+          "signature": "pub fn escape(bytes: &[u8]) -> String",
+          "plain": "Turns arbitrary bytes into a printable, typeable escaped string for error messages."
+        },
+        {
+          "name": "hostname",
+          "kind": "function",
+          "location": "crates/cli/src/hostname.rs:16",
+          "signature": "pub fn hostname() -> io::Result<OsString>",
+          "plain": "Looks up the current machine's hostname (used to build hyperlinks in output)."
+        }
+      ],
+      "depends_on": [
+        { "unit": "globset", "entrypoint": "GlobSet" },
+        { "unit": "globset", "entrypoint": "GlobSetBuilder" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "Reads pattern files from disk (patterns_from_path) and writes buffered, optionally colored output to stdout." },
+        { "kind": "subprocess", "description": "Spawns external decompression programs (gzip, bzip2, xz, lz4, zstd, ...) and other child processes, and reads their stdout/stderr." },
+        { "kind": "env", "description": "Consults the PATH environment variable to resolve which binary to run for a given decompression/preprocessor program." }
+      ]
+    },
+    {
+      "name": "globset",
+      "kind": "infra",
+      "role": "General-purpose glob and glob-set matching, independent of grep or gitignore semantics.",
+      "description": "This unit compiles Unix-style wildcard patterns like '*.rs' or 'src/**/foo.rs' into fast matchers, and can test one or many such patterns against a file path at once, reporting which ones matched. It has no knowledge of grep, regular text search, or gitignore rules; it is a standalone, published library that both the file-type-filtering and gitignore-parsing units build on top of.",
+      "files": [
+        "crates/globset/src/lib.rs",
+        "crates/globset/src/glob.rs",
+        "crates/globset/src/fnv.rs",
+        "crates/globset/src/pathutil.rs",
+        "crates/globset/src/serde_impl.rs",
+        "crates/globset/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "Glob",
+          "kind": "type",
+          "location": "crates/globset/src/glob.rs:76",
+          "plain": "A single compiled wildcard pattern, e.g. '*.rs'."
+        },
+        {
+          "name": "GlobBuilder",
+          "kind": "type",
+          "location": "crates/globset/src/glob.rs:211",
+          "plain": "Configures how a single glob pattern should be interpreted (case sensitivity, whether '*' can cross directory separators, etc.) before compiling it."
+        },
+        {
+          "name": "GlobMatcher",
+          "kind": "type",
+          "location": "crates/globset/src/glob.rs:133",
+          "plain": "A compiled single glob, ready to test candidate paths against."
+        },
+        {
+          "name": "GlobSet",
+          "kind": "type",
+          "location": "crates/globset/src/lib.rs:309",
+          "plain": "A compiled set of many glob patterns that can all be tested against one path in a single pass, returning which ones matched."
+        },
+        {
+          "name": "GlobSetBuilder",
+          "kind": "type",
+          "location": "crates/globset/src/lib.rs:566",
+          "plain": "Accumulates individual globs and compiles them into one efficient GlobSet."
+        },
+        {
+          "name": "Candidate",
+          "kind": "type",
+          "location": "crates/globset/src/lib.rs:599",
+          "plain": "A pre-processed path, used to match the same path against many globs cheaply."
+        }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "grep",
+      "kind": "domain",
+      "role": "The 'ripgrep as a library' facade: a single crate that re-exports the matching, regex, pcre2, searching, printing and cli units under one name.",
+      "description": "This unit does not contain search logic of its own. It is a thin convenience layer that gathers all of the separately published grep-* library crates (the matcher trait, the two regex engines, the line searcher, the result printers, and the cli helpers) and re-exports them under one crate called 'grep', so that a downstream program only has to depend on one thing. The core ripgrep application uses this facade rather than depending on each piece individually.",
+      "files": [
+        "crates/grep/src/lib.rs",
+        "crates/grep/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "cli",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:15",
+          "signature": "pub extern crate grep_cli as cli;",
+          "plain": "Re-exports the command-line helper utilities (the 'cli' unit) for downstream users."
+        },
+        {
+          "name": "matcher",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:16",
+          "signature": "pub extern crate grep_matcher as matcher;",
+          "plain": "Re-exports the generic text-matching trait (the 'matcher' unit)."
+        },
+        {
+          "name": "pcre2",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:18",
+          "signature": "pub extern crate grep_pcre2 as pcre2;",
+          "plain": "Re-exports the PCRE2-backed regex matcher (the 'pcre2' unit), only when the pcre2 feature is enabled."
+        },
+        {
+          "name": "printer",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:19",
+          "signature": "pub extern crate grep_printer as printer;",
+          "plain": "Re-exports the result printers (the 'printer' unit)."
+        },
+        {
+          "name": "regex",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:20",
+          "signature": "pub extern crate grep_regex as regex;",
+          "plain": "Re-exports the Rust-regex-backed matcher (the 'regex' unit)."
+        },
+        {
+          "name": "searcher",
+          "kind": "type",
+          "location": "crates/grep/src/lib.rs:21",
+          "signature": "pub extern crate grep_searcher as searcher;",
+          "plain": "Re-exports the line-oriented file searcher (the 'searcher' unit)."
+        }
+      ],
+      "depends_on": [
+        { "unit": "cli", "entrypoint": "StandardStream" },
+        { "unit": "matcher", "entrypoint": "Matcher" },
+        { "unit": "pcre2", "entrypoint": "RegexMatcher" },
+        { "unit": "printer", "entrypoint": "Standard" },
+        { "unit": "regex", "entrypoint": "RegexMatcher" },
+        { "unit": "searcher", "entrypoint": "Searcher" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "ignore",
+      "kind": "infra",
+      "role": "Recursively walks a directory tree while filtering out files/directories per .gitignore, .ignore, global excludes and file-type rules.",
+      "description": "This unit provides ripgrep's file discovery: given a starting directory, it walks the tree (optionally in parallel across many threads) and, for each entry, decides whether it should be skipped because it matches a .gitignore or .ignore rule, an explicit override, a hidden-file rule, or a file-type filter such as '--type rust'. It has no idea what a regular expression is; its only job is to produce the right list of files and directories to hand to the searching unit.",
+      "files": [
+        "crates/ignore/src/lib.rs",
+        "crates/ignore/src/walk.rs",
+        "crates/ignore/src/dir.rs",
+        "crates/ignore/src/gitignore.rs",
+        "crates/ignore/src/overrides.rs",
+        "crates/ignore/src/types.rs",
+        "crates/ignore/src/default_types.rs",
+        "crates/ignore/src/incremental.rs",
+        "crates/ignore/src/pathutil.rs",
+        "crates/ignore/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "WalkBuilder",
+          "kind": "type",
+          "location": "crates/ignore/src/walk.rs:488",
+          "plain": "Configures a recursive directory walk: which ignore files to respect, whether to follow symlinks, thread count, and so on."
+        },
+        {
+          "name": "Walk",
+          "kind": "type",
+          "location": "crates/ignore/src/walk.rs:1117",
+          "plain": "A single-threaded iterator over directory entries that respects the configured ignore rules."
+        },
+        {
+          "name": "WalkParallel",
+          "kind": "type",
+          "location": "crates/ignore/src/walk.rs:1411",
+          "plain": "A multi-threaded version of the directory walk, calling back into user code for each entry found."
+        },
+        {
+          "name": "DirEntry",
+          "kind": "type",
+          "location": "crates/ignore/src/walk.rs:31",
+          "plain": "One file or directory found during the walk, along with its path and metadata."
+        },
+        {
+          "name": "Gitignore",
+          "kind": "type",
+          "location": "crates/ignore/src/gitignore.rs:81",
+          "plain": "A compiled set of gitignore-style rules from one file, that can test whether a given path is ignored."
+        },
+        {
+          "name": "Types",
+          "kind": "type",
+          "location": "crates/ignore/src/types.rs:165",
+          "plain": "A compiled set of file-type definitions (e.g. what counts as a 'rust' or 'python' file) used by --type/--type-not."
+        },
+        {
+          "name": "TypesBuilder",
+          "kind": "type",
+          "location": "crates/ignore/src/types.rs:307",
+          "plain": "Accumulates and selects file-type definitions before compiling them into Types."
+        },
+        {
+          "name": "Override",
+          "kind": "type",
+          "location": "crates/ignore/src/overrides.rs:47",
+          "plain": "A set of user-supplied glob overrides (-g/--glob) that can force-include or force-exclude paths regardless of gitignore rules."
+        }
+      ],
+      "depends_on": [
+        { "unit": "globset", "entrypoint": "GlobSet" },
+        { "unit": "globset", "entrypoint": "GlobBuilder" },
+        { "unit": "globset", "entrypoint": "GlobSetBuilder" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "Recursively reads directory entries, opens and parses .gitignore/.ignore files, and follows/detects symlinks while walking." },
+        { "kind": "env", "description": "Consults environment/home-directory information to locate global gitignore and git config files." }
+      ]
+    },
+    {
+      "name": "index",
+      "kind": "infra",
+      "role": "Experimental on-disk search index (ngram-based) that lets ripgrep skip files that can't possibly match, backed by an embedded database.",
+      "description": "This unit builds and reads a persistent index of file contents stored on disk, so that a later search can quickly discover which files are even worth opening instead of reading every file from scratch. It is currently unstable/opt-in and self-contained: it does not depend on ripgrep's own matching or searching code, only on generic external indexing and database libraries. The core application uses it, when enabled, as an alternative fast path before falling back to a normal file-by-file search.",
+      "files": [
+        "crates/index/src/lib.rs",
+        "crates/index/src/index.rs",
+        "crates/index/src/literal.rs",
+        "crates/index/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "Index",
+          "kind": "type",
+          "location": "crates/index/src/index.rs:12",
+          "plain": "A handle to an open on-disk search index for one directory."
+        },
+        {
+          "name": "IndexBuilder",
+          "kind": "type",
+          "location": "crates/index/src/index.rs:33",
+          "plain": "Creates or opens an on-disk index, in read-only or writable mode."
+        },
+        {
+          "name": "IndexDiscovery",
+          "kind": "type",
+          "location": "crates/index/src/index.rs:104",
+          "plain": "Searches upward from the current directory to find an existing index to use."
+        }
+      ],
+      "depends_on": [],
+      "effects": [
+        { "kind": "filesystem", "description": "Creates and opens an index directory containing an 'index.db' file on disk." },
+        { "kind": "database", "description": "Reads and writes the index as an embedded redb key-value database file." },
+        { "kind": "env", "description": "Reads environment/current-directory state while discovering an existing index." }
+      ]
+    },
+    {
+      "name": "matcher",
+      "kind": "domain",
+      "role": "Defines the generic 'Matcher' trait that every text-matching engine in ripgrep (Rust regex, PCRE2) implements, plus the shared Match/Captures types.",
+      "description": "This unit defines the common language that all of ripgrep's search engines speak, independent of which actual regex library is used underneath. It describes, as a Rust trait, what it means to search a slice of bytes and report matches, capture groups and replacements. It contains no search implementation itself; the regex and pcre2 units each implement this trait, and the searcher and printer units are written generically against it so they work with either engine.",
+      "files": [
+        "crates/matcher/src/lib.rs",
+        "crates/matcher/src/interpolate.rs",
+        "crates/matcher/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "Matcher",
+          "kind": "type",
+          "location": "crates/matcher/src/lib.rs:546",
+          "signature": "pub trait Matcher { ... }",
+          "plain": "The shared interface every regex/text-matching engine in ripgrep implements, so the rest of the program doesn't need to care which engine is in use."
+        },
+        {
+          "name": "Match",
+          "kind": "type",
+          "location": "crates/matcher/src/lib.rs:69",
+          "plain": "A start/end byte range identifying where a match was found."
+        }
+      ],
+      "depends_on": [],
+      "effects": []
+    },
+    {
+      "name": "pcre2",
+      "kind": "domain",
+      "role": "Implements the Matcher trait using the PCRE2 regex engine, enabling backreferences and lookaround that Rust's own regex engine doesn't support.",
+      "description": "This unit adapts the third-party PCRE2 regular expression library so that it can be used anywhere ripgrep expects a Matcher. It is what powers ripgrep's optional '-P/--pcre2' flag, giving users access to advanced regex features like backreferences and lookaround at the cost of some performance, while presenting the exact same interface as the default regex engine to the rest of the program.",
+      "files": [
+        "crates/pcre2/src/lib.rs",
+        "crates/pcre2/src/matcher.rs",
+        "crates/pcre2/src/error.rs",
+        "crates/pcre2/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "RegexMatcher",
+          "kind": "type",
+          "location": "crates/pcre2/src/matcher.rs:302",
+          "plain": "A compiled PCRE2 regular expression that implements the shared Matcher interface."
+        },
+        {
+          "name": "RegexMatcherBuilder",
+          "kind": "type",
+          "location": "crates/pcre2/src/matcher.rs:12",
+          "plain": "Configures PCRE2-specific options (case insensitivity, multi-line, JIT, ...) before compiling a pattern."
+        }
+      ],
+      "depends_on": [
+        { "unit": "matcher", "entrypoint": "Matcher" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "printer",
+      "kind": "domain",
+      "role": "Turns raw search matches into ripgrep's various output formats: human-readable (standard), JSON lines, and summary/count-only.",
+      "description": "This unit is responsible for what the user actually sees after a search runs. It receives match events from the searcher unit and renders them as colorized human-readable text (the default), as newline-delimited JSON for machine consumption, or as an aggregate summary showing only match counts or matching file names. It also tracks statistics like elapsed time and bytes printed for ripgrep's --stats output.",
+      "files": [
+        "crates/printer/src/lib.rs",
+        "crates/printer/src/standard.rs",
+        "crates/printer/src/json.rs",
+        "crates/printer/src/jsont.rs",
+        "crates/printer/src/summary.rs",
+        "crates/printer/src/stats.rs",
+        "crates/printer/src/path.rs",
+        "crates/printer/src/color.rs",
+        "crates/printer/src/counter.rs",
+        "crates/printer/src/util.rs",
+        "crates/printer/src/macros.rs",
+        "crates/printer/src/hyperlink/mod.rs",
+        "crates/printer/src/hyperlink/aliases.rs",
+        "crates/printer/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "Standard",
+          "kind": "type",
+          "location": "crates/printer/src/standard.rs:480",
+          "plain": "The default human-readable printer, similar to standard grep output, with optional color and context lines."
+        },
+        {
+          "name": "StandardBuilder",
+          "kind": "type",
+          "location": "crates/printer/src/standard.rs:99",
+          "plain": "Configures the standard printer's behavior (line numbers, context, color, replacement text, ...) before use."
+        },
+        {
+          "name": "JSON",
+          "kind": "type",
+          "location": "crates/printer/src/json.rs:487",
+          "plain": "Prints one JSON object per line describing each match, for machine consumption."
+        },
+        {
+          "name": "Summary",
+          "kind": "type",
+          "location": "crates/printer/src/summary.rs:349",
+          "plain": "Prints only an aggregate result per file, e.g. just the count of matches or just the matching file names."
+        },
+        {
+          "name": "Stats",
+          "kind": "type",
+          "location": "crates/printer/src/stats.rs:13",
+          "plain": "Accumulated statistics (matches, lines, bytes, elapsed time) for the whole search, used by --stats."
+        },
+        {
+          "name": "PathPrinter",
+          "kind": "type",
+          "location": "crates/printer/src/path.rs:1",
+          "plain": "Prints just a file path, used when ripgrep is only listing files rather than searching their contents."
+        },
+        {
+          "name": "ColorSpecs",
+          "kind": "type",
+          "location": "crates/printer/src/color.rs:1",
+          "plain": "Holds the parsed --colors configuration describing what color/style to use for matched text, line numbers, etc."
+        }
+      ],
+      "depends_on": [
+        { "unit": "matcher", "entrypoint": "Matcher" },
+        { "unit": "searcher", "entrypoint": "Sink" }
+      ],
+      "effects": [
+        { "kind": "clock", "description": "Measures elapsed search time (Instant::now) to include in JSON 'summary' and text 'elapsed_total' output." }
+      ]
+    },
+    {
+      "name": "regex",
+      "kind": "domain",
+      "role": "Implements the Matcher trait using Rust's own 'regex' engine, ripgrep's default and fastest search backend.",
+      "description": "This unit adapts Rust's regex library so it can be used anywhere ripgrep expects a Matcher, translating between ripgrep's own pattern syntax extensions (like word boundaries and case-insensitivity flags) and the underlying regex engine's configuration. It is the default engine used for every ripgrep search unless the user explicitly asks for PCRE2.",
+      "files": [
+        "crates/regex/src/lib.rs",
+        "crates/regex/src/matcher.rs",
+        "crates/regex/src/ast.rs",
+        "crates/regex/src/config.rs",
+        "crates/regex/src/error.rs",
+        "crates/regex/src/literal.rs",
+        "crates/regex/src/non_matching.rs",
+        "crates/regex/src/strip.rs",
+        "crates/regex/src/ban.rs",
+        "crates/regex/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "RegexMatcher",
+          "kind": "type",
+          "location": "crates/regex/src/matcher.rs:367",
+          "plain": "A compiled regular expression, using Rust's regex engine, that implements the shared Matcher interface."
+        },
+        {
+          "name": "RegexMatcherBuilder",
+          "kind": "type",
+          "location": "crates/regex/src/matcher.rs:24",
+          "plain": "Configures regex options (case sensitivity, multi-line, word boundaries, literal detection, ...) before compiling a pattern."
+        },
+        {
+          "name": "Error",
+          "kind": "type",
+          "location": "crates/regex/src/error.rs:7",
+          "plain": "A regex compilation error with a human-readable explanation of what's wrong with the pattern."
+        }
+      ],
+      "depends_on": [
+        { "unit": "matcher", "entrypoint": "Matcher" }
+      ],
+      "effects": []
+    },
+    {
+      "name": "searcher",
+      "kind": "domain",
+      "role": "The core line-oriented search engine: reads a file (or memory-mapped bytes), runs a Matcher over it, and reports matches, context and line numbers to a Sink.",
+      "description": "This unit is the heart of ripgrep's search: given anything that implements the Matcher interface and a source of bytes, it efficiently scans for matches line by line, handles multi-line matches, counts lines, detects and skips binary files, shows surrounding context lines, and decides when to memory-map a file for speed. Results are reported by calling into a caller-supplied Sink, which is what the printer unit implements to actually display them.",
+      "files": [
+        "crates/searcher/src/lib.rs",
+        "crates/searcher/src/macros.rs",
+        "crates/searcher/src/line_buffer.rs",
+        "crates/searcher/src/lines.rs",
+        "crates/searcher/src/sink.rs",
+        "crates/searcher/src/testutil.rs",
+        "crates/searcher/src/searcher/mod.rs",
+        "crates/searcher/src/searcher/core.rs",
+        "crates/searcher/src/searcher/glue.rs",
+        "crates/searcher/src/searcher/mmap.rs",
+        "crates/searcher/Cargo.toml"
+      ],
+      "entrypoints": [
+        {
+          "name": "Searcher",
+          "kind": "type",
+          "location": "crates/searcher/src/searcher/mod.rs:597",
+          "plain": "Runs a search of a file or byte slice using a given Matcher and reports results to a Sink."
+        },
+        {
+          "name": "SearcherBuilder",
+          "kind": "type",
+          "location": "crates/searcher/src/searcher/mod.rs:298",
+          "plain": "Configures search behavior before building a Searcher: context lines, binary detection, memory-map policy, multi-line mode, and more."
+        },
+        {
+          "name": "Sink",
+          "kind": "type",
+          "location": "crates/searcher/src/sink.rs:102",
+          "signature": "pub trait Sink { ... }",
+          "plain": "The interface a Searcher calls into whenever it finds a match or context line, so results can be displayed or collected."
+        }
+      ],
+      "depends_on": [
+        { "unit": "matcher", "entrypoint": "Matcher" }
+      ],
+      "effects": [
+        { "kind": "filesystem", "description": "Opens files as std::fs::File and, when enabled, memory-maps them with memmap2 for faster scanning." }
+      ]
+    }
+  ],
+  "excluded": [
+    { "path": "tests", "reason": "Root black-box integration test suite that drives the compiled `rg` binary and its test fixture data; exercises units together but isn't itself unit source." },
+    { "path": "crates/ignore/tests", "reason": "Unit tests for the ignore crate (gitignore edge cases)." },
+    { "path": "crates/matcher/tests", "reason": "Integration tests for the grep-matcher trait." },
+    { "path": "crates/globset/benches", "reason": "Benchmark harness for the globset crate, not shipped functionality." },
+    { "path": "crates/grep/examples", "reason": "Example program (simplegrep) demonstrating the grep facade; documentation only." },
+    { "path": "crates/ignore/examples", "reason": "Example program (walk) demonstrating the ignore crate; documentation only." },
+    { "path": "crates/searcher/examples", "reason": "Example program (search-stdin) demonstrating the searcher crate; documentation only." },
+    { "path": "fuzz", "reason": "cargo-fuzz fuzz targets and their own lockfile/manifest; not part of the shipped binary or library." },
+    { "path": "benchsuite", "reason": "Historical ad hoc benchmarking scripts and result logs, unrelated to program logic." },
+    { "path": "ci", "reason": "Continuous-integration helper shell scripts." },
+    { "path": ".github", "reason": "GitHub Actions workflows and issue templates." },
+    { "path": "scripts", "reason": "Maintainer utility script (copy-examples), not part of the program." },
+    { "path": "pkg", "reason": "Packaging assets: Homebrew formula and Windows manifest, used only at release/build-packaging time." },
+    { "path": "HomebrewFormula", "reason": "Symlink into pkg/brew; packaging asset." },
+    { "path": ".cargo/config.toml", "reason": "Cargo build configuration, not program source." },
+    { "path": ".claude", "reason": "Harness/tooling configuration for this partitioning exercise itself, not repository source." },
+    { "path": "README.md", "reason": "Project documentation." },
+    { "path": "GUIDE.md", "reason": "Project documentation." },
+    { "path": "FAQ.md", "reason": "Project documentation." },
+    { "path": "CHANGELOG.md", "reason": "Project documentation." },
+    { "path": "CONTRIBUTING.md", "reason": "Project documentation." },
+    { "path": "AI_POLICY.md", "reason": "Project documentation." },
+    { "path": "RELEASE-CHECKLIST.md", "reason": "Project documentation." },
+    { "path": "COPYING", "reason": "Licensing text." },
+    { "path": "LICENSE-MIT", "reason": "Licensing text." },
+    { "path": "UNLICENSE", "reason": "Licensing text." },
+    { "path": "crates/cli/README.md", "reason": "Per-crate documentation (pattern repeats for each crates/*/README.md)." },
+    { "path": ".gitignore", "reason": "Tooling/config dotfile, not source." },
+    { "path": ".ignore", "reason": "Tooling/config dotfile, not source." },
+    { "path": ".nvim.lua", "reason": "Editor configuration dotfile, not source." },
+    { "path": "rustfmt.toml", "reason": "Formatter configuration, not source." }
+  ],
+  "unpartitioned": [],
+  "violations_observed": []
+}

@@ -1,0 +1,57 @@
+=== lint round 1788995011 ===
+I1 'build.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/decompress.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/escape.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/hostname.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/human.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/pattern.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/process.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/wtr.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/bash.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/fish.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/powershell.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/zsh.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/config.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/defs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/help.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/man.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/version.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/hiargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/lowargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/parse.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/haystack.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/disabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/enabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/logger.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/main.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/messages.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/search.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/globset/benches/bench.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/grep/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/default_types.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/dir.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/gitignore.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/incremental.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/overrides.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/pathutil.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/types.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/src/walk.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_skip_bom.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/index.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/literal.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/test_matcher.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/tests.rs' in no unit, not excluded, not unpartitioned
+I1 ...and 38 more unassigned files
+51 blocking error(s)
+exit=1
+=== lint round 1788995724 ===
+0 blocking error(s)
+exit=0

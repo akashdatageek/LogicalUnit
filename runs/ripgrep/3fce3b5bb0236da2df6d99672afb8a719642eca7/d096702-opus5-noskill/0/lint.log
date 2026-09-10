@@ -1,0 +1,8 @@
+=== lint round 1789008929 ===
+I4 'rg-flags' file 'crates/core/flags/hiargs.rs' shows 'subprocess' effect not declared
+I4 'rg-diagnostics' file 'crates/core/messages.rs' shows 'subprocess' effect not declared
+2 blocking error(s)
+exit=1
+=== lint round 1789009256 ===
+0 blocking error(s)
+exit=0

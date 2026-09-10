@@ -1,0 +1,62 @@
+=== lint round 1789006505 ===
+I1 'build.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/escape.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/hostname.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/human.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/pattern.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/cli/src/wtr.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/bash.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/fish.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/powershell.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/complete/zsh.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/config.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/defs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/help.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/man.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/doc/version.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/hiargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/lowargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/parse.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/haystack.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/disabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/enabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/logger.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/main.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/messages.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/search.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/globset/benches/bench.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/grep/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/ignore/tests/gitignore_skip_bom.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/test_matcher.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/tests.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/matcher/tests/util.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/color.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/counter.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/json.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/jsont.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/macros.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/path.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/standard.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/stats.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/summary.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/printer/src/util.rs' in no unit, not excluded, not unpartitioned
+I1 'fuzz/fuzz_targets/fuzz_glob.rs' in no unit, not excluded, not unpartitioned
+I1 'tests/binary.rs' in no unit, not excluded, not unpartitioned
+I1 ...and 12 more unassigned files
+I3 'hyperlink-formatting' depends on unknown unit 'search-output'
+52 blocking error(s)
+exit=1
+=== lint round 1789007934 ===
+I4 'diagnostics' file 'crates/core/messages.rs' shows 'subprocess' effect not declared
+1 blocking error(s)
+exit=1
+=== lint round 1789008424 ===
+0 blocking error(s)
+exit=0
