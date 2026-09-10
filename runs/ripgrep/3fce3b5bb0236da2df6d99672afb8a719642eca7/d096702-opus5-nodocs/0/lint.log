@@ -1,0 +1,28 @@
+=== lint round 1789010045 ===
+I1 'crates/core/flags/config.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/defs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/hiargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/lowargs.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/flags/parse.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/haystack.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/disabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/enabled.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/index/mod.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/main.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/core/search.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/index.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/lib.rs' in no unit, not excluded, not unpartitioned
+I1 'crates/index/src/literal.rs' in no unit, not excluded, not unpartitioned
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I3 'flag-docs' depends on unknown unit 'flag-parsing'
+I4 'diagnostics' file 'crates/core/messages.rs' shows 'subprocess' effect not declared
+22 blocking error(s)
+exit=1
+=== lint round 1789010765 ===
+0 blocking error(s)
+exit=0

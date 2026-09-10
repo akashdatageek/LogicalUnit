@@ -16,6 +16,14 @@ NAME="${REPO#*/}"
 WORK="${LU_WORK:-/work/$NAME-${SHA:0:7}-$REP}"
 OUT="${LU_OUT:-/out/$NAME-${SHA:0:7}-$REP}"
 SKILL_LABEL="$(git -C "$HERE" rev-parse --short HEAD 2>/dev/null || echo nogit)"
+# The model changes the measurement, so it belongs in the label. aggregate.py groups by label
+# alone, so two models under one label are silently pooled — exactly the confound REVIEW.md B5
+# warns about. meta.json still carries the full id. Runs before 2026-09-09 predate this and
+# carry a bare label; they were all claude-sonnet-5.
+if [ -n "$MODEL" ]; then
+  MODEL_SLUG=$(printf '%s' "$MODEL" | sed 's/^claude-//; s/-[0-9]\{8\}$//; s/[^a-zA-Z0-9]//g')
+  SKILL_LABEL="${SKILL_LABEL}-${MODEL_SLUG}"
+fi
 [ "$CONDITION" = skill ] || SKILL_LABEL="${SKILL_LABEL}-${CONDITION}"
 [ "$HIDE_DOCS" = 1 ] && SKILL_LABEL="${SKILL_LABEL}-nodocs"
 RUN="$HERE/runs/$NAME/$SHA/$SKILL_LABEL/$REP"
@@ -61,6 +69,16 @@ EXIT=$?
 set -e
 
 # 5. collect + provenance
+# A zero-byte result.json means the CLI never returned: killed, or the container died. That is
+# operator/infra action, never model behaviour, so it must not enter the record as a data point.
+# Scoring it anyway consumes the (repo,label,rep) slot forever AND lands with run_error=false
+# and no subtype, i.e. indistinguishable from a model that genuinely produced zero units.
+# A run that really failed still writes JSON (error_max_turns, terminal_reason=api_error).
+if [ ! -s "$RUN/result.json" ]; then
+  echo "ABORTED $RUN — CLI produced no result (killed, or the container died)." >&2
+  echo "  Leaving the slot free: no score.json written." >&2
+  exit 3
+fi
 cp "$OUT/manifest.json" "$RUN/manifest.json" 2>/dev/null || echo '{}' > "$RUN/manifest.json"
 cp "$OUT/lint.log" "$RUN/lint.log" 2>/dev/null || true
 jq -n --arg repo "$REPO" --arg sha "$SHA" --arg rep "$REP" --arg skill "$SKILL_LABEL" --arg overlay "$OVERLAY_HASH" \

@@ -1,0 +1,27 @@
+# lu-bench — Python dependencies for the scoring harness.
+#
+#   pip install -r requirements.txt
+#
+# The SessionStart hook (.claude/hooks/session_setup.sh) installs these automatically when
+# they are missing, so this file is the source of truth rather than a manual step. The
+# agent's own permission list denies pip; the hook runs outside it.
+#
+# Versions are the ones the 2026-09 baseline (label cac873e) was measured with. score.json
+# records graph_source, so a run that fell back to regex instead of tree-sitter is visible
+# after the fact — but a fallback run is not comparable to a tree-sitter one, so pin these.
+#
+# Verify after install:
+#   python3 -c "import tree_sitter, tree_sitter_language_pack, networkx"
+#   python3 harness/test_score.py        # 8 fixtures, must be 8/8
+
+tree-sitter==0.26.0
+tree-sitter-language-pack==1.16.2
+networkx==3.6.1
+
+# Requires Python >= 3.10 (harness uses match-free but modern typing and pathlib idioms).
+# Measured on Python 3.11.15.
+#
+# Not pip-installable, needed on PATH:
+#   claude    Claude Code CLI (measured on 2.1.265-2.1.267)
+#   git, jq   used by run_one.sh, run_corpus.sh, checkpoint.sh and the overlay hooks
+#   ent       optional; the lint hook falls back to overlay/.claude/hooks/lint_stub.py
