@@ -11,10 +11,25 @@
   "n_units": 1,
   "unpartitioned": 0,
   "lint_rounds": 2,
+  "units": [
+    {
+      "name": "mavlink-transport-core",
+      "kind": "infra",
+      "n_files": 155,
+      "is_singleton": false,
+      "entered_from_outside": true,
+      "entrypoint_p": 0.25,
+      "entrypoint_r": 0.047619047619047616,
+      "effects_p": 0.75,
+      "effects_r": 0.5,
+      "n_missed_entrypoints": 60,
+      "n_undeclared_effects": 3
+    }
+  ],
   "q_llm": 0.0404,
   "q_one": 0.0,
   "q_dir": 0.1283,
-  "q_ceiling": 0.6212,
+  "q_ceiling": 0.6224,
   "q_cochange_llm": 0.1008,
   "q_cochange_gain": -0.1009,
   "gold_ari": null,

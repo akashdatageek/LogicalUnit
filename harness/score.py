@@ -181,10 +181,11 @@ def main(run_dir, repo_dir):
     if graph:
         g = defaultdict(set)
         for a, bs in graph['edges'].items(): g[a] |= set(bs)
-        contracts = RES.score(graph, m)['summary'] if units else {}
+        sc = RES.score(graph, m) if units else {'summary': {}, 'units': {}}
+        contracts = sc['summary']; per_unit_contract = sc.get('units', {})
         graph_source = 'tree-sitter'
     else:
-        g = import_graph(repo, files); contracts = {}; graph_source = 'regex-fallback'
+        g = import_graph(repo, files); contracts = {}; per_unit_contract = {}; graph_source = 'regex-fallback'
     q_llm = modularity(owned, g)
     q_one = modularity({f:'all' for f in files}, g)
     q_dir = modularity({f:str(Path(f).parent) for f in files}, g)
@@ -213,6 +214,20 @@ def main(run_dir, repo_dir):
     cost = res.get('total_cost_usd') or 0.0
     lint_rounds = (run/'lint.log').read_text().count('=== lint round') if (run/'lint.log').exists() else 0
 
+    # per-unit records: the resolver already computes ground truth per unit; keep it instead of
+    # collapsing to one summary per run. This is the sample harness/units.py analyses at unit level.
+    unit_records = []
+    for u in units:
+        nm = u.get('name'); uf = u.get('files', []); c = per_unit_contract.get(nm, {})
+        te = c.get('true_entrypoints')
+        unit_records.append(dict(
+            name=nm, kind=u.get('kind'), n_files=len(uf), is_singleton=len(uf) <= 1,
+            entered_from_outside=(None if te is None else bool(te)),
+            entrypoint_p=c.get('entrypoint_p'), entrypoint_r=c.get('entrypoint_r'),
+            effects_p=c.get('effects_p'), effects_r=c.get('effects_r'),
+            n_missed_entrypoints=(len(c['missed']) if 'missed' in c else None),
+            n_undeclared_effects=(len(c['undeclared']) if 'undeclared' in c else None)))
+
     valid_nontrivial = coverage >= 0.95 and edge_res >= 0.90 and not trivial and not budget_exhausted
     out = dict(
         # primary
@@ -221,6 +236,7 @@ def main(run_dir, repo_dir):
         coverage=round(coverage,3), edge_resolution=round(edge_res,3), trivial=trivial, budget_exhausted=budget_exhausted,
         run_error=run_error, result_subtype=subtype or None, singleton_unit_frac=None if singleton_frac is None else round(singleton_frac,3),
         n_units=n_units, unpartitioned=len(m.get('unpartitioned', [])), lint_rounds=lint_rounds,
+        units=unit_records,
         # structure
         q_llm=round(q_llm,4), q_one=round(q_one,4), q_dir=round(q_dir,4), q_ceiling=round(q_ceiling,4),
         q_cochange_llm=None if qc_llm is None else round(qc_llm,4),

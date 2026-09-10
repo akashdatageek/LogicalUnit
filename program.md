@@ -45,6 +45,28 @@ KEEP only if: validity gate holds, stability gate holds, contract-recall gate ho
 of per-repo delta q_gain_dir excludes zero. Then REPLICATE with 3 fresh replicates
 (reps 3,4,5) on the after-label; if --decide flips, revert and log "did not replicate".
 
+TRANSFER (pre-registration amendment 2026-09-10; notes/architecture.md change 4). An edit is KEEP
+only if it ALSO holds on a second model. Confirm with
+    python3 harness/aggregate.py --decide-transfer <before> <after> --models <m1>,<m2>
+which requires the paired-bootstrap CI to exclude zero on EVERY model (model is a run-label suffix,
+e.g. sonnet5, opus5; the token `base` means the bare label). This moves the RQ5 transfer test out of
+a final phase and into the KEEP gate, so the ratchet cannot tune one model's idiosyncrasies for
+twelve iterations before anyone checks whether the edit generalises. Set LU_MODEL_SECONDARY below.
+
+UNIT-LEVEL VIEW (secondary, advisory; does NOT override the run-level rule above). Each run emits
+many independently-checkable units, so score.py persists per-unit ground truth and
+    python3 harness/units.py --decide <before> <after>
+reports the edit at unit granularity (entrypoint recall, effects recall, entered-from-outside,
+singleton fraction) with a cluster-robust paired bootstrap over repos (the repo is the independent
+cluster). Most RQ2 hypotheses are claims about units, and that is where the sample is large. It
+informs a decision; it never makes one.
+
+INSTRUMENT CALIBRATION (gate on any future change to the primary outcome). Before altering how the
+primary metric is computed, `python3 harness/calibrate.py` must pass: it scores a known-correct
+synthetic decomposition and a set of degraded ones and asserts the score moves the right way
+(sensitivity) and does not move for a pure contract error (specificity). A metric change that
+breaks calibration is rejected regardless of its effect on real repos.
+
 ## Research questions
 
 RQ1 (exploratory) Under the baseline skill, which repo properties predict failure?

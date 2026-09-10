@@ -4,10 +4,11 @@
 # before/after comparisons are explicit:  runs/<repo>/<sha>/<skill_label>/<rep>/
 set -euo pipefail
 REPO="$1"; SHA="$2"; REP="${3:-0}"; shift 3
-MAX_TURNS=60; CONDITION=skill; HIDE_DOCS=0; MODEL="${LU_MODEL:-}"; STRATUM=unknown
+MAX_TURNS=60; CONDITION=skill; HIDE_DOCS=0; MODEL="${LU_MODEL:-}"; STRATUM=unknown; ABLATE=""
 while [ $# -gt 0 ]; do case "$1" in
   --max-turns) MAX_TURNS="$2"; shift 2;; --condition) CONDITION="$2"; shift 2;;
-  --hide-docs) HIDE_DOCS=1; shift;; --model) MODEL="$2"; shift 2;; --stratum) STRATUM="$2"; shift 2;; *) shift;; esac; done
+  --hide-docs) HIDE_DOCS=1; shift;; --model) MODEL="$2"; shift 2;; --stratum) STRATUM="$2"; shift 2;;
+  --ablate) ABLATE="$2"; shift 2;; *) shift;; esac; done
 
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
 NAME="${REPO#*/}"
@@ -26,6 +27,7 @@ if [ -n "$MODEL" ]; then
 fi
 [ "$CONDITION" = skill ] || SKILL_LABEL="${SKILL_LABEL}-${CONDITION}"
 [ "$HIDE_DOCS" = 1 ] && SKILL_LABEL="${SKILL_LABEL}-nodocs"
+[ -n "$ABLATE" ] && SKILL_LABEL="${SKILL_LABEL}-abl${ABLATE}"
 RUN="$HERE/runs/$NAME/$SHA/$SKILL_LABEL/$REP"
 if [ -f "$RUN/score.json" ]; then echo "have $RUN"; exit 0; fi
 mkdir -p "$RUN" "$OUT"; rm -f "$OUT/manifest.json" "$OUT/lint.log"
@@ -48,6 +50,22 @@ if [ "$CONDITION" = skill ]; then
   # Point the per-run copy of the skill at this run's output dir. The file in git is never
   # touched, so the instrument under study and overlay_hash are unchanged.
   [ "$OUT" = /out ] || sed -i "s#/out/#$OUT/#g" "$WORK/.claude/skills/lu-decompose/SKILL.md"
+  # Ablation (architecture.md change 3): remove ONE top-level section from the per-run copy to
+  # measure what part of the skill carries the effect. The tracked instrument is never touched;
+  # only this run's copy is edited, exactly like the /out sed above. Label records which section.
+  if [ -n "$ABLATE" ]; then
+    case "$ABLATE" in
+      definition)   HDR="## What a Logical Unit is";;
+      invariants)   HDR="## The five invariants";;
+      procedure)    HDR="## Procedure";;
+      antipatterns) HDR="## Anti-patterns";;
+      example)      HDR="## Worked example";;
+      budget)       HDR="## Budget";;
+      *) echo "run_one.sh: unknown --ablate section '$ABLATE'" >&2; exit 2;;
+    esac
+    SK="$WORK/.claude/skills/lu-decompose/SKILL.md"
+    awk -v hdr="$HDR" 'BEGIN{skip=0} /^## /{ if (index($0,hdr)==1){skip=1; next} else {skip=0} } skip!=1{print}' "$SK" > "$SK.abl" && mv "$SK.abl" "$SK"
+  fi
   PROMPT="/lu-decompose"
 else
   mkdir -p "$WORK/.claude"; cp "$HERE/overlay/.claude/settings.json" "$WORK/.claude/"; cp -r "$HERE/overlay/.claude/hooks" "$WORK/.claude/"; cp "$HERE/harness/resolver.py" "$WORK/.claude/hooks/"
@@ -74,6 +92,14 @@ set -e
 # Scoring it anyway consumes the (repo,label,rep) slot forever AND lands with run_error=false
 # and no subtype, i.e. indistinguishable from a model that genuinely produced zero units.
 # A run that really failed still writes JSON (error_max_turns, terminal_reason=api_error).
+# Distinguish an account usage/rate-limit death from a generic kill. The limit message lands on
+# stderr whether or not result.json was written; the driver (harness/sweep.sh) backs off and
+# retries a LIMITED slot, but only retries a killed slot a few times. Either way the slot is left
+# free (no score.json), so it never enters the record as a model data point.
+if grep -qiE 'usage limit|rate limit|429|quota exceeded|overloaded' "$RUN/stderr.log" 2>/dev/null; then
+  echo "LIMITED $RUN -- account usage/rate limit; slot left free for retry." >&2
+  exit 4
+fi
 if [ ! -s "$RUN/result.json" ]; then
   echo "ABORTED $RUN — CLI produced no result (killed, or the container died)." >&2
   echo "  Leaving the slot free: no score.json written." >&2
