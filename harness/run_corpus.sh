@@ -7,7 +7,7 @@ HERE="$(cd "$(dirname "$0")/.." && pwd)"
 REPS="0,1,2"; ONLY=""; PASS=(); SHARD=""
 while [ $# -gt 0 ]; do case "$1" in
   --reps) REPS="$2"; shift 2;; --only) ONLY="$2"; shift 2;; --shard) SHARD="$2"; shift 2;;
-  --max-turns|--condition|--model) PASS+=("$1" "$2"); shift 2;; --hide-docs) PASS+=("$1"); shift;; *) shift;; esac; done
+  --max-turns|--condition|--model|--ablate) PASS+=("$1" "$2"); shift 2;; --hide-docs) PASS+=("$1"); shift;; *) shift;; esac; done
 HOLD=$(grep -v '^#' "$HERE/harness/holdout.txt" 2>/dev/null | tr '\n' ' ')
 IDX=-1
 grep -v '^#' "$HERE/harness/corpus.txt" | while read -r repo sha stratum lang; do
