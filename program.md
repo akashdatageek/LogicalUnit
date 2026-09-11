@@ -61,6 +61,12 @@ singleton fraction) with a cluster-robust paired bootstrap over repos (the repo 
 cluster). Most RQ2 hypotheses are claims about units, and that is where the sample is large. It
 informs a decision; it never makes one.
 
+COST IN THE DECISION RECORD (notes/architecture.md change 6). `aggregate.py --decide` now reports
+cost/run before->after and the % change alongside every verdict, and `aggregate.py --budget` gives a
+per-repo token/cost rollup and a runs/week capacity figure. This is REPORTED, not gated: making an
+edit's cost increase flip a KEEP is a pre-registration change to this decision rule and is not in
+effect. Record the cost delta with each kept version.
+
 INSTRUMENT CALIBRATION (gate on any future change to the primary outcome). Before altering how the
 primary metric is computed, `python3 harness/calibrate.py` must pass: it scores a known-correct
 synthetic decomposition and a set of degraded ones and asserts the score moves the right way
