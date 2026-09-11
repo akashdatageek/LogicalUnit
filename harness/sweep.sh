@@ -19,10 +19,11 @@
 #                 [--condition ..] [--model ID] [--ablate SEC] [--hide-docs] [--max-turns N]
 set -uo pipefail    # deliberately NOT -e: one failed slot must not abort the sweep
 HERE="$(cd "$(dirname "$0")/.." && pwd)"
-REPS="0,1,2"; ONLY=""; PAR=1; MAX_RETRY=3; PASS=()
+REPS="0,1,2"; ONLY=""; PAR=1; MAX_RETRY=3; DEADLINE=0; PASS=()
 while [ $# -gt 0 ]; do case "$1" in
   --reps) REPS="$2"; shift 2;; --only) ONLY="$2"; shift 2;;
   --parallel) PAR="$2"; shift 2;; --retries) MAX_RETRY="$2"; shift 2;;
+  --deadline-min) DEADLINE="$2"; shift 2;;
   --max-turns|--condition|--model|--ablate) PASS+=("$1" "$2"); shift 2;;
   --hide-docs) PASS+=("$1"); shift;; *) shift;; esac; done
 
@@ -30,6 +31,7 @@ RUNNER="${LU_RUNNER:-$HERE/harness/run_one.sh}"      # overridable for testing t
 LEDGER="${LU_LEDGER:-$HERE/notes/sweep-ledger.tsv}"
 [ -f "$LEDGER" ] || printf 'utc\trepo\trep\toutcome\tattempts\tpass_args\n' > "$LEDGER"
 HOLD=$(grep -v '^#' "$HERE/harness/holdout.txt" 2>/dev/null | tr '\n' ' ')
+START=$(date +%s)
 
 ledger() {   # utc repo rep outcome attempts
   printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$(date -u +%FT%TZ)" "$1" "$2" "$3" "$4" "${PASS[*]:-}" >> "$LEDGER"
@@ -64,6 +66,11 @@ while read -r repo sha stratum lang; do
   [ -n "$ONLY" ] && ! grep -qw "$name" <<< "$ONLY" && continue
   if grep -qw "$name" <<< "$HOLD" && [ "${LU_HOLDOUT_OK:-0}" != 1 ]; then echo "skip $name: HOLDOUT"; continue; fi
   for r in ${REPS//,/ }; do
+    # Window budget: stop LAUNCHING new slots past the deadline (in-flight ones finish). sweep is
+    # resumable -- run_one.sh skips a slot with a score.json -- so the next window continues here.
+    if [ "$DEADLINE" -gt 0 ] && [ $(( ($(date +%s) - START) / 60 )) -ge "$DEADLINE" ]; then
+      echo "deadline ${DEADLINE}m reached; stopping new launches (resume next window)" >&2; break 2
+    fi
     run_slot "$repo" "$sha" "$r" &
     active=$((active+1))
     if [ "$active" -ge "$PAR" ]; then wait -n 2>/dev/null || wait; active=$((active-1)); fi
