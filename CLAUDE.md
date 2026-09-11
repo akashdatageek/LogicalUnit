@@ -25,12 +25,14 @@ is. Four of the seven current dev repos are in that state; treat them as control
     ./harness/pin_corpus.sh                               replace PIN_ME with HEAD shas (mechanical; allowed)
     ./harness/run_one.sh <owner/name> <sha> <rep> [--condition noskill] [--hide-docs] [--ablate SECTION]
     ./harness/run_corpus.sh [--reps 0,1,2] [--only a,b] [--condition ..] [--hide-docs] [--ablate SECTION]
-    ./harness/sweep.sh [--reps ..] [--only ..] [--parallel N] [--retries K] [..]   resumable, limit-aware driver; writes notes/sweep-ledger.tsv
+    ./harness/sweep.sh [--reps ..] [--only ..] [--parallel N] [--retries K] [--deadline-min M] [..]   resumable, limit-aware driver; writes notes/sweep-ledger.tsv
+    ./harness/night_sweep.sh [--window-min M] [sweep args]   one usage-window's worth, then stop cleanly (schedule per window externally)
     ./harness/ablation_sweep.sh [reps] [repos]            full skill vs each single-section ablation vs bare prompt
     python3 harness/aggregate.py [--label <sha>]          per-repo table, corpus primaries
     python3 harness/aggregate.py --decide <before> <after> KEEP/REVERT — final, not advisory
     python3 harness/aggregate.py --decide-transfer <before> <after> --models m1,m2   KEEP only if it holds on every model
     python3 harness/units.py [--label <sha>] | --decide <before> <after>   unit-level analysis (~200 units, not ~16 runs)
+    python3 harness/aggregate.py --budget [--label <sha>] [--weekly-tokens N]   per-repo token/cost rollup + runs/week capacity
     python3 harness/aggregate.py --tsv >> results.tsv     one row per kept skill version
     python3 harness/rescore.py [--apply]                  re-score runs in place after a scorer change (backfills per-unit records)
 

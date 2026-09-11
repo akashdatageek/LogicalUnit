@@ -57,6 +57,7 @@ def summarise(per):
             ep_r=mean(x['entrypoint_r'] for x in S if x.get('entrypoint_r') is not None) if any(x.get('entrypoint_r') is not None for x in S) else None,
             ef_r=mean(x['effects_r'] for x in S if x.get('effects_r') is not None) if any(x.get('effects_r') is not None for x in S) else None,
             units=mean(x['n_units'] for x in S), cost=mean(x['cost_usd'] or 0 for x in S),
+            tokens=mean((x.get('input_tokens') or 0)+(x.get('output_tokens') or 0) for x in S),
             exhausted=sum(x['budget_exhausted'] for x in S), jaccard=jac,
             md=any(r['meta'].get('has_claude_md') for r in runs), cond=runs[0]['meta'].get('condition','skill'),
             stratum=runs[0]['meta'].get('stratum','unknown')))
@@ -95,8 +96,16 @@ def _decide_core(before, after, alpha=0.10, boot=5000):
     means.sort(); lo, hi = means[int(alpha/2*boot)], means[int((1-alpha/2)*boot)-1]
     obs = mean(deltas)
     verdict = 'KEEP' if lo > 0 else 'REVERT'
-    return dict(verdict=verdict, n_repos=len(common),
-                line=f"{verdict}  delta_gain={obs:+.4f}  {int((1-alpha)*100)}%CI=[{lo:+.4f},{hi:+.4f}]  validity {va:.2f}->{vb:.2f}  n_repos={len(common)}")
+    # cost/latency in the decision record (notes/architecture.md change 6): reported alongside the
+    # verdict so a quality gain that doubles tokens is visible. It is REPORTED, not gated -- turning
+    # it into a gate changes the KEEP rule and is a pre-registration decision, not done here.
+    cost_a = mean(ra[k]['cost'] for k in common); cost_b = mean(rb[k]['cost'] for k in common)
+    dpct = (cost_b - cost_a) / cost_a * 100 if cost_a else 0.0
+    cost_note = f"  cost/run ${cost_a:.2f}->${cost_b:.2f} ({dpct:+.0f}%)"
+    if dpct > 25: cost_note += " [>+25%: reported, does NOT gate the verdict]"
+    return dict(verdict=verdict, n_repos=len(common), cost_before=cost_a, cost_after=cost_b, cost_pct=dpct,
+                line=(f"{verdict}  delta_gain={obs:+.4f}  {int((1-alpha)*100)}%CI=[{lo:+.4f},{hi:+.4f}]  "
+                      f"validity {va:.2f}->{vb:.2f}  n_repos={len(common)}" + cost_note))
 
 def decide(before, after, alpha=0.10, boot=5000):
     print(_decide_core(before, after, alpha, boot)['line'])
@@ -122,6 +131,25 @@ def decide_transfer(before, after, models, alpha=0.10, boot=5000):
     print(f"\nTRANSFER {overall}  ({n_keep}/{len(results)} models KEEP)  "
           f"-- KEEP requires all {len(results)} models")
 
+def budget(label=None, reps=None, weekly_tokens=None):
+    """Per-repo token/cost rollup + capacity. `log tokens per repo; after N repos you know how many
+    runs per week the plan supports` -- and that number is itself a thesis-relevant cost figure."""
+    per = load(label, reps); rows = summarise(per)
+    if not rows: print('no runs'); return
+    tot_tok = sum(r['tokens']*r['n'] for r in rows); tot_cost = sum(r['cost']*r['n'] for r in rows)
+    n_runs = sum(r['n'] for r in rows)
+    print(f"{'repo':20}{'runs':>6}{'tok/run':>10}{'$/run':>8}{'tot tok':>12}{'tot $':>8}")
+    for r in sorted(rows, key=lambda x: -x['tokens']):
+        print(f"{r['repo']:20}{r['n']:>6}{r['tokens']:>10.0f}{r['cost']:>8.2f}{r['tokens']*r['n']:>12.0f}{r['cost']*r['n']:>8.2f}")
+    mean_tok = tot_tok / n_runs if n_runs else 0
+    print(f"\n{'TOTAL':20}{n_runs:>6}{mean_tok:>10.0f}{tot_cost/n_runs if n_runs else 0:>8.2f}{tot_tok:>12.0f}{tot_cost:>8.2f}")
+    if weekly_tokens and mean_tok:
+        print(f"\nAt {weekly_tokens:,} tokens/week and {mean_tok:,.0f} tokens/run, the plan supports "
+              f"~{weekly_tokens/mean_tok:.0f} runs/week "
+              f"(~{weekly_tokens/mean_tok/3:.0f} repos/week at 3 replicates).")
+    else:
+        print(f"\nmean {mean_tok:,.0f} tokens/run. Pass --weekly-tokens N to get runs/week under the plan.")
+
 def n_dev():
     """Number of pinned, non-holdout repos in corpus.txt (for the Phase-2 gate)."""
     c = HERE/'harness'/'corpus.txt'
@@ -138,6 +166,11 @@ def n_dev():
 def main():
     a = sys.argv[1:]
     if a and a[0] == '--n-dev': print(n_dev()); return
+    if a and a[0] == '--budget':
+        label = a[a.index('--label')+1] if '--label' in a else None
+        reps = set(a[a.index('--rep')+1].split(',')) if '--rep' in a else None
+        wk = int(a[a.index('--weekly-tokens')+1].replace(',','')) if '--weekly-tokens' in a else None
+        return budget(label, reps, wk)
     if a and a[0] == '--decide':
         alpha = float(a[a.index('--alpha')+1]) if '--alpha' in a else 0.10
         boot = int(a[a.index('--boot')+1]) if '--boot' in a else 5000
@@ -161,10 +194,10 @@ def main():
     strata = sorted({r['stratum'] for r in rows})
     if len(strata) > 1:
         print("per stratum:  " + "   ".join(f"{st}: valid {mean(r['valid'] for r in rows if r['stratum']==st):.2f} gain {mean(r['gain'] for r in rows if r['stratum']==st):+.3f} (n={sum(1 for r in rows if r['stratum']==st)})" for st in strata) + "\n")
-    print(f"{'repo':20}{'n':>3}{'valid':>7}{'gain':>8}{'cochg':>8}{'gold':>7}{'cov':>6}{'edge':>6}{'ep_r':>6}{'ef_r':>6}{'units':>6}{'jac':>6}{'exh':>4}{'$':>6}  md cond")
+    print(f"{'repo':20}{'n':>3}{'valid':>7}{'gain':>8}{'cochg':>8}{'gold':>7}{'cov':>6}{'edge':>6}{'ep_r':>6}{'ef_r':>6}{'units':>6}{'jac':>6}{'exh':>4}{'$':>6}{'tok/k':>7}  md cond")
     for r in rows:
         f = lambda v, w: f"{v:>{w}.3f}" if v is not None else f"{'-':>{w}}"
         print(f"{r['repo']:20}{r['n']:>3}{r['valid']:>7.2f}{r['gain']:>+8.3f}{f(r['cochange'],8)}{f(r['gold'],7)}{r['coverage']:>6.2f}{r['edge']:>6.2f}{f(r['ep_r'],6)}{f(r['ef_r'],6)}"
-              f"{r['units']:>6.1f}{f(r['jaccard'],6)}{r['exhausted']:>4}{r['cost']:>6.2f}  {'y' if r['md'] else '-'}  {r['cond']}")
+              f"{r['units']:>6.1f}{f(r['jaccard'],6)}{r['exhausted']:>4}{r['cost']:>6.2f}{r['tokens']/1000:>7.0f}  {'y' if r['md'] else '-'}  {r['cond']}")
 
 if __name__ == '__main__': main()

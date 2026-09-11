@@ -22,11 +22,20 @@ action). Each was validated before commit.
 | 4 transfer in KEEP | DONE | `aggregate.py --decide-transfer`; pre-registered in `program.md` | requires the CI to exclude zero on every model; smoke-tested on the two-model ripgrep labels |
 | 5 operational fragility | DONE | `run_one.sh` exit-4 classifies a usage/rate-limit death; `harness/sweep.sh` is resumable, bounded-parallel, retries killed/limited slots, and writes `notes/sweep-ledger.tsv` so lost runs are visible | orchestration tested with a stub runner; ledger records done / FAILED-killed / FAILED-limit |
 
-Still open and deliberately NOT done here: change 6 (cost in the decision record) and change 7's
-human-anchor point — there is still no gold decomposition judged by a person, so every outcome
-remains a proxy. Patch 05 (the account API key) is environment-only and cannot be set from the
-harness; `sweep.sh` makes the limit survivable rather than removing it. Changing the PRIMARY metric
-itself is still a pre-registration decision reserved for the human and is untouched here.
+Change 6 (cost in the decision record) is now half done: `aggregate.py --decide` reports cost/run
+before->after with every verdict, `aggregate.py --budget` gives a per-repo token/cost rollup and a
+runs/week capacity figure, and the run table carries a tok/k column. The cost is REPORTED, not
+gated — turning a cost increase into a KEEP-flipping gate is a pre-registration change to the
+decision rule and is deliberately left off. Overnight throughput (efficiency, not a change to what
+is measured): `sweep.sh --deadline-min` time-boxes a window and `harness/night_sweep.sh` runs one
+usage-window's worth and stops, so an external per-window scheduler spreads the corpus across the
+free overnight windows a serial run would waste.
+
+Still open and deliberately NOT done: the cost GATE half of change 6, and change 7's human-anchor
+point — there is still no gold decomposition judged by a person, so every outcome remains a proxy.
+Patch 05 (the account API key) is environment-only and cannot be set from the harness; `sweep.sh`
+makes the limit survivable rather than removing it. Changing the PRIMARY metric itself is still a
+pre-registration decision reserved for the human and is untouched here.
 
 ---
 
